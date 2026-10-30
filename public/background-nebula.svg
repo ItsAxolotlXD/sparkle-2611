@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="100%" height="100%" preserveAspectRatio="none">
+  <defs>
+    <!-- Background Base -->
+    <linearGradient id="base-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#120713"/>
+      <stop offset="100%" stop-color="#0a040b"/>
+    </linearGradient>
+
+    <!-- Top-Left Crimson / Magenta Wine Nebula Glow -->
+    <radialGradient id="glow-magenta" cx="7%" cy="17%" r="52%" fx="7%" fy="17%">
+      <stop offset="0%" stop-color="#881242" stop-opacity="0.82"/>
+      <stop offset="25%" stop-color="#640e32" stop-opacity="0.55"/>
+      <stop offset="55%" stop-color="#2d0818" stop-opacity="0.22"/>
+      <stop offset="85%" stop-color="#120713" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Upper-Center Ethereal Violet / Purple Nebula Glow -->
+    <radialGradient id="glow-purple" cx="38%" cy="32%" r="48%" fx="38%" fy="32%">
+      <stop offset="0%" stop-color="#8426d0" stop-opacity="0.45"/>
+      <stop offset="38%" stop-color="#5a189a" stop-opacity="0.24"/>
+      <stop offset="70%" stop-color="#120713" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Bottom-Left Deep Violet / Plum Glow -->
+    <radialGradient id="glow-plum" cx="12%" cy="82%" r="46%" fx="12%" fy="82%">
+      <stop offset="0%" stop-color="#702082" stop-opacity="0.68"/>
+      <stop offset="35%" stop-color="#3d1047" stop-opacity="0.35"/>
+      <stop offset="75%" stop-color="#120713" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Bottom-Right Royal Navy / Cobalt Nebula Glow -->
+    <radialGradient id="glow-blue" cx="91%" cy="72%" r="52%" fx="91%" fy="72%">
+      <stop offset="0%" stop-color="#1c336b" stop-opacity="0.75"/>
+      <stop offset="28%" stop-color="#14244d" stop-opacity="0.48"/>
+      <stop offset="60%" stop-color="#0d142b" stop-opacity="0.18"/>
+      <stop offset="90%" stop-color="#120713" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="100%" height="100%" fill="url(#base-bg)"/>
+  <rect width="100%" height="100%" fill="url(#glow-magenta)"/>
+  <rect width="100%" height="100%" fill="url(#glow-purple)"/>
+  <rect width="100%" height="100%" fill="url(#glow-plum)"/>
+  <rect width="100%" height="100%" fill="url(#glow-blue)"/>
+</svg>

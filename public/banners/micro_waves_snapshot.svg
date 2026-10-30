@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 200" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgLightWave" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="50%" stop-color="#fdf2f8"/>
+      <stop offset="100%" stop-color="#fce7f3"/>
+    </linearGradient>
+    <linearGradient id="pinkWaveGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#ec4899"/>
+      <stop offset="100%" stop-color="#e11d48"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="400" height="200" fill="url(#bgLightWave)"/>
+
+  <!-- Concentric radiating rings -->
+  <g fill="none" stroke="#f472b6" opacity="0.35" stroke-width="14">
+    <circle cx="105" cy="100" r="45" />
+    <circle cx="105" cy="100" r="75" />
+    <circle cx="105" cy="100" r="105" />
+    <circle cx="105" cy="100" r="135" />
+    <circle cx="105" cy="100" r="165" />
+  </g>
+  <g fill="none" stroke="#f472b6" opacity="0.35" stroke-width="14">
+    <circle cx="310" cy="100" r="55" />
+    <circle cx="310" cy="100" r="95" />
+    <circle cx="310" cy="100" r="135" />
+  </g>
+
+  <!-- Waves Logo -->
+  <g transform="translate(90, 60)">
+    <!-- stylized wavy icon -->
+    <path d="M 15 35 C 10 20, 25 15, 35 25 C 45 35, 60 20, 55 10 C 45 0, 20 5, 10 20 C 0 35, 15 50, 30 45" fill="none" stroke="url(#pinkWaveGrad)" stroke-width="6" stroke-linecap="round"/>
+    
+    <!-- waves wordmark -->
+    <text x="65" y="38" font-family="'Segoe UI', system-ui, sans-serif" font-size="34" font-weight="800" fill="#db2777" letter-spacing="-1">waves</text>
+    
+    <!-- subtitle -->
+    <g transform="translate(68, 52)">
+      <polygon points="0,0 8,4 0,8" fill="#db2777"/>
+      <text x="14" y="7" font-family="'Segoe UI', system-ui, sans-serif" font-size="9.5" font-weight="600" fill="#6b7280" letter-spacing="0.2">Nhịp sống lưu dấu thời đại</text>
+    </g>
+  </g>
+</svg>

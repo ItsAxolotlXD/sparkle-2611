@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 200" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgVtv1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#18181b"/>
+      <stop offset="100%" stop-color="#09090b"/>
+    </linearGradient>
+    <linearGradient id="redG1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ff3b30"/>
+      <stop offset="100%" stop-color="#b91c1c"/>
+    </linearGradient>
+    <linearGradient id="greenG1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#34c759"/>
+      <stop offset="100%" stop-color="#15803d"/>
+    </linearGradient>
+    <linearGradient id="blueG1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#007aff"/>
+      <stop offset="100%" stop-color="#1d4ed8"/>
+    </linearGradient>
+    <filter id="gloss1">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000" flood-opacity="0.8"/>
+    </filter>
+  </defs>
+
+  <rect width="400" height="200" fill="url(#bgVtv1)"/>
+  
+  <g transform="translate(15, 10) scale(0.62)" filter="url(#gloss1)">
+    <!-- V (Red) -->
+    <path d="M 80 40 L 140 40 L 80 260 L 20 260 Z" fill="url(#redG1)" stroke="#ffffff" stroke-width="5" stroke-linejoin="round" />
+    
+    <!-- T (Green) -->
+    <path d="M 110 40 L 290 40 L 265 115 L 225 115 L 195 260 L 135 260 L 165 115 L 125 115 Z" fill="url(#greenG1)" stroke="#ffffff" stroke-width="5" stroke-linejoin="round" />
+    
+    <!-- V (Blue) -->
+    <path d="M 260 40 L 320 40 L 260 260 L 200 260 Z" fill="url(#blueG1)" stroke="#ffffff" stroke-width="5" stroke-linejoin="round" />
+
+    <!-- 1 (Red) -->
+    <path d="M 330 90 L 370 40 L 430 40 L 360 260 L 305 260 L 350 115 L 320 125 Z" fill="url(#redG1)" stroke="#ffffff" stroke-width="5" stroke-linejoin="round" />
+  </g>
+</svg>

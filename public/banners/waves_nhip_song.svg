@@ -1,0 +1,91 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080">
+  <defs>
+    <!-- Background Gradient -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#241e2b"/>
+      <stop offset="50%" stop-color="#18151f"/>
+      <stop offset="100%" stop-color="#0f0d14"/>
+    </linearGradient>
+
+    <!-- Wave Rings Gradients -->
+    <linearGradient id="waveGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#C026D3"/>
+      <stop offset="50%" stop-color="#9333EA"/>
+      <stop offset="100%" stop-color="#4F46E5"/>
+    </linearGradient>
+
+    <linearGradient id="waveGrad2" x1="100%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#EC4899"/>
+      <stop offset="50%" stop-color="#A855F7"/>
+      <stop offset="100%" stop-color="#6366F1"/>
+    </linearGradient>
+
+    <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FF3366"/>
+      <stop offset="50%" stop-color="#E6005A"/>
+      <stop offset="100%" stop-color="#9333EA"/>
+    </linearGradient>
+
+    <!-- Ambient Glow Filter -->
+    <filter id="waveGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="35" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+    <filter id="textGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="10" stdDeviation="20" flood-color="#000000" flood-opacity="0.8"/>
+    </filter>
+  </defs>
+
+  <!-- Background base -->
+  <rect width="1920" height="1080" fill="url(#bgGrad)"/>
+
+  <!-- Right Side Concentric Wave Arcs -->
+  <g transform="translate(1480, 540)">
+    <!-- Ambient Radial Bloom behind rings -->
+    <circle r="460" fill="#9333EA" opacity="0.18" filter="url(#waveGlow)"/>
+    <circle r="260" fill="#E6005A" opacity="0.14" filter="url(#waveGlow)"/>
+
+    <!-- Dynamic Thick Concentric Wave Bands -->
+    <circle r="720" fill="none" stroke="url(#waveGrad1)" stroke-width="70" opacity="0.35"/>
+    <circle r="560" fill="none" stroke="url(#waveGrad2)" stroke-width="65" opacity="0.55"/>
+    <circle r="410" fill="none" stroke="url(#waveGrad1)" stroke-width="58" opacity="0.75"/>
+    <circle r="270" fill="none" stroke="url(#waveGrad2)" stroke-width="50" opacity="0.9"/>
+    <circle r="140" fill="none" stroke="url(#waveGrad1)" stroke-width="38" opacity="0.95"/>
+    <circle r="40" fill="#FFFFFF" opacity="0.95"/>
+  </g>
+
+  <!-- Left Side Content: Brand Logo & Typography -->
+  <g transform="translate(160, 410)" filter="url(#textGlow)">
+    <!-- Waves Stylized Logo Symbol -->
+    <g transform="translate(0, -110)">
+      <!-- Broadcast Arcs above V -->
+      <path d="M 68,-30 A 75 75 0 0 1 142,-30" fill="none" stroke="url(#logoGrad)" stroke-width="8" stroke-linecap="round"/>
+      <path d="M 52,-48 A 95 95 0 0 1 158,-48" fill="none" stroke="url(#logoGrad)" stroke-width="8" stroke-linecap="round" opacity="0.8"/>
+      <path d="M 36,-66 A 115 115 0 0 1 174,-66" fill="none" stroke="url(#logoGrad)" stroke-width="8" stroke-linecap="round" opacity="0.6"/>
+
+      <!-- Stylized V lettermark -->
+      <path d="M 58,-12 L 105,78 L 152,-12 L 126,-12 L 105,40 L 84,-12 Z" fill="url(#logoGrad)"/>
+      <text x="175" y="60" font-family="'Inter', -apple-system, system-ui, sans-serif" font-weight="900" font-size="82" fill="#FFFFFF" letter-spacing="4">
+        WAVES
+      </text>
+    </g>
+
+    <!-- Main Slogan: Nhịp sóng lưu dấu thời đại -->
+    <g transform="translate(0, 75)">
+      <text x="0" y="70" font-family="'Inter', -apple-system, system-ui, sans-serif" font-weight="900" font-size="88" fill="#FFFFFF" letter-spacing="-1">
+        Nhịp sóng lưu dấu thời đại
+      </text>
+      <text x="4" y="145" font-family="'Inter', -apple-system, system-ui, sans-serif" font-weight="600" font-size="32" fill="#D8B4FE" letter-spacing="4">
+        NƠI MỖI NHỊP SÓNG ĐI QUA, MỘT DẤU ẤN Ở LẠI
+      </text>
+    </g>
+
+    <!-- Category Pill Badge -->
+    <g transform="translate(0, 310)">
+      <rect width="270" height="52" rx="26" fill="rgba(230, 0, 90, 0.2)" stroke="rgba(230, 0, 90, 0.5)" stroke-width="2"/>
+      <text x="135" y="34" text-anchor="middle" font-family="'Inter', -apple-system, system-ui, sans-serif" font-weight="800" font-size="19" fill="#FF4D8B" letter-spacing="2">
+        KHÔNG GIAN TRUYỀN THÔNG
+      </text>
+    </g>
+  </g>
+</svg>

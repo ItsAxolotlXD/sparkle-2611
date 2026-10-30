@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="vi" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script>
+      (function() {
+        try {
+          var saved = localStorage.getItem('waves_system_settings');
+          var fontScaleMap = ['0.78', '0.88', '1', '1.12', '1.24'];
+          var scaleIdx = 2; // Default: Trung bình (1)
+          if (saved) {
+            var parsed = JSON.parse(saved);
+            if (typeof parsed.fontScale === 'number') {
+              scaleIdx = parsed.fontScale;
+              if (parsed.fontScaleVersion !== 2) {
+                if (scaleIdx === 1) scaleIdx = 2;
+                else if (scaleIdx === 0) scaleIdx = 1;
+                else if (scaleIdx === 2) scaleIdx = 3;
+                else if (scaleIdx === 3) scaleIdx = 4;
+                else scaleIdx = 2;
+              }
+            }
+          }
+          var scaleVal = fontScaleMap[scaleIdx] || '1';
+          document.documentElement.style.setProperty('--waves-font-scale', scaleVal);
+
+          // Fluent Design on by default (shiny outline and heavy spatial glass removed)
+          document.documentElement.classList.add('no-shiny-outline', 'fluent-design');
+          if (saved) {
+            try {
+              var s = JSON.parse(saved);
+              var isAcrylicActive = s.spatialGlass !== false;
+              var acrylicOpacity = typeof s.spatialGlassOpacity === 'number' ? s.spatialGlassOpacity : 20;
+              if (isAcrylicActive && acrylicOpacity < 40) {
+                document.documentElement.classList.add('spatial-glass-under-40');
+              } else {
+                document.documentElement.classList.remove('spatial-glass-under-40');
+              }
+              if (isAcrylicActive && acrylicOpacity > 40) {
+                document.documentElement.classList.add('spatial-glass-dark-content');
+              } else {
+                document.documentElement.classList.remove('spatial-glass-dark-content');
+              }
+            } catch(e) {}
+          }
+
+          // Default to dark mode (user preference: dark mode là chế độ giao diện mặc định)
+          var theme = 'dark';
+          if (saved) {
+            try {
+              var ts = JSON.parse(saved);
+              if (ts.themeVersion === 2) {
+                if (ts.theme === 'light') theme = 'light';
+                else theme = 'dark';
+              } else {
+                theme = 'dark';
+              }
+            } catch(e) {}
+          }
+          if (theme === 'light') {
+            document.documentElement.classList.add('light-mode');
+            document.documentElement.classList.remove('dark');
+          } else {
+            document.documentElement.classList.remove('light-mode');
+            document.documentElement.classList.add('dark');
+          }
+        } catch(e) {
+          document.documentElement.classList.remove('light-mode');
+          document.documentElement.classList.add('dark');
+        }
+      })();
+    </script>
+    <title>fluent</title>
+    <meta name="description" content="Nền tảng cộng đồng dành cho những người yêu thích, theo dõi và lưu trữ nội dung về truyền hình Việt Nam với giao diện streaming hiện đại." />
+    <link rel="icon" type="image/png" href="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-iTzEG0iuHLTKbWp5e2y55NABj3UWZr.png" />
+    <link rel="apple-touch-icon" href="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-iTzEG0iuHLTKbWp5e2y55NABj3UWZr.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400;1,600;1,700&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Roboto:ital,wght@0,300;0,400;0,500;0,700;1,400;1,700&display=swap" rel="stylesheet">
+    <meta property="og:title" content="fluent" />
+    <meta property="og:description" content="Nền tảng cộng đồng dành cho những người yêu thích, theo dõi và lưu trữ nội dung về truyền hình Việt Nam với giao diện streaming hiện đại." />
+    <meta property="og:image" content="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-iTzEG0iuHLTKbWp5e2y55NABj3UWZr.png" />
+    <meta name="twitter:image" content="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-iTzEG0iuHLTKbWp5e2y55NABj3UWZr.png" />
+    <link rel="image_src" href="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-iTzEG0iuHLTKbWp5e2y55NABj3UWZr.png" />
+    <meta property="og:type" content="website" />
+  </head>
+  <body class="bg-[#202020] min-h-screen text-[#F3F4F6] antialiased selection:bg-[#d946ef] selection:text-white dark:selection:bg-[#ff2d92] dark:selection:text-white" style="font-family: 'Segoe UI Variable Display', 'Segoe UI Variable Text', 'Segoe UI Variable', 'Segoe UI', 'Be Vietnam Pro', 'Inter', system-ui, -apple-system, sans-serif;">
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
+
