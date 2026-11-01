@@ -15,6 +15,7 @@ import { FindWordsBar } from './components/FindWordsBar';
 import { AddStreamModal } from './components/AddStreamModal';
 import { TextToSpeechPlayer } from './components/TextToSpeechPlayer';
 import { SplashScreen } from './components/SplashScreen';
+import { SparkleOOBE } from './components/SparkleOOBE';
 import { SPINNING_RING_GIF_LOOP_DURATION_MS } from './components/SpinningRing';
 import { AnimatedBootScreen } from './components/AnimatedBootScreen';
 import { NativeKeyboard } from './components/NativeKeyboard';
@@ -153,6 +154,13 @@ export default function App() {
   }, [currentChannel]);
 
   // Modals state
+  const [isOobeOpen, setIsOobeOpen] = useState<boolean>(() => {
+    try {
+      return !localStorage.getItem('sparkle_oobe_completed');
+    } catch {
+      return false;
+    }
+  });
   const [isWelcomeModalOpen, setIsWelcomeModalOpen] = useState(false);
   const [isBootVideoFinished, setIsBootVideoFinished] = useState(() => !settings.animatedBootScreen);
   const [isSplashFinished, setIsSplashFinished] = useState(false);
@@ -727,6 +735,7 @@ export default function App() {
             onOpenUpdate={() => setIsUpdating(true)}
             onOpenOfficeTool={handleOpenOfficeTool}
             navigate={navigate}
+            onRestartOobe={() => setIsOobeOpen(true)}
           />
         );
 
@@ -1052,7 +1061,7 @@ export default function App() {
       )}
 
       {/* Startup splash waits for two full progress GIF loops after the boot video. */}
-      {isBootVideoFinished && !isSplashFinished && (
+      {isBootVideoFinished && !isSplashFinished && !isOobeOpen && (
         <SplashScreen
           duration={SPINNING_RING_GIF_LOOP_DURATION_MS * 2}
           ringSize={60}
@@ -1060,6 +1069,16 @@ export default function App() {
           onFinish={() => setIsSplashFinished(true)}
         />
       )}
+
+      {/* Sparkle Out of Box Experience (OOBE) Setup Wizard */}
+      <SparkleOOBE
+        isOpen={isOobeOpen}
+        onComplete={() => {
+          setIsOobeOpen(false);
+          setIsSplashFinished(true);
+        }}
+        navigate={navigate}
+      />
 
       {/* Update Sparkle Splash Screen (1 minute: 60s) */}
       {isUpdating && (

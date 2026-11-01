@@ -62,6 +62,7 @@ interface SettingsProps {
   onOpenUpdate?: () => void;
   onOpenOfficeTool?: (tool: string) => void;
   navigate?: (route: string) => void;
+  onRestartOobe?: () => void;
 }
 
 // Staggered slide up variant for cascading entrance animation matching sidebar context menu
@@ -82,7 +83,8 @@ export const Settings: React.FC<SettingsProps> = ({
   searchQuery = '',
   onOpenUpdate,
   onOpenOfficeTool,
-  navigate
+  navigate,
+  onRestartOobe
 }) => {
   const { 
     draftSettings, 
@@ -1509,6 +1511,34 @@ export const Settings: React.FC<SettingsProps> = ({
                       className="px-4 py-1.5 rounded-[6px] font-normal text-white bg-[#005fb8] dark:bg-[#4cc2ff] hover:bg-[#0067c0] dark:hover:bg-[#6bd0ff] dark:text-black transition-colors text-xs flex items-center justify-center shrink-0 shadow-xs tracking-tight text-center select-none border-none cursor-pointer"
                     >
                       <span className="light-mode-white-label">Recover</span>
+                    </button>
+                  </motion.div>
+                )}
+
+                {/* 5. Restart Out of Box Experience */}
+                {matchesSearch(['Restart Out of Box Experience', 'Out of Box Experience', 'OOBE', 'Setup Wizard', 'cài đặt ban đầu', 'khoi dong lai oobe']) && (
+                  <motion.div variants={slideUpVariant} initial="hidden" animate="visible" custom={elementIndex++} className="settings-block-card rounded-[6px] bg-white dark:bg-[#2c3037] shadow-xs p-4 sm:p-4.5 flex items-center justify-between gap-3 hover:bg-black/[0.02] dark:hover:bg-[#363b43] transition-colors border-none">
+                    <div>
+                      <div className="font-normal text-[#111827] dark:text-white text-xs sm:text-sm">Restart Out of Box Experience</div>
+                      <div className="text-[11px] sm:text-xs text-[#9CA3AF] mt-0.5 leading-normal">
+                        Launch the initial Sparkle Setup Wizard and welcome onboarding sequence again.
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        try {
+                          localStorage.removeItem('sparkle_oobe_completed');
+                        } catch {}
+                        if (onRestartOobe) {
+                          onRestartOobe();
+                        } else {
+                          window.location.reload();
+                        }
+                      }}
+                      className="px-4 py-1.5 rounded-[6px] font-normal text-white bg-[#005fb8] dark:bg-[#4cc2ff] hover:bg-[#0067c0] dark:hover:bg-[#6bd0ff] dark:text-black transition-colors text-xs flex items-center justify-center shrink-0 shadow-xs tracking-tight text-center select-none border-none cursor-pointer"
+                    >
+                      <span className="light-mode-white-label">Restart</span>
                     </button>
                   </motion.div>
                 )}

@@ -214,6 +214,25 @@ html.light-mode ::-moz-selection,
     overflow-x: hidden;
     min-height: 100vh;
   }
+
+  /* Suppress default browser scrollbar on containers with custom native scrollbar */
+  [data-winui-scroll="true"]::-webkit-scrollbar,
+  .winui-scrollbar-none::-webkit-scrollbar,
+  [style*="scrollbar-width: none"]::-webkit-scrollbar,
+  [style*="scrollbarWidth: none"]::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+  }
+
+  /* OOBE Greeting sequence text strictly uses regular (normal) font-weight */
+  .oobe-regular-text,
+  .oobe-regular-text *,
+  .oobe-regular-heading,
+  .oobe-regular-heading * {
+    font-weight: 400 !important;
+    letter-spacing: normal !important;
+  }
 }
 
 /* WinUI 3 page theme tokens */
