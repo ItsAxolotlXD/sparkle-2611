@@ -116,6 +116,7 @@ export const SparkleRecoveryModal: React.FC<SparkleRecoveryModalProps> = ({
         clearInterval(interval);
         // Reset all options to default values
         try {
+          localStorage.removeItem('sparkle_oobe_completed');
           localStorage.removeItem('waves_sidebar_collapsed');
           localStorage.removeItem('vplay_recent_channel_id');
           localStorage.removeItem('vplay_font_size');
@@ -231,13 +232,13 @@ export const SparkleRecoveryModal: React.FC<SparkleRecoveryModalProps> = ({
           className="fixed inset-0 bg-black/70 backdrop-blur-[2px]"
         />
 
-        {/* Windows Blue Dialog Frame (#0078d7) - Static frame with NO animation */}
+        {/* Dark Grey Dialog Frame (#2b2f36) - Static frame with NO animation */}
         <div
           role="dialog"
           aria-modal="true"
-          className="relative z-10 w-full max-w-[620px] bg-[#0078d7] text-white rounded-none px-6 py-5 sm:px-8 sm:py-6 shadow-[0_24px_64px_rgba(0,0,0,0.85)] select-text border-none"
+          className="relative z-10 w-full max-w-[620px] bg-[#2b2f36] text-white rounded-[10px] px-6 py-5 sm:px-8 sm:py-6 shadow-[0_24px_64px_rgba(0,0,0,0.85)] select-text border border-white/10"
           style={{
-            backgroundColor: '#0078d7',
+            backgroundColor: '#2b2f36',
             fontFamily: "'Segoe UI Variable Text', 'Segoe UI', system-ui, sans-serif"
           }}
         >
@@ -387,7 +388,7 @@ export const SparkleRecoveryModal: React.FC<SparkleRecoveryModalProps> = ({
                             }`}
                           >
                             {reasonBug && (
-                              <svg viewBox="0 0 16 16" className="w-3.5 h-3.5 fill-[#0078d7]" aria-hidden="true">
+                              <svg viewBox="0 0 16 16" className="w-3.5 h-3.5 fill-[#2b2f36]" aria-hidden="true">
                                 <path d="M13.485 3.429a1 1 0 0 1 .086 1.411l-7 8a1 1 0 0 1-1.474.025l-3.5-3.75a1 1 0 1 1 1.45-1.38l2.748 2.944 6.279-7.174a1 1 0 0 1 1.411-.076z" />
                               </svg>
                             )}
@@ -433,7 +434,7 @@ export const SparkleRecoveryModal: React.FC<SparkleRecoveryModalProps> = ({
                             }`}
                           >
                             {reasonDefaults && (
-                              <svg viewBox="0 0 16 16" className="w-3.5 h-3.5 fill-[#0078d7]" aria-hidden="true">
+                              <svg viewBox="0 0 16 16" className="w-3.5 h-3.5 fill-[#2b2f36]" aria-hidden="true">
                                 <path d="M13.485 3.429a1 1 0 0 1 .086 1.411l-7 8a1 1 0 0 1-1.474.025l-3.5-3.75a1 1 0 1 1 1.45-1.38l2.748 2.944 6.279-7.174a1 1 0 0 1 1.411-.076z" />
                               </svg>
                             )}
@@ -459,7 +460,7 @@ export const SparkleRecoveryModal: React.FC<SparkleRecoveryModalProps> = ({
                             }`}
                           >
                             {reasonOther && (
-                              <svg viewBox="0 0 16 16" className="w-3.5 h-3.5 fill-[#0078d7]" aria-hidden="true">
+                              <svg viewBox="0 0 16 16" className="w-3.5 h-3.5 fill-[#2b2f36]" aria-hidden="true">
                                 <path d="M13.485 3.429a1 1 0 0 1 .086 1.411l-7 8a1 1 0 0 1-1.474.025l-3.5-3.75a1 1 0 1 1 1.45-1.38l2.748 2.944 6.279-7.174a1 1 0 0 1 1.411-.076z" />
                               </svg>
                             )}
@@ -505,7 +506,7 @@ export const SparkleRecoveryModal: React.FC<SparkleRecoveryModalProps> = ({
                             }`}
                           >
                             {submitToFeedback && (
-                              <svg viewBox="0 0 16 16" className="w-3.5 h-3.5 fill-[#0078d7]" aria-hidden="true">
+                              <svg viewBox="0 0 16 16" className="w-3.5 h-3.5 fill-[#2b2f36]" aria-hidden="true">
                                 <path d="M13.485 3.429a1 1 0 0 1 .086 1.411l-7 8a1 1 0 0 1-1.474.025l-3.5-3.75a1 1 0 1 1 1.45-1.38l2.748 2.944 6.279-7.174a1 1 0 0 1 1.411-.076z" />
                               </svg>
                             )}

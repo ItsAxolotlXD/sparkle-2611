@@ -154,6 +154,7 @@ export default function App() {
   }, [currentChannel]);
 
   // Modals state
+  const [oobeKey, setOobeKey] = useState(0);
   const [isOobeOpen, setIsOobeOpen] = useState<boolean>(() => {
     try {
       return !localStorage.getItem('sparkle_oobe_completed');
@@ -161,6 +162,15 @@ export default function App() {
       return false;
     }
   });
+
+  const handleRestartOobe = useCallback(() => {
+    try {
+      localStorage.removeItem('sparkle_oobe_completed');
+    } catch {}
+    setOobeKey((prev) => prev + 1);
+    setIsOobeOpen(true);
+    setIsSplashFinished(true);
+  }, []);
   const [isWelcomeModalOpen, setIsWelcomeModalOpen] = useState(false);
   const [isBootVideoFinished, setIsBootVideoFinished] = useState(() => !settings.animatedBootScreen);
   const [isSplashFinished, setIsSplashFinished] = useState(false);
@@ -735,7 +745,7 @@ export default function App() {
             onOpenUpdate={() => setIsUpdating(true)}
             onOpenOfficeTool={handleOpenOfficeTool}
             navigate={navigate}
-            onRestartOobe={() => setIsOobeOpen(true)}
+            onRestartOobe={handleRestartOobe}
           />
         );
 
@@ -1072,6 +1082,7 @@ export default function App() {
 
       {/* Sparkle Out of Box Experience (OOBE) Setup Wizard */}
       <SparkleOOBE
+        key={`sparkle-oobe-${oobeKey}`}
         isOpen={isOobeOpen}
         onComplete={() => {
           setIsOobeOpen(false);

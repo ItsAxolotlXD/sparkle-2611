@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   Check, 
@@ -480,6 +481,20 @@ export const SparkleOOBE: React.FC<SparkleOOBEProps> = ({
   // Step 5 State: Terms
   const [termsDeclinePrompt, setTermsDeclinePrompt] = useState(false);
 
+  // Synchronously reset state during render when isOpen changes to true
+  const [prevIsOpen, setPrevIsOpen] = useState(isOpen);
+  if (isOpen && !prevIsOpen) {
+    setPrevIsOpen(true);
+    setCurrentStep(1);
+    setIsStepTransitioning(false);
+    setIsFinalLoading(false);
+    setGreetingPhase('idle');
+    setSelectedAction('install');
+    setIsRecoveryModalOpen(false);
+  } else if (!isOpen && prevIsOpen) {
+    setPrevIsOpen(false);
+  }
+
   // Reset or initialize on open
   useEffect(() => {
     if (isOpen) {
@@ -704,11 +719,17 @@ export const SparkleOOBE: React.FC<SparkleOOBEProps> = ({
   const rightPaneUsableTrack = Math.max(0, rightPaneTrackH - rightPaneThumbHeight);
   const rightPaneThumbTop = rightPaneScrollProgress * rightPaneUsableTrack;
 
+  const renderPortal = (content: React.ReactNode) => {
+    return typeof document !== 'undefined'
+      ? createPortal(content, document.body)
+      : (content as React.ReactElement);
+  };
+
   // ==========================================
   // RENDER POST-SETUP GREETING SCREENS
   // ==========================================
   if (greetingPhase !== 'idle' && greetingPhase !== 'finished') {
-    return (
+    return renderPortal(
       <div 
         className="fixed inset-0 z-[9999999] bg-black select-none flex items-center justify-center overflow-hidden"
         style={{ fontFamily: "'Segoe UI Variable Display', 'Segoe UI Variable Text', 'Segoe UI', system-ui, -apple-system, sans-serif" }}
@@ -855,7 +876,7 @@ export const SparkleOOBE: React.FC<SparkleOOBEProps> = ({
   // RENDER FINAL 10-SECOND LOADING CIRCLE (ENLARGED THROBBER)
   // ==========================================
   if (isFinalLoading) {
-    return (
+    return renderPortal(
       <div 
         className="fixed inset-0 z-[9999999] select-none flex flex-col items-center justify-center bg-[#0b0f17]"
         style={{
@@ -894,7 +915,7 @@ export const SparkleOOBE: React.FC<SparkleOOBEProps> = ({
   // RENDER INTERMEDIATE 5-SECOND STEP TRANSITION (ENLARGED THROBBER)
   // ==========================================
   if (isStepTransitioning) {
-    return (
+    return renderPortal(
       <div 
         className="fixed inset-0 z-[9999999] select-none flex flex-col items-center justify-center bg-[#0b0f17]"
         style={{
@@ -932,7 +953,7 @@ export const SparkleOOBE: React.FC<SparkleOOBEProps> = ({
   // ==========================================
   // RENDER MAIN OOBE WIZARD (ALWAYS DARK MODE)
   // ==========================================
-  return (
+  return renderPortal(
     <div 
       className="fixed inset-0 z-[999999] dark flex flex-col items-center justify-start sm:justify-center p-2 sm:p-4 md:p-6 overflow-y-auto overflow-x-hidden bg-[#090d14]"
       style={{
