@@ -11,6 +11,7 @@ import {
   Play
 } from 'lucide-react';
 import { AnimatedBootScreen } from '../components/AnimatedBootScreen';
+import { SparkleRecoveryModal } from '../components/SparkleRecoveryModal';
 import { motion, AnimatePresence } from 'motion/react';
 import { useSettings, FONT_SCALE_CONFIG, SystemSettings } from '../hooks/useSettings';
 import { modalDialogVariants, modalBackdropVariants } from '../utils/animations';
@@ -60,6 +61,7 @@ interface SettingsProps {
   onSearchChange?: (query: string) => void;
   onOpenUpdate?: () => void;
   onOpenOfficeTool?: (tool: string) => void;
+  navigate?: (route: string) => void;
 }
 
 // Staggered slide up variant for cascading entrance animation matching sidebar context menu
@@ -79,7 +81,8 @@ const slideUpVariant = {
 export const Settings: React.FC<SettingsProps> = ({
   searchQuery = '',
   onOpenUpdate,
-  onOpenOfficeTool
+  onOpenOfficeTool,
+  navigate
 }) => {
   const { 
     draftSettings, 
@@ -91,6 +94,7 @@ export const Settings: React.FC<SettingsProps> = ({
 
   const [collapsedCategories, setCollapsedCategories] = useState<Record<string, boolean>>({});
 
+  const [isRecoveryOpen, setIsRecoveryOpen] = useState(false);
   const [isLightModeUnlockOpen, setIsLightModeUnlockOpen] = useState(false);
   const [lightModeUnlockCode, setLightModeUnlockCode] = useState('');
   const [lightModeUnlockError, setLightModeUnlockError] = useState('');
@@ -185,7 +189,7 @@ export const Settings: React.FC<SettingsProps> = ({
   const matchesKeyboard = matchesSearch(['Keyboard and Mouse', 'Native keyboard', 'bàn phím số', 'clipboard', 'âm bàn phím', 'keyboard sound', 'keybinds', 'phím tắt']);
   const matchesTools = false;
   const matchesVersion = 
-    matchesSearch(['Updates', 'thông tin phiên bản', 'cập nhật', 'software update', 'build', 'test sparkle', 'update sparkle']);
+    matchesSearch(['Updates', 'thông tin phiên bản', 'cập nhật', 'software update', 'build', 'test sparkle', 'update sparkle', 'sparkle recovery', 'recovery', 'khôi phục', 'reset']);
 
   const hasAnyMatch = 
     !query || 
@@ -1489,6 +1493,25 @@ export const Settings: React.FC<SettingsProps> = ({
                     <a id="btn-test-vplay-switch" href="https://test-vplay.vercel.app" target="_blank" rel="noopener noreferrer" className="px-4 py-1.5 rounded-[6px] font-normal text-white bg-[#005fb8] dark:bg-[#4cc2ff] hover:bg-[#0067c0] dark:hover:bg-[#6bd0ff] dark:text-black transition-colors text-xs flex items-center justify-center shrink-0 shadow-xs tracking-tight text-center select-none border-none"><span className="light-mode-white-label">Switch</span></a>
                   </motion.div>
                 )}
+
+                {/* 4. Sparkle Recovery */}
+                {matchesSearch(['Sparkle Recovery', 'Recovery', 'Useful if something went wrong', 'reset all the options to default value', 'reset', 'khôi phục']) && (
+                  <motion.div variants={slideUpVariant} initial="hidden" animate="visible" custom={elementIndex++} className="settings-block-card rounded-[6px] bg-white dark:bg-[#2c3037] shadow-xs p-4 sm:p-4.5 flex items-center justify-between gap-3 hover:bg-black/[0.02] dark:hover:bg-[#363b43] transition-colors border-none">
+                    <div>
+                      <div className="font-normal text-[#111827] dark:text-white text-xs sm:text-sm">Sparkle Recovery</div>
+                      <div className="text-[11px] sm:text-xs text-[#9CA3AF] mt-0.5 leading-normal">
+                        Useful if something went wrong with the app or you want to reset all the options to default value.
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setIsRecoveryOpen(true)}
+                      className="px-4 py-1.5 rounded-[6px] font-normal text-white bg-[#005fb8] dark:bg-[#4cc2ff] hover:bg-[#0067c0] dark:hover:bg-[#6bd0ff] dark:text-black transition-colors text-xs flex items-center justify-center shrink-0 shadow-xs tracking-tight text-center select-none border-none cursor-pointer"
+                    >
+                      <span className="light-mode-white-label">Recover</span>
+                    </button>
+                  </motion.div>
+                )}
                   </div>
             </motion.div>
           </section>
@@ -1592,6 +1615,13 @@ export const Settings: React.FC<SettingsProps> = ({
       {isPreviewBootScreen && (
         <AnimatedBootScreen onFinish={() => setIsPreviewBootScreen(false)} />
       )}
+
+      {/* Sparkle Recovery Modal */}
+      <SparkleRecoveryModal
+        isOpen={isRecoveryOpen}
+        onClose={() => setIsRecoveryOpen(false)}
+        navigate={navigate}
+      />
     </motion.div>
   );
 };

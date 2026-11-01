@@ -726,6 +726,7 @@ export default function App() {
             onSearchChange={handleTabSearchChange}
             onOpenUpdate={() => setIsUpdating(true)}
             onOpenOfficeTool={handleOpenOfficeTool}
+            navigate={navigate}
           />
         );
 

@@ -8707,3 +8707,54 @@ html.dark .app-toast-tick {
   color: #ffffff !important;
 }
 
+/* Sparkle Recovery Modal Styles */
+.sparkle-recovery-header,
+.sparkle-recovery-header-regular,
+#sparkle-recovery-modal-container .sparkle-recovery-header,
+#sparkle-recovery-modal-container .sparkle-recovery-header-regular,
+#sparkle-recovery-modal-container [role="heading"] {
+  font-family: 'Segoe UI Variable Text', 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, Roboto, sans-serif !important;
+  font-weight: 400 !important;
+}
+
+.sparkle-recovery-btn,
+#sparkle-recovery-modal-container button,
+#settings-page button.sparkle-recovery-btn,
+#settings-page button[class*="sparkle-recovery-btn"] {
+  border: 2px solid #ffffff !important;
+  border-width: 2px !important;
+  border-style: solid !important;
+  border-color: #ffffff !important;
+  outline: none !important;
+  background-color: transparent !important;
+  color: #ffffff !important;
+  border-radius: 0px !important;
+  box-sizing: border-box !important;
+}
+
+.sparkle-recovery-btn:hover,
+#sparkle-recovery-modal-container button:hover,
+#settings-page button.sparkle-recovery-btn:hover {
+  background-color: rgba(255, 255, 255, 0.15) !important;
+  border: 2px solid #ffffff !important;
+  border-width: 2px !important;
+  border-style: solid !important;
+  border-color: #ffffff !important;
+}
+
+.sparkle-recovery-btn:active,
+#sparkle-recovery-modal-container button:active,
+#settings-page button.sparkle-recovery-btn:active {
+  background-color: rgba(255, 255, 255, 0.28) !important;
+  border: 2px solid #ffffff !important;
+  border-width: 2px !important;
+  border-style: solid !important;
+  border-color: #ffffff !important;
+}
+
+#sparkle-recovery-modal-container input::placeholder,
+.sparkle-recovery-input::placeholder {
+  color: #ffffff !important;
+  opacity: 0.9 !important;
+}
+
