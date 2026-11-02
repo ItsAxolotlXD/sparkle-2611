@@ -586,8 +586,6 @@ export const SparkleOOBE: React.FC<SparkleOOBEProps> = ({
     };
   }, [greetingPhase, onComplete, username, selectedTheme]);
 
-  if (!isOpen || greetingPhase === 'finished') return null;
-
   // Filtered countries
   const filteredCountries = COUNTRIES_LIST.filter((c) =>
     c.toLowerCase().includes(countrySearch.toLowerCase())
@@ -724,6 +722,8 @@ export const SparkleOOBE: React.FC<SparkleOOBEProps> = ({
       ? createPortal(content, document.body)
       : (content as React.ReactElement);
   };
+
+  if (!isOpen || greetingPhase === 'finished') return null;
 
   // ==========================================
   // RENDER POST-SETUP GREETING SCREENS

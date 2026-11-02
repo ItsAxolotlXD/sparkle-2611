@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { MoreHorizontal, X, Bell } from 'lucide-react';
+import { MoreHorizontal, X } from 'lucide-react';
 import { AppToastDetail } from '../utils/toast';
 import { TOAST_NOTIFICATION_SOUND_SRC } from '../constants/assets';
 
@@ -61,16 +61,10 @@ export const GlobalToast: React.FC = () => {
     };
   }, []);
 
-  if (!toast) return null;
+  let titleText = toast?.title;
+  let descText = toast?.description;
 
-  // Compute title & description:
-  // If toast.title is given: title = toast.title, description = toast.description || toast.message
-  // Otherwise if toast.message has newlines: first line = title, remaining = description
-  // Otherwise: title = toast.message, description = toast.description
-  let titleText = toast.title;
-  let descText = toast.description;
-
-  if (!titleText) {
+  if (toast && !titleText) {
     if (toast.message.includes('\n')) {
       const parts = toast.message.split('\n');
       titleText = parts[0];
@@ -78,22 +72,27 @@ export const GlobalToast: React.FC = () => {
     } else {
       titleText = toast.message;
     }
-  } else if (!descText && toast.message && toast.message !== toast.title) {
+  } else if (toast && !descText && toast.message && toast.message !== toast.title) {
     descText = toast.message;
   }
 
-  const appName = toast.appName || 'fluent';
+  const appName = toast?.appName || 'fluent';
 
   return (
     <AnimatePresence>
-      <div className="fixed bottom-5 right-5 sm:bottom-6 sm:right-6 z-[9999999] pointer-events-none flex flex-col items-end">
+      {toast && (
         <motion.div
           key={toast.id || toast.message}
-          initial={{ opacity: 0, x: 100 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: 100, transition: { duration: 0.22, ease: 'easeIn' } }}
+          initial={{ opacity: 0, x: 120, scale: 0.95 }}
+          animate={{ opacity: 1, x: 0, scale: 1 }}
+          exit={{ 
+            opacity: 0, 
+            x: 140, 
+            scale: 0.94, 
+            transition: { duration: 0.28, ease: [0.4, 0, 0.2, 1] } 
+          }}
           transition={{ duration: 0.36, ease: [0.16, 1, 0.3, 1] }}
-          className="pointer-events-auto w-[350px] max-w-[calc(100vw-32px)] rounded-[14px] p-3.5 sm:p-4 bg-[#f0f0f0]/95 dark:bg-[#20232a]/95 backdrop-blur-2xl border border-black/10 dark:border-white/10 text-[#111827] dark:text-white shadow-[0_12px_32px_rgba(0,0,0,0.12)] dark:shadow-[0_18px_48px_rgba(0,0,0,0.6)] select-none transition-colors duration-150"
+          className="fixed bottom-5 right-5 sm:bottom-6 sm:right-6 z-[9999999] pointer-events-auto w-[360px] max-w-[calc(100vw-32px)] rounded-[14px] p-3.5 sm:p-4 bg-[#f8f8fa]/98 dark:bg-[#1e2127]/98 backdrop-blur-3xl border border-black/15 dark:border-white/15 text-[#111827] dark:text-white shadow-[0_16px_40px_rgba(0,0,0,0.22)] dark:shadow-[0_22px_54px_rgba(0,0,0,0.7)] select-none transition-colors duration-150"
           style={{
             fontFamily: "'Segoe UI Variable Text', 'Segoe UI', system-ui, -apple-system, sans-serif",
           }}
@@ -101,7 +100,7 @@ export const GlobalToast: React.FC = () => {
           {/* Header row: App Icon + App Name + Options + Close */}
           <div className="flex items-center justify-between text-xs text-[#4b5563] dark:text-[#cbd5e1] mb-2 select-none">
             <div className="flex items-center gap-2 font-normal text-[12px] truncate">
-              {/* Gold notification bell icon matching the screenshot */}
+              {/* Gold notification bell icon matching Windows 11 notifications */}
               <span className="text-[13px] leading-none shrink-0" aria-hidden="true">
                 🔔
               </span>
@@ -166,7 +165,7 @@ export const GlobalToast: React.FC = () => {
             </div>
           )}
         </motion.div>
-      </div>
+      )}
     </AnimatePresence>
   );
 };

@@ -1081,15 +1081,17 @@ export default function App() {
       )}
 
       {/* Sparkle Out of Box Experience (OOBE) Setup Wizard */}
-      <SparkleOOBE
-        key={`sparkle-oobe-${oobeKey}`}
-        isOpen={isOobeOpen}
-        onComplete={() => {
-          setIsOobeOpen(false);
-          setIsSplashFinished(true);
-        }}
-        navigate={navigate}
-      />
+      {isOobeOpen && (
+        <SparkleOOBE
+          key={`sparkle-oobe-${oobeKey}`}
+          isOpen={isOobeOpen}
+          onComplete={() => {
+            setIsOobeOpen(false);
+            setIsSplashFinished(true);
+          }}
+          navigate={navigate}
+        />
+      )}
 
       {/* Update Sparkle Splash Screen (1 minute: 60s) */}
       {isUpdating && (
