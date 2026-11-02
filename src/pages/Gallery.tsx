@@ -427,7 +427,7 @@ export const Gallery: React.FC<GalleryProps> = ({ navigate, searchQuery = '', ro
   };
 
   const showToast = (msg: string) => {
-    showAppToast(msg);
+    showAppToast(msg, { source: 'gallery' });
   };
 
   // Upload handler supporting images, videos, audio, and all office formats

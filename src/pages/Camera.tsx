@@ -290,7 +290,7 @@ export const Camera: React.FC<CameraProps> = ({ navigate }) => {
   // Perform the capture and save to Gallery -> Camera Rolls folder
   const executeCapture = async () => {
     if (!videoRef.current || !isStreamActive) {
-      showAppToast('Máy ảnh chưa sẵn sàng');
+      showAppToast('Máy ảnh chưa sẵn sàng', { source: 'camera' });
       return;
     }
 
@@ -393,10 +393,10 @@ export const Camera: React.FC<CameraProps> = ({ navigate }) => {
       // Save to Gallery IndexedDB
       await galleryDB.add(newItem);
       setRecentCapture(newItem);
-      showAppToast(`Đã lưu ảnh vào mục "Camera Rolls" trong Gallery`);
+      showAppToast(`Đã lưu ảnh vào mục "Camera Rolls" trong Gallery`, { source: 'camera' });
     } catch (err) {
       console.error('Lỗi khi chụp và lưu ảnh:', err);
-      showAppToast('Không thể lưu ảnh chụp');
+      showAppToast('Không thể lưu ảnh chụp', { source: 'camera' });
     }
   };
 

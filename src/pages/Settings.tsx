@@ -132,17 +132,17 @@ export const Settings: React.FC<SettingsProps> = ({
     if (!silentToast) {
       const label = SETTING_LABELS[key] || String(key);
       if (typeof value === 'boolean') {
-        showAppToast(value ? `Enable ${label}` : `Disable ${label}`);
+        showAppToast(value ? `Enable ${label}` : `Disable ${label}`, { source: 'settings' });
       } else if (key === 'fontScale') {
         const item = FONT_SCALE_CONFIG[value as number];
         const param = item ? `${item.value}%` : `${value}`;
-        showAppToast(`Changed ${label} to ${param}`);
+        showAppToast(`Changed ${label} to ${param}`, { source: 'settings' });
       } else if (typeof value === 'number') {
-        showAppToast(`Changed ${label} to ${value}%`);
+        showAppToast(`Changed ${label} to ${value}%`, { source: 'settings' });
       } else if (key === 'theme') {
-        showAppToast(`Changed ${label} to ${value === 'light' ? 'Light' : 'Dark'}`);
+        showAppToast(`Changed ${label} to ${value === 'light' ? 'Light' : 'Dark'}`, { source: 'settings' });
       } else {
-        showAppToast(`Changed ${label} to ${String(value)}`);
+        showAppToast(`Changed ${label} to ${String(value)}`, { source: 'settings' });
       }
     }
     if (key === 'superDarkMode') {

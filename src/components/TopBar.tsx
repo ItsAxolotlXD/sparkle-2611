@@ -2045,7 +2045,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                             const currentVal = Boolean(settings[item.settingKey]);
                             const nextVal = !currentVal;
                             updateSetting(item.settingKey, nextVal);
-                            showAppToast(nextVal ? `Enable ${item.title}` : `Disable ${item.title}`);
+                            showAppToast(nextVal ? `Enable ${item.title}` : `Disable ${item.title}`, { source: 'search' });
                           }
                         }}
                         className="toggle-switch-btn shrink-0"
