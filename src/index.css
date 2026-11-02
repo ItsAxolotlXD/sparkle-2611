@@ -129,6 +129,40 @@ html.light-mode ::-moz-selection,
     color: #ffffff;
   }
 
+  /* Themed Home and Feed icons: white overlay in dark mode, black in light mode */
+  .home-icon-themed,
+  .feed-icon-themed {
+    background-color: #000000;
+  }
+
+  html.dark .home-icon-themed,
+  html.dark .feed-icon-themed,
+  .dark .home-icon-themed,
+  .dark .feed-icon-themed,
+  html:not(.light-mode) .home-icon-themed,
+  html:not(.light-mode) .feed-icon-themed {
+    background-color: #ffffff !important;
+  }
+
+  html.light-mode .home-icon-themed,
+  html.light-mode .feed-icon-themed {
+    background-color: #000000 !important;
+  }
+
+  html.dark .home-icon-img,
+  html.dark .feed-icon-img,
+  .dark .home-icon-img,
+  .dark .feed-icon-img,
+  html:not(.light-mode) .home-icon-img,
+  html:not(.light-mode) .feed-icon-img {
+    filter: brightness(0) invert(1) !important;
+  }
+
+  html.light-mode .home-icon-img,
+  html.light-mode .feed-icon-img {
+    filter: brightness(0) !important;
+  }
+
   :root {
     --ui-accent: #ff82ff;
     --primary-red: var(--ui-accent);

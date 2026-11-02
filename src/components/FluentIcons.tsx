@@ -10,12 +10,15 @@ export const FluentInkCanvasIcon: React.FC<{ className?: string; style?: React.C
   <img src={INK_CANVAS_ICON_URL} alt="Ink Canvas" className={className} style={style} />
 );
 
+export const HOME_ICON_URL = '/icons/home.png';
+export const FEED_ICON_URL = '/icons/feed.png';
+
 export const FLUENT_ICON_URLS = {
-  home: 'https://raw.githubusercontent.com/microsoft/fluentui-system-icons/main/assets/Home/SVG/ic_fluent_home_48_regular.svg',
+  home: HOME_ICON_URL,
   watch: 'https://raw.githubusercontent.com/microsoft/fluentui-system-icons/refs/heads/main/assets/Movies%20and%20TV/SVG/ic_fluent_movies_and_tv_24_regular.svg',
   liveTv: 'https://raw.githubusercontent.com/microsoft/fluentui-system-icons/refs/heads/main/assets/Movies%20and%20TV/SVG/ic_fluent_movies_and_tv_24_regular.svg',
-  news: 'https://raw.githubusercontent.com/microsoft/fluentui-system-icons/refs/heads/main/assets/New/SVG/ic_fluent_new_24_regular.svg',
-  articles: 'https://raw.githubusercontent.com/microsoft/fluentui-system-icons/refs/heads/main/assets/New/SVG/ic_fluent_new_24_regular.svg',
+  news: FEED_ICON_URL,
+  articles: FEED_ICON_URL,
   notes: 'https://raw.githubusercontent.com/microsoft/fluentui-system-icons/refs/heads/main/assets/Document%20Edit/SVG/ic_fluent_document_edit_24_regular.svg',
   settings: 'https://raw.githubusercontent.com/microsoft/fluentui-system-icons/refs/heads/main/assets/Settings/SVG/ic_fluent_settings_48_regular.svg',
   user: 'https://raw.githubusercontent.com/microsoft/fluentui-system-icons/refs/heads/main/assets/Person/SVG/ic_fluent_person_48_regular.svg',
@@ -32,9 +35,22 @@ export const FLUENT_ICON_URLS = {
 };
 
 export const FluentHomeIcon: React.FC<{ className?: string; style?: React.CSSProperties }> = ({ className = 'w-5 h-5', style }) => (
-  <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" className={className} style={style}>
-    <path d="M21.6062 5.85517C23.0048 4.71494 24.9952 4.71494 26.3938 5.85517L39.5688 16.5966C40.4736 17.3342 41 18.4492 41 19.628V39.1134C41 41.2599 39.2875 43 37.175 43H31.825C29.7125 43 28 41.2599 28 39.1134V29.8866C28 29.1711 27.4292 28.5911 26.725 28.5911H21.275C20.5708 28.5911 20 29.1711 20 29.8866V39.1134C20 41.2599 18.2875 43 16.175 43H10.825C8.71251 43 7 41.2599 7 39.1134V19.628C7 18.4493 7.52645 17.3342 8.43124 16.5966L21.6062 5.85517ZM24.7979 7.87612C24.3317 7.49604 23.6683 7.49604 23.2021 7.87612L10.0271 18.6175C9.72548 18.8634 9.55 19.2351 9.55 19.628V39.1134C9.55 39.8289 10.1208 40.4089 10.825 40.4089H16.175C16.8792 40.4089 17.45 39.8289 17.45 39.1134V29.8866C17.45 27.7401 19.1625 26 21.275 26H26.725C28.8375 26 30.55 27.7401 30.55 29.8866V39.1134C30.55 39.8289 31.1208 40.4089 31.825 40.4089H37.175C37.8792 40.4089 38.45 39.8289 38.45 39.1134V19.628C38.45 19.2351 38.2745 18.8634 37.9729 18.6175L24.7979 7.87612Z" fill="currentColor"/>
-  </svg>
+  <span
+    role="img"
+    aria-label="Home"
+    className={`inline-block shrink-0 ${className} home-icon-themed`}
+    style={{
+      maskImage: `url('${HOME_ICON_URL}')`,
+      WebkitMaskImage: `url('${HOME_ICON_URL}')`,
+      maskSize: 'contain',
+      WebkitMaskSize: 'contain',
+      maskRepeat: 'no-repeat',
+      WebkitMaskRepeat: 'no-repeat',
+      maskPosition: 'center',
+      WebkitMaskPosition: 'center',
+      ...style,
+    }}
+  />
 );
 
 export const FluentWatchIcon: React.FC<{ className?: string; style?: React.CSSProperties }> = ({ className = 'w-5 h-5', style }) => (
@@ -46,9 +62,22 @@ export const FluentWatchIcon: React.FC<{ className?: string; style?: React.CSSPr
 export const FluentLiveTvIcon = FluentWatchIcon;
 
 export const FluentArticlesIcon: React.FC<{ className?: string; style?: React.CSSProperties }> = ({ className = 'w-5 h-5', style }) => (
-  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={className} style={style}>
-    <path d="M18.25 4C18.6642 4 19 4.33579 19 4.75V13.25C19 13.6642 18.6642 14 18.25 14C17.8358 14 17.5 13.6642 17.5 13.25V4.75C17.5 4.33579 17.8358 4 18.25 4ZM4 18.25C4 17.8358 4.33579 17.5 4.75 17.5H13.25C13.6642 17.5 14 17.8358 14 18.25C14 18.6642 13.6642 19 13.25 19H4.75C4.33579 19 4 18.6642 4 18.25ZM8.28033 7.21967C7.98744 6.92678 7.51256 6.92678 7.21967 7.21967C6.92678 7.51256 6.92678 7.98744 7.21967 8.28033L13.7197 14.7803C14.0126 15.0732 14.4874 15.0732 14.7803 14.7803C15.0732 14.4874 15.0732 14.0126 14.7803 13.7197L8.28033 7.21967Z" fill="currentColor"/>
-  </svg>
+  <span
+    role="img"
+    aria-label="Feed"
+    className={`inline-block shrink-0 ${className} feed-icon-themed`}
+    style={{
+      maskImage: `url('${FEED_ICON_URL}')`,
+      WebkitMaskImage: `url('${FEED_ICON_URL}')`,
+      maskSize: 'contain',
+      WebkitMaskSize: 'contain',
+      maskRepeat: 'no-repeat',
+      WebkitMaskRepeat: 'no-repeat',
+      maskPosition: 'center',
+      WebkitMaskPosition: 'center',
+      ...style,
+    }}
+  />
 );
 
 export const FluentNewsIcon = FluentArticlesIcon;

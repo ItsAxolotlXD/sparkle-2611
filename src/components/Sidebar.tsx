@@ -29,9 +29,7 @@ import {
   Film,
   Music,
   FileText,
-  FolderPlus,
-  Home,
-  Newspaper
+  FolderPlus
 } from 'lucide-react';
 import { galleryDB, GalleryFolder, GalleryMediaItem } from '../services/galleryStorage';
 import { 
@@ -1315,7 +1313,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   : 'text-black dark:text-[#cccccc] hover:bg-black/5 dark:hover:bg-white/[0.05] hover:text-black dark:hover:text-white'
               }`}
             >
-              <Home className="w-5 h-5 shrink-0 text-black dark:text-white stroke-[1.8]" />
+              <FluentHomeIcon className="w-5 h-5 shrink-0 text-black dark:text-white" />
               <span className="truncate text-[13.5px]">Home</span>
             </button>
           </div>
@@ -1334,7 +1332,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   : 'text-black dark:text-[#cccccc] hover:bg-black/5 dark:hover:bg-white/[0.05] hover:text-black dark:hover:text-white'
               }`}
             >
-              <Newspaper className="w-5 h-5 shrink-0 text-black dark:text-white stroke-[1.8]" />
+              <FluentNewsIcon className="w-5 h-5 shrink-0 text-black dark:text-white" />
               <span className="truncate text-[13.5px]">Feed</span>
             </button>
           </div>
@@ -1989,7 +1987,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       : 'text-black dark:text-[#cccccc] hover:bg-black/5 dark:hover:bg-white/[0.05] hover:text-black dark:hover:text-white'
                   }`}
                 >
-                  <Home className="w-5 h-5 text-black dark:text-white stroke-[1.8]" />
+                  <FluentHomeIcon className="w-5 h-5 text-black dark:text-white" />
                 </button>
 
                 {/* 2. Feed Icon */}
@@ -2007,7 +2005,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       : 'text-black dark:text-[#cccccc] hover:bg-black/5 dark:hover:bg-white/[0.05] hover:text-black dark:hover:text-white'
                   }`}
                 >
-                  <Newspaper className="w-5 h-5 text-black dark:text-white stroke-[1.8]" />
+                  <FluentNewsIcon className="w-5 h-5 text-black dark:text-white" />
                 </button>
 
                 {/* Divider: Apps */}
