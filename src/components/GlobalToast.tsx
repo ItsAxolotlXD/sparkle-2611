@@ -171,7 +171,7 @@ export const GlobalToast: React.FC = () => {
               {sourceName}
             </div>
             <div
-              className="text-[12.5px] text-[#4b5563] dark:text-[#cbd5e1] leading-normal break-words"
+              className="text-[12.5px] text-[#6b7280] dark:text-[#a3a3a3] leading-normal break-words"
               style={{ fontWeight: 350 }}
             >
               {actionText}
