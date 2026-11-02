@@ -67,7 +67,7 @@ export const LiveTV: React.FC<LiveTVProps> = ({
   }, [distinctCategories, filteredChannels]);
 
   const handleSelectChannel = (channel: Channel) => {
-    showAppToast(`Switched to ${channel.name}`);
+    showAppToast(`Switched to ${channel.name}`, { source: 'live-tv' });
     onSelectChannel(channel);
   };
 

@@ -1202,19 +1202,19 @@ export const Sidebar: React.FC<SidebarProps> = ({
             onToggleHoverToExpand={() => {
               const next = !settings.hoverToExpand;
               updateSetting('hoverToExpand', next);
-              showAppToast(next ? 'Enable Hover to expand' : 'Disable Hover to expand');
+              showAppToast(next ? 'Enable Hover to expand' : 'Disable Hover to expand', { source: 'sidebar' });
             }}
             fluentIcons={settings.fluentIcons}
             onToggleFluentIcons={() => {
               const next = !settings.fluentIcons;
               updateSetting('fluentIcons', next);
-              showAppToast(next ? 'Enable Fluent icons' : 'Disable Fluent icons');
+              showAppToast(next ? 'Enable Fluent icons' : 'Disable Fluent icons', { source: 'sidebar' });
             }}
             dynamicSidebarIcons={settings.dynamicSidebarIcons}
             onToggleDynamicSidebarIcons={() => {
               const next = !settings.dynamicSidebarIcons;
               updateSetting('dynamicSidebarIcons', next);
-              showAppToast(next ? 'Enable Dynamic sidebar icons' : 'Disable Dynamic sidebar icons');
+              showAppToast(next ? 'Enable Dynamic sidebar icons' : 'Disable Dynamic sidebar icons', { source: 'sidebar' });
             }}
             onNavigateSettings={() => navigate('/settings')}
             onGoBack={handleGoBack}
@@ -1394,7 +1394,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     onClick={() => {
                       handleNavClick(`/live-tv?channel=${ch.slug}`);
                       if (onSelectChannel) onSelectChannel(ch);
-                      showAppToast(`Switched to ${ch.name}`);
+                      showAppToast(`Switched to ${ch.name}`, { source: 'sidebar' });
                     }}
                     className="w-full h-[30px] flex items-center justify-between px-2.5 rounded-[4px] text-xs text-black dark:text-[#a1a1aa] hover:text-black dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/10 cursor-pointer"
                   >
