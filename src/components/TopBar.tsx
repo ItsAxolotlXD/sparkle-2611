@@ -700,9 +700,9 @@ export const TopBar: React.FC<TopBarProps> = ({
       // Insider Flags
       {
         id: 'flag-native-keyboard',
-        title: 'Native virtual keyboard',
+        title: 'Touch keyboard',
         subtitle: 'Insider Flags',
-        keywords: 'insider flags experimental native keyboard bàn phím ảo vni telex',
+        keywords: 'insider flags experimental touch keyboard native keyboard on-screen keyboard bàn phím cảm ứng bàn phím ảo vni telex',
         type: 'setting-toggle',
         settingKey: 'nativeKeyboard',
         onSelect: () => navigate('/test'),

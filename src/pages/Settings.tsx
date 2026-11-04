@@ -32,7 +32,7 @@ const SETTING_LABELS: Partial<Record<keyof SystemSettings, string>> = {
   spatialGlassBlur: 'Spatial glass blur',
   autoHideSidebar: 'Auto-hide sidebar',
   hoverToExpand: 'Hover to expand',
-  nativeKeyboard: 'Native keyboard',
+  nativeKeyboard: 'Touch keyboard',
   keyboardNumberRow: 'Keyboard number row',
   keyboardClipboard: 'Keyboard clipboard',
   keyboardSoundEnabled: 'Keyboard sound',
@@ -186,7 +186,7 @@ export const Settings: React.FC<SettingsProps> = ({
   };
 
   const matchesExperimental =
-    matchesSearch(['Insider experiments', 'Insider Flags', 'thử nghiệm', 'native keyboard', 'bàn phím ảo', 'immersive search', 'fluent icons', 'flumojs', 'fluent emojis', 'emoji', '3d icons', 'animated boot screen', 'boot screen', 'khởi động', 'video khởi động']);
+    matchesSearch(['Insider experiments', 'Insider Flags', 'thử nghiệm', 'touch keyboard', 'native keyboard', 'bàn phím cảm ứng', 'bàn phím ảo', 'immersive search', 'fluent icons', 'flumojs', 'fluent emojis', 'emoji', '3d icons', 'animated boot screen', 'boot screen', 'khởi động', 'video khởi động']);
   const matchesInterface = 
     matchesSearch(['Appearance', 'Interface', 'giao diện', 'chế độ ứng dụng', 'ban ngày', 'ban đêm', 'light', 'dark', 'thanh điều hướng', 'navigation', 'side view', 'top view', 'tab view', 'thu phóng giao diện', 'font', 'vị trí thanh bên', 'siêu chế độ tối', 'super dark']);
   const matchesAccessibility = matchesSearch(['Accessibility', 'trợ năng', 'hover to expand']);
@@ -291,27 +291,39 @@ export const Settings: React.FC<SettingsProps> = ({
               className="overflow-hidden"
             >
               <div className="space-y-2.5 bg-transparent pt-0.5">
-                {/* 1. Native keyboard */}
-                {false && matchesSearch(['Native keyboard', 'bàn phím', 'cảm ứng']) && (
-                  <motion.div 
+                {/* Touch keyboard */}
+                {matchesSearch(['Touch keyboard', 'Native keyboard', 'bàn phím cảm ứng', 'bàn phím ảo']) && (
+                  <motion.div
                     variants={slideUpVariant}
                     initial="hidden"
                     animate="visible"
                     custom={elementIndex++}
-                    id="setting-experimental-native-keyboard"
+                    id="setting-experimental-touch-keyboard"
                     onClick={() => updateDraft('nativeKeyboard', !draftSettings.nativeKeyboard)}
                     className="settings-block-card rounded-[6px] bg-white dark:bg-[#2c3037] shadow-xs px-4 py-3 sm:py-3.5 flex items-center justify-between gap-4 settings-block-card cursor-pointer hover:bg-black/[0.02] dark:hover:bg-[#363b43] transition-colors border-none"
                   >
                     <div className="min-w-0 flex-1 pr-2">
-                      <div className="font-normal text-sm text-[#111827] dark:text-white" style={{ fontWeight: 400 }}>
-                        Native keyboard
+                      <div
+                        id="touch-keyboard-label"
+                        className="font-normal text-sm text-[#111827] dark:text-white"
+                        style={{ fontWeight: 400 }}
+                      >
+                        Touch keyboard
                       </div>
+                      <p
+                        id="touch-keyboard-description"
+                        className="mt-1 text-xs leading-relaxed text-[#6B7280] dark:text-[#9CA3AF]"
+                      >
+                        Shows an on-screen keyboard when you focus a text field. On by default on mobile and off by default on desktop; you can change it anytime.
+                      </p>
                     </div>
 
                     <button
-                      id="toggle-native-keyboard"
+                      id="toggle-touch-keyboard"
                       type="button"
                       role="switch"
+                      aria-labelledby="touch-keyboard-label"
+                      aria-describedby="touch-keyboard-description"
                       aria-checked={draftSettings.nativeKeyboard}
                       onClick={(e) => {
                         e.stopPropagation();
