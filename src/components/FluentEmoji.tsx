@@ -22,6 +22,8 @@ for (const emoji of emojiData) {
 
 const FlumojsContext = createContext(false);
 
+export const useFlumojsEnabled = () => useContext(FlumojsContext);
+
 export const FlumojsProvider = ({ children }: { children: ReactNode }) => {
   const { settings } = useSettings();
 

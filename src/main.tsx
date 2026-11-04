@@ -1,6 +1,7 @@
 import {StrictMode} from 'react';
 import {createRoot} from 'react-dom/client';
 import App from './App.tsx';
+import { FluentInputMirror } from './components/FluentInputMirror';
 import { FlumojsProvider } from './components/FluentEmoji';
 import './index.css';
 import { initBrowserTooltipSuppressor } from './utils/suppressBrowserTooltips';
@@ -12,6 +13,7 @@ createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <FlumojsProvider>
       <App />
+      <FluentInputMirror />
     </FlumojsProvider>
   </StrictMode>,
 );

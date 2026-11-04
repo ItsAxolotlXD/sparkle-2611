@@ -18,6 +18,7 @@ import {
   BookOpen
 } from 'lucide-react';
 import { SpinningRing } from './SpinningRing';
+import { FluentEmojiText } from './FluentEmoji';
 import { 
   FluentHomeIcon, 
   FluentLiveTvIcon, 
@@ -2015,7 +2016,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                       <div className="flex items-center justify-between gap-2">
                         <div className="flex items-center gap-1.5 min-w-0">
                           <span className="search-result-title text-[13.5px] font-medium text-[#111827] dark:text-white/95 truncate leading-snug">
-                            {item.title}
+                            <FluentEmojiText>{item.title}</FluentEmojiText>
                           </span>
                           {item.type === 'history' && item.timestamp && (
                             <span className="text-[11px] font-normal text-[#9ca3af] dark:text-[#9ca3af]/80 shrink-0 select-none">
@@ -2026,7 +2027,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                       </div>
                       {item.subtitle && (
                         <div className="text-[11.5px] font-normal text-[#6b7280] dark:text-[#9ca3af] truncate leading-tight mt-0.5">
-                          {item.subtitle}
+                          <FluentEmojiText>{item.subtitle}</FluentEmojiText>
                         </div>
                       )}
                     </div>
