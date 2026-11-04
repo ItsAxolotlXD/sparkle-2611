@@ -122,9 +122,7 @@ export const NativeKeyboardProvider: React.FC<{ children: React.ReactNode }> = (
           return;
         }
         const rect = input.getBoundingClientRect();
-        const keyboardTop = window.innerWidth >= 768
-          ? (window.innerHeight - keyboardHeight) / 2 - 16
-          : window.innerHeight - keyboardHeight - 16;
+        const keyboardTop = window.innerHeight - keyboardHeight - 16;
         if (rect.bottom > keyboardTop) {
           const scrollDiff = rect.bottom - keyboardTop + 32;
           window.scrollBy({ top: scrollDiff, behavior: 'smooth' });
