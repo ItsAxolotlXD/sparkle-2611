@@ -48,6 +48,7 @@ export interface SystemSettings {
   newWatchTab: boolean;
   fluentIcons: boolean;
   dynamicSidebarIcons: boolean;
+  useFlumojs: boolean;
   pageAnimation: 'slideUp' | 'zoomIn';
   pageLoading: boolean;
   pageLoadingVersion?: number;
@@ -104,6 +105,7 @@ export const DEFAULT_SETTINGS: SystemSettings = {
   newWatchTab: false,
   fluentIcons: false,
   dynamicSidebarIcons: true,
+  useFlumojs: true,
   pageAnimation: 'slideUp',
   pageLoading: false,
   pageLoadingVersion: 2,
@@ -174,6 +176,7 @@ export const getStoredSettings = (): SystemSettings => {
         keyboardNumberRow: typeof parsed.keyboardNumberRow === 'boolean' ? parsed.keyboardNumberRow : DEFAULT_SETTINGS.keyboardNumberRow,
         keyboardClipboard: typeof parsed.keyboardClipboard === 'boolean' ? parsed.keyboardClipboard : DEFAULT_SETTINGS.keyboardClipboard,
         keyboardSoundEnabled: typeof parsed.keyboardSoundEnabled === 'boolean' ? parsed.keyboardSoundEnabled : DEFAULT_SETTINGS.keyboardSoundEnabled,
+        useFlumojs: typeof parsed.useFlumojs === 'boolean' ? parsed.useFlumojs : DEFAULT_SETTINGS.useFlumojs,
         superDarkMode: typeof parsed.superDarkMode === 'boolean' ? parsed.superDarkMode : DEFAULT_SETTINGS.superDarkMode,
         spatialGlass: parsed.spatialGlassVersion >= 2
           ? (typeof parsed.spatialGlass === 'boolean' ? parsed.spatialGlass : true)

@@ -12,10 +12,12 @@ import {
   Sun, 
   Moon,
   ChevronUp,
-  ChevronDown
+  ChevronDown,
+  Bug
 } from 'lucide-react';
 import { SPINNING_RING_GIF_URL } from './SpinningRing';
 import { SparkleRecoveryModal } from './SparkleRecoveryModal';
+import { SparkleOOBEDebug } from './SparkleOOBEDebug';
 
 interface SparkleOOBEProps {
   isOpen: boolean;
@@ -438,6 +440,7 @@ export const SparkleOOBE: React.FC<SparkleOOBEProps> = ({
 }) => {
   // OOBE is strictly DARK MODE ("oobe luôn là dark mode")
   const [isMuted, setIsMuted] = useState(false);
+  const [isDebugPageOpen, setIsDebugPageOpen] = useState(false);
 
   // Theme selection in Step 1 ("thêm bước Choose app theme prefereneces (Light/dark) ở đầu oobe")
   const [selectedTheme, setSelectedTheme] = useState<'dark' | 'light'>('dark');
@@ -950,6 +953,26 @@ export const SparkleOOBE: React.FC<SparkleOOBEProps> = ({
     );
   }
 
+  if (isDebugPageOpen) {
+    return renderPortal(
+      <SparkleOOBEDebug
+        onBack={() => setIsDebugPageOpen(false)}
+        onSkipInstallation={() => {
+          try {
+            localStorage.setItem('sparkle_oobe_completed', 'true');
+          } catch {}
+          setIsDebugPageOpen(false);
+          onComplete();
+        }}
+        onOpenInsiderExperiments={() => {
+          setIsDebugPageOpen(false);
+          onComplete();
+          navigate?.('/settings');
+        }}
+      />
+    );
+  }
+
   // ==========================================
   // RENDER MAIN OOBE WIZARD (ALWAYS DARK MODE)
   // ==========================================
@@ -970,6 +993,15 @@ export const SparkleOOBE: React.FC<SparkleOOBEProps> = ({
       >
         {/* TOP CONTROLS */}
         <div className="absolute top-4 right-4 z-20 flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setIsDebugPageOpen(true)}
+            title="Debug"
+            className="flex h-8 items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.04] px-3 text-neutral-200 transition-colors hover:bg-white/10"
+          >
+            <Bug className="h-4 w-4" aria-hidden="true" />
+            <span className="text-[11px] font-medium">Debug</span>
+          </button>
           <button
             type="button"
             onClick={() => setIsMuted(!isMuted)}

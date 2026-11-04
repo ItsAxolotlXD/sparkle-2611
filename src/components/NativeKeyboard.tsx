@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
-import { Delete, Smile, ArrowBigUp, X, Check, Globe, Keyboard, ClipboardList, Copy, Search } from 'lucide-react';
+import { Delete, Smile, ArrowBigUp, X, Check, Globe, Keyboard, ClipboardList, Copy, Mic, Search } from 'lucide-react';
 import { FluentDeleteIcon, FluentSearchIcon } from './FluentIcons';
 import { motion, AnimatePresence } from 'motion/react';
 import { flyoutPanelClassName, flyoutPanelStyle } from './FlyoutDropdown';
@@ -16,9 +16,6 @@ import {
   ClipboardItem,
 } from '../utils/clipboardHistory';
 import { EmojiBoard } from './EmojiBoard';
-
-const SF_SEARCH_ICON_URL = '/icons/search_sparkle.png';
-const SF_MIC_ICON_URL = 'https://github.com/andrewtavis/sf-symbols-online/blob/master/glyphs/mic.png?raw=true';
 
 type KeyboardLayoutMode = 'alpha' | 'numeric' | 'symbols';
 
@@ -417,13 +414,18 @@ export const NativeKeyboard: React.FC = () => {
           setActiveBubbleKey(null);
         }}
         onClick={() => handleCharPress(char)}
-        className={`relative flex-1 min-w-0 ${keyHeightClass} rounded-[7px] sm:rounded-[9px] bg-white/60 hover:bg-white/70 active:bg-white/80 text-black border border-white/35 shadow-[0_1px_2px_rgba(0,0,0,0.16)] font-semibold ${
+        className={`touch-keycap relative flex-1 min-w-0 ${keyHeightClass} rounded-[4px] font-semibold ${
           hasNumberRow ? 'text-[17px] sm:text-[19px] md:text-[21px]' : 'text-[19px] sm:text-[21px] md:text-[23px]'
         } flex items-center justify-center transition-colors cursor-default font-sans select-none ${
-          isBubbleActive ? 'z-40 bg-white/85' : 'z-10'
+          isBubbleActive ? 'touch-keycap-active z-40' : 'z-10'
         }`}
       >
-        {displayChar}
+        {!hasNumberRow && layoutMode === 'alpha' && rowIndex === 1 && (
+          <span aria-hidden="true" className="absolute left-1.5 top-1 text-[9px] sm:text-[10px] font-medium text-black/45">
+            {rowNumbers[colIndex]}
+          </span>
+        )}
+        <span className="relative z-10">{displayChar}</span>
 
         {/* iOS-Style Key Press Bubble Tooltip */}
         {isBubbleActive && (
@@ -437,7 +439,7 @@ export const NativeKeyboard: React.FC = () => {
             }`}
             style={{ filter: 'drop-shadow(0 8px 18px rgba(0, 0, 0, 0.32))' }}
           >
-            {/* Bubble body with bold black enlarged letter */}
+            {/* Enlarged key press bubble */}
             <div className="w-[48px] sm:w-[54px] h-[50px] sm:h-[56px] rounded-[14px] sm:rounded-[16px] bg-white border border-black/10 flex items-center justify-center shadow-xs">
               <span className="text-black font-semibold text-[26px] sm:text-[30px] font-sans leading-none select-none">
                 {displayChar}
@@ -458,22 +460,20 @@ export const NativeKeyboard: React.FC = () => {
   return (
     <div
       id="vplay-native-keyboard"
-      aria-label="Sparkle Native Keyboard"
+      role="group"
+      aria-label="Touch keyboard"
       style={{
         height: `${keyboardHeight}px`,
-        backgroundColor: 'rgba(255, 255, 255, 0.70)',
-        backdropFilter: 'blur(20px)',
-        WebkitBackdropFilter: 'blur(20px)',
         zIndex: 2147483647,
       }}
-      className={`fixed bottom-0 left-0 right-0 z-50 rounded-t-xl bg-white/70 backdrop-blur-[20px] border-t border-black/10 shadow-[0_-8px_30px_rgba(0,0,0,0.25)] transition-all duration-[440ms] [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] will-change-transform select-none flex flex-col justify-between ${
+      className={`touch-keyboard-shell fixed inset-x-0 bottom-0 z-50 rounded-none bg-white/50 backdrop-blur-2xl border-t border-black/10 transition-all duration-[440ms] [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] will-change-transform select-none flex flex-col justify-between ${
         isOpen ? 'translate-y-0 opacity-100 pointer-events-auto' : 'translate-y-full opacity-0 pointer-events-none'
       }`}
     >
-      <div className="w-full max-w-full md:max-w-4xl lg:max-w-5xl xl:max-w-6xl mx-auto flex flex-col justify-between h-full px-2 sm:px-3 md:px-5 pt-1.5 pb-2">
+      <div className="w-full max-w-full md:max-w-4xl lg:max-w-5xl xl:max-w-6xl mx-auto flex flex-col justify-between h-full px-2 sm:px-2 md:px-2 pt-1.5 pb-2">
         {/* Top bar with Switch to device's keyboard button and emoji search bar when in emoji mode */}
-        <div className="relative flex items-center justify-center gap-2 px-1 pt-0.5 pb-1 select-none min-h-[34px]">
-          {/* Switch to device's keyboard button - Hide title text when in emoji board */}
+        <div className="touch-keyboard-header relative flex items-center justify-between gap-2 px-1 pt-0.5 pb-1 select-none min-h-[36px] border-b border-black/10">
+          {/* Compact switch to the device keyboard button */}
           <button
             type="button"
             id="btn-switch-to-device-keyboard"
@@ -485,30 +485,23 @@ export const NativeKeyboard: React.FC = () => {
             onClick={() => {
               switchToDeviceKeyboard();
             }}
-            className={`flex items-center gap-1.5 rounded-full bg-black/10 hover:bg-black/15 text-black tracking-tight transition-all cursor-default shadow-xs shrink-0 ${
-              showEmojiPicker
-                ? 'p-2'
-                : 'px-3 py-1 text-[11px] sm:text-xs font-semibold'
-            }`}
+            className="flex h-7 w-7 items-center justify-center rounded-md bg-transparent text-black/70 hover:bg-black/[0.06] active:bg-black/[0.1] transition-colors cursor-default shrink-0"
             title="Switch to device's keyboard"
             aria-label="Switch to device's keyboard"
           >
-            <Keyboard className="w-3.5 h-3.5 text-black shrink-0" />
-            {!showEmojiPicker && (
-              <span className="text-black whitespace-nowrap">Switch to device's keyboard</span>
-            )}
+              <Keyboard className="w-4 h-4 text-black/70 shrink-0" />
           </button>
 
-          {/* Emoji search bar matching TopBar search box design style with PURE WHITE background */}
+          {/* Search field for the emoji board */}
           {showEmojiPicker && (
-            <div className="relative flex items-center shrink-0 w-48 xs:w-56 sm:w-72 md:w-84 h-8 rounded-[100px] bg-white border border-black/15 px-3 gap-2 transition-all focus-within:bg-white focus-within:border-[#ff01ff] focus-within:ring-1 focus-within:ring-[#ff01ff]/40 shadow-xs">
-              <FluentSearchIcon className="w-[15px] h-[15px] text-[#71717a] shrink-0 pointer-events-none select-none" />
+            <div className="absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 items-center shrink-0 w-48 xs:w-56 sm:w-72 md:w-84 h-8 rounded-[10px] bg-white/70 border border-black/10 px-3 gap-2 transition-all focus-within:bg-white/85 focus-within:border-[#0078d4] focus-within:ring-1 focus-within:ring-[#0078d4]/25 shadow-xs">
+              <FluentSearchIcon className="w-[15px] h-[15px] text-[#6b7280] shrink-0 pointer-events-none select-none" />
               <input
                 type="text"
                 value={emojiSearchQuery}
                 onChange={(e) => setEmojiSearchQuery(e.target.value)}
                 placeholder="Tìm kiếm emoji..."
-                className="flex-1 min-w-0 bg-transparent text-xs sm:text-[13px] text-[#111827] placeholder-[#71717a] outline-none border-none py-0.5 pr-1 font-sans"
+                className="flex-1 min-w-0 bg-transparent text-xs sm:text-[13px] text-[#1f2937] placeholder-[#6b7280] outline-none border-none py-0.5 pr-1 font-sans"
               />
               {emojiSearchQuery && (
                 <button
@@ -527,7 +520,7 @@ export const NativeKeyboard: React.FC = () => {
           {/* Active input hint / indicator & Dismiss button - Pinned to right */}
           <div className="absolute right-1 top-1/2 -translate-y-1/2 flex items-center gap-2">
             {!showEmojiPicker && (
-              <span className="text-[11px] font-medium text-black truncate max-w-[100px] sm:max-w-[180px] select-none hidden xs:inline">
+              <span className="sr-only">
                 {activeInput?.placeholder || 'Sparkle Keyboard'}
               </span>
             )}
@@ -541,11 +534,11 @@ export const NativeKeyboard: React.FC = () => {
                 playSound('action');
               }}
               onClick={closeKeyboard}
-              className="p-1 rounded-full text-black hover:bg-black/10 transition-colors cursor-default"
+              className="p-1 rounded-md text-black/70 hover:bg-black/[0.06] transition-colors cursor-default"
               title="Đóng bàn phím"
               aria-label="Đóng bàn phím"
             >
-              <X className="w-4 h-4 text-black" />
+              <X className="w-4 h-4" />
             </button>
           </div>
         </div>
@@ -611,8 +604,8 @@ export const NativeKeyboard: React.FC = () => {
               </div>
             </div>
 
-            {/* Clipboard Search Bar - Pure white background pill matching TopBar & emoji search bar */}
-            <div className="relative flex items-center w-full h-7.5 rounded-[100px] bg-white border border-black/15 px-3 gap-2 transition-all focus-within:bg-white focus-within:border-[#ff01ff] focus-within:ring-1 focus-within:ring-[#ff01ff]/40 shadow-xs my-1 shrink-0">
+            {/* Clipboard search pill */}
+            <div className="relative flex items-center w-full h-7.5 rounded-[100px] bg-white border border-black/15 px-3 gap-2 transition-all focus-within:bg-white focus-within:border-[#55c5f4] focus-within:ring-1 focus-within:ring-[#55c5f4]/35 shadow-xs my-1 shrink-0">
               <FluentSearchIcon className="w-3.5 h-3.5 text-[#71717a] shrink-0 pointer-events-none select-none" />
               <input
                 type="text"
@@ -753,7 +746,7 @@ export const NativeKeyboard: React.FC = () => {
                 onMouseDown={(e) => e.preventDefault()}
                 onPointerDown={() => playSound('action')}
                 onClick={closeKeyboard}
-                className="px-4 py-1.5 rounded-xl bg-[#ff01ff] hover:bg-[#ff33ff] active:bg-[#e600e6] text-xs font-bold text-white shadow-xs transition-colors cursor-default"
+                className="px-4 py-1.5 rounded-lg bg-[#48c3f2] hover:bg-[#66d0f7] active:bg-[#34a9d7] text-xs font-bold text-[#08212a] shadow-xs transition-colors cursor-default"
               >
                 Xong
               </button>
@@ -772,7 +765,7 @@ export const NativeKeyboard: React.FC = () => {
             }}
           />
         ) : (
-          /* Standard Keyboard Grid - 40% Opacity Keys, Black Text & Icons, Bubble Tooltips */
+          /* Standard keyboard grid with charcoal keycaps and press bubbles */
           <div className="flex flex-col gap-1 sm:gap-1.5 md:gap-2 flex-1 justify-center">
             {/* ROW 0: Dedicated Number Row (Bàn phím số: 0 đến 9 trên dải phím chữ) */}
             {hasNumberRow && (
@@ -800,7 +793,7 @@ export const NativeKeyboard: React.FC = () => {
             {/* ROW 3: Shift / Mode, Characters, Backspace */}
             <div className="flex items-center justify-between gap-1 sm:gap-1.5 md:gap-2 w-full">
               {layoutMode === 'alpha' ? (
-                /* Shift Key - Black text and icon with slightly boosted opacity */
+                /* Shift key with an accent state for Caps Lock and Shift */
                 <button
                   type="button"
                   onMouseDown={(e) => e.preventDefault()}
@@ -812,10 +805,8 @@ export const NativeKeyboard: React.FC = () => {
                     }
                   }}
                   onClick={handleShiftTap}
-                  className={`w-[13.5%] min-w-[38px] sm:min-w-[48px] ${keyHeightClass} rounded-[7px] sm:rounded-[9px] flex items-center justify-center shadow-[0_1px_2px_rgba(0,0,0,0.16)] transition-colors cursor-default border ${
-                    isCapsLock || isShiftActive
-                      ? 'bg-white/85 text-black border-white/60 shadow-sm'
-                      : 'bg-white/60 hover:bg-white/70 active:bg-white/80 text-black border-white/35'
+                  className={`touch-keycap w-[13.5%] min-w-[38px] sm:min-w-[48px] ${keyHeightClass} rounded-[4px] flex items-center justify-center transition-colors cursor-default border ${
+                    isCapsLock || isShiftActive ? 'touch-keycap-active' : ''
                   }`}
                   title={isCapsLock ? 'Caps Lock BẬT' : isShiftActive ? 'Shift BẬT' : 'Shift'}
                   aria-label="Shift"
@@ -823,7 +814,7 @@ export const NativeKeyboard: React.FC = () => {
                   <ArrowBigUp className={`w-5 h-5 text-black ${isCapsLock || isShiftActive ? 'fill-black' : ''}`} />
                 </button>
               ) : (
-                /* #+= or 123 Toggle - Black text with boosted opacity */
+                /* #+= or 123 layout toggle */
                 <button
                   type="button"
                   onMouseDown={(e) => e.preventDefault()}
@@ -834,7 +825,7 @@ export const NativeKeyboard: React.FC = () => {
                   onClick={() => {
                     setLayoutMode(layoutMode === 'numeric' ? 'symbols' : 'numeric');
                   }}
-                  className={`w-[13.5%] min-w-[38px] sm:min-w-[48px] ${keyHeightClass} rounded-[7px] sm:rounded-[9px] bg-white/60 hover:bg-white/70 active:bg-white/80 text-black border border-white/35 text-xs sm:text-sm font-semibold flex items-center justify-center shadow-[0_1px_2px_rgba(0,0,0,0.16)] transition-colors cursor-default font-sans`}
+                  className={`touch-keycap w-[13.5%] min-w-[38px] sm:min-w-[48px] ${keyHeightClass} rounded-[4px] text-xs sm:text-sm font-semibold flex items-center justify-center transition-colors cursor-default font-sans`}
                 >
                   {layoutMode === 'numeric' ? '#+=' : '123'}
                 </button>
@@ -845,7 +836,7 @@ export const NativeKeyboard: React.FC = () => {
                 renderCharKey(char, 3, colIndex, arr.length)
               )}
 
-              {/* Backspace Key - Black icon with boosted opacity */}
+              {/* Backspace key */}
               <button
                 type="button"
                 onMouseDown={(e) => e.preventDefault()}
@@ -856,7 +847,7 @@ export const NativeKeyboard: React.FC = () => {
                 onPointerUp={handleDeleteUp}
                 onPointerLeave={handleDeleteUp}
                 onPointerCancel={handleDeleteUp}
-                className={`w-[13.5%] min-w-[38px] sm:min-w-[48px] ${keyHeightClass} rounded-[7px] sm:rounded-[9px] bg-white/60 hover:bg-white/70 active:bg-white/80 text-black border border-white/35 flex items-center justify-center shadow-[0_1px_2px_rgba(0,0,0,0.16)] transition-colors cursor-default`}
+                className={`touch-keycap w-[13.5%] min-w-[38px] sm:min-w-[48px] ${keyHeightClass} rounded-[4px] flex items-center justify-center transition-colors cursor-default`}
                 title="Xóa"
                 aria-label="Xóa"
               >
@@ -864,9 +855,9 @@ export const NativeKeyboard: React.FC = () => {
               </button>
             </div>
 
-            {/* ROW 4: 123 / ABC, Spacebar, Magenta Search Button */}
-            <div className="flex items-center justify-between gap-1.5 w-full">
-              {/* Layout Switch: 123 or ABC - Black text */}
+            {/* ROW 4: Layout, utilities, space, voice and search */}
+            <div className="flex w-full items-center gap-1 sm:gap-1.5">
+              {/* Layout switch: 123 or ABC */}
               <button
                 type="button"
                 onMouseDown={(e) => e.preventDefault()}
@@ -877,117 +868,59 @@ export const NativeKeyboard: React.FC = () => {
                 onClick={() => {
                   setLayoutMode(layoutMode === 'alpha' ? 'numeric' : 'alpha');
                 }}
-                className={`w-[18%] sm:w-[16%] min-w-[50px] sm:min-w-[70px] ${keyHeightClass} rounded-[7px] sm:rounded-[9px] bg-white/60 hover:bg-white/70 active:bg-white/80 text-black border border-white/35 font-semibold text-sm sm:text-base flex items-center justify-center shadow-[0_1px_2px_rgba(0,0,0,0.16)] transition-colors cursor-default font-sans`}
+                className="touch-keycap h-[42px] w-[7%] min-w-[42px] shrink-0 rounded-[4px] flex items-center justify-center text-xs font-semibold transition-colors cursor-default font-sans sm:h-[46px] sm:min-w-[52px] sm:text-sm md:h-[50px] md:min-w-[58px]"
+                aria-label={layoutMode === 'alpha' ? 'Chuyển sang phím số' : 'Chuyển sang phím chữ'}
               >
                 {layoutMode === 'alpha' ? '123' : 'ABC'}
               </button>
 
-              {/* Spacebar - Boosted Opacity, Black text */}
+              {/* Emoji toggle */}
               <button
                 type="button"
-                onMouseDown={(e) => e.preventDefault()}
-                onPointerDown={(e) => {
-                  e.preventDefault();
-                  playSound('space');
-                  if (navigator.vibrate) {
-                    try { navigator.vibrate(10); } catch {}
-                  }
-                }}
-                onClick={handleSpacePress}
-                className={`flex-1 min-w-0 ${keyHeightClass} rounded-[7px] sm:rounded-[9px] bg-white/60 hover:bg-white/70 active:bg-white/80 text-black border border-white/35 font-semibold text-sm flex items-center justify-center shadow-[0_1px_2px_rgba(0,0,0,0.16)] transition-colors cursor-default`}
-                aria-label="Phím cách"
-              >
-                <span className="text-[11px] sm:text-xs text-black font-semibold font-sans tracking-wide truncate px-2">
-                  {inputMethod === 'vi-telex'
-                    ? 'cách • Tiếng Việt (Telex)'
-                    : inputMethod === 'vi-vni'
-                    ? 'cách • Tiếng Việt (VNI)'
-                    : 'space • Tiếng Anh'}
-                </span>
-              </button>
-
-              {/* Magenta Search / Action Button (WinUI light mode magenta #ff01ff) */}
-              <button
-                type="button"
-                id="btn-native-keyboard-search"
-                onMouseDown={(e) => e.preventDefault()}
-                onPointerDown={(e) => {
-                  e.preventDefault();
-                  playSound('action');
-                  if (navigator.vibrate) {
-                    try { navigator.vibrate(16); } catch {}
-                  }
-                }}
-                onClick={handleSearchAction}
-                className={`w-[22%] sm:w-[20%] min-w-[65px] sm:min-w-[85px] ${keyHeightClass} rounded-[7px] sm:rounded-[9px] bg-[#ff01ff] hover:bg-[#ff33ff] active:bg-[#e600e6] text-white flex items-center justify-center shadow-none border-0 transition-colors cursor-default`}
-                title="Tìm kiếm"
-                aria-label="Tìm kiếm"
-              >
-                <img
-                  src={SF_SEARCH_ICON_URL}
-                  alt="Search"
-                  className="w-5 h-5 sm:w-5.5 sm:h-5.5 object-contain filter brightness-0 invert select-none pointer-events-none transition-transform"
-                  referrerPolicy="no-referrer"
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).src = '/icons/sf-magnifyingglass.png';
-                  }}
-                />
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* ROW 5: Bottom Utility Bar - All text and icons black */}
-        <div className="relative flex items-center justify-between px-2 pt-1 pb-1 select-none">
-          {/* Left section: Emoji, Globe language switcher, and Clipboard button */}
-          <div className="flex items-center gap-1.5 sm:gap-2">
-            {/* Emoji toggle - Black icon */}
-            <button
-              type="button"
-              onMouseDown={(e) => e.preventDefault()}
-              onPointerDown={(e) => {
-                e.preventDefault();
-                playSound('modifier');
-              }}
-              onClick={() => {
-                setShowClipboard(false);
-                setShowLanguageMenu(false);
-                setShowEmojiPicker((prev) => !prev);
-              }}
-              className="p-1 text-black hover:text-black transition-colors cursor-default"
-              title="Emoji"
-              aria-label="Emoji"
-            >
-              <Smile className="w-5 h-5 text-black" />
-            </button>
-
-            {/* Clipboard Button (if enabled in settings) */}
-            {settings.keyboardClipboard && (
-              <button
-                type="button"
-                id="btn-native-keyboard-clipboard"
+                id="btn-native-keyboard-emoji"
                 onMouseDown={(e) => e.preventDefault()}
                 onPointerDown={(e) => {
                   e.preventDefault();
                   playSound('modifier');
                 }}
                 onClick={() => {
+                  setShowClipboard(false);
                   setShowLanguageMenu(false);
-                  setShowEmojiPicker(false);
-                  setShowClipboard((prev) => !prev);
+                  setShowEmojiPicker((prev) => !prev);
                 }}
-                className={`p-1 rounded-full text-black transition-colors cursor-default flex items-center justify-center ${
-                  showClipboard ? 'bg-black/20 text-black shadow-xs' : 'hover:bg-black/10'
-                }`}
-                title="Lịch sử sao chép (Clipboard)"
-                aria-label="Lịch sử sao chép"
+                className={`touch-keycap h-[42px] w-[5%] min-w-[36px] shrink-0 rounded-[4px] flex items-center justify-center transition-colors cursor-default sm:h-[46px] sm:min-w-[40px] md:h-[50px] ${showEmojiPicker ? 'touch-keycap-active' : ''}`}
+                title="Emoji"
+                aria-label="Emoji"
+                aria-pressed={showEmojiPicker}
               >
-                <ClipboardList className="w-5 h-5 text-black" />
+                <Smile className="w-5 h-5" />
               </button>
-            )}
 
-            {/* Globe Language Switcher Button - Black icon and text */}
-            <div className="relative">
+              {/* Clipboard history toggle */}
+              {settings.keyboardClipboard && (
+                <button
+                  type="button"
+                  id="btn-native-keyboard-clipboard"
+                  onMouseDown={(e) => e.preventDefault()}
+                  onPointerDown={(e) => {
+                    e.preventDefault();
+                    playSound('modifier');
+                  }}
+                  onClick={() => {
+                    setShowLanguageMenu(false);
+                    setShowEmojiPicker(false);
+                    setShowClipboard((prev) => !prev);
+                  }}
+                  className={`touch-keycap h-[42px] w-[5%] min-w-[36px] shrink-0 rounded-[4px] flex items-center justify-center transition-colors cursor-default sm:h-[46px] sm:min-w-[40px] md:h-[50px] ${showClipboard ? 'touch-keycap-active' : ''}`}
+                  title="Lịch sử sao chép (Clipboard)"
+                  aria-label="Lịch sử sao chép"
+                  aria-pressed={showClipboard}
+                >
+                  <ClipboardList className="w-5 h-5" />
+                </button>
+              )}
+
+              {/* Language picker */}
               <button
                 ref={globeBtnRef}
                 type="button"
@@ -1008,20 +941,88 @@ export const NativeKeyboard: React.FC = () => {
                   }
                   setShowLanguageMenu((prev) => !prev);
                 }}
-                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold transition-colors cursor-default ${
-                  showLanguageMenu
-                    ? 'bg-black/20 text-black shadow-xs'
-                    : 'text-black bg-black/10 hover:bg-black/15'
-                }`}
-                title="Chuyển ngôn ngữ gõ"
-                aria-label="Chuyển ngôn ngữ gõ"
+                className={`touch-keycap h-[42px] w-[7%] min-w-[48px] shrink-0 rounded-[4px] px-1.5 flex items-center justify-center gap-1 text-[10px] font-semibold transition-colors cursor-default sm:h-[46px] sm:min-w-[58px] sm:text-[11px] md:h-[50px] ${showLanguageMenu ? 'touch-keycap-active' : ''}`}
+                title={`Ngôn ngữ gõ: ${inputMethod === 'vi-telex' ? 'Tiếng Việt (Telex)' : inputMethod === 'vi-vni' ? 'Tiếng Việt (VNI)' : 'Tiếng Anh'}`}
+                aria-label={`Ngôn ngữ gõ: ${inputMethod === 'vi-telex' ? 'Tiếng Việt (Telex)' : inputMethod === 'vi-vni' ? 'Tiếng Việt (VNI)' : 'Tiếng Anh'}`}
+                aria-haspopup="menu"
+                aria-expanded={showLanguageMenu}
               >
-                <Globe className="w-4 h-4 text-black" />
-                <span className="text-[11px] font-semibold tracking-tight text-black">
+                <Globe className="w-4 h-4 shrink-0" />
+                <span className="hidden sm:inline text-[10px] sm:text-[11px] tracking-tight">
                   {inputMethod === 'vi-telex' ? 'Telex' : inputMethod === 'vi-vni' ? 'VNI' : 'EN'}
                 </span>
               </button>
 
+              {/* Spacebar */}
+              <button
+                type="button"
+                onMouseDown={(e) => e.preventDefault()}
+                onPointerDown={(e) => {
+                  e.preventDefault();
+                  playSound('space');
+                  if (navigator.vibrate) {
+                    try { navigator.vibrate(10); } catch {}
+                  }
+                }}
+                onClick={handleSpacePress}
+                className={`touch-keycap flex-1 min-w-[24px] h-[42px] sm:h-[46px] md:h-[50px] rounded-[4px] font-semibold text-sm flex items-center justify-center transition-colors cursor-default`}
+                aria-label="Phím cách"
+              >
+                <span className="text-[11px] sm:text-xs text-black font-semibold font-sans tracking-wide truncate px-1 sm:px-2">
+                  {inputMethod === 'vi-telex'
+                    ? 'cách • Tiếng Việt (Telex)'
+                    : inputMethod === 'vi-vni'
+                    ? 'cách • Tiếng Việt (VNI)'
+                    : 'space • Tiếng Anh'}
+                </span>
+              </button>
+
+              {/* Microphone, adjacent to search */}
+              <button
+                type="button"
+                id="btn-native-keyboard-mic"
+                onMouseDown={(e) => e.preventDefault()}
+                onPointerDown={(e) => {
+                  e.preventDefault();
+                  playSound('action');
+                }}
+                onClick={toggleMic}
+                className={`touch-keycap h-[42px] w-[7%] min-w-[38px] shrink-0 rounded-[4px] flex items-center justify-center transition-colors cursor-default sm:h-[46px] sm:min-w-[46px] md:h-[50px] ${isMicListening ? 'touch-keycap-active' : ''}`}
+                title={isMicListening ? 'Đang nghe...' : 'Nhập bằng giọng nói'}
+                aria-label={isMicListening ? 'Đang nghe, dừng nhập bằng giọng nói' : 'Nhập bằng giọng nói'}
+                aria-pressed={isMicListening}
+              >
+                <Mic className="w-5 h-5" />
+              </button>
+
+              {/* Search / action button */}
+              <button
+                type="button"
+                id="btn-native-keyboard-search"
+                onMouseDown={(e) => e.preventDefault()}
+                onPointerDown={(e) => {
+                  e.preventDefault();
+                  playSound('action');
+                  if (navigator.vibrate) {
+                    try { navigator.vibrate(16); } catch {}
+                  }
+                }}
+                onClick={handleSearchAction}
+                className="touch-keycap h-[42px] w-[8%] min-w-[50px] shrink-0 rounded-[4px] flex items-center justify-center transition-colors cursor-default sm:h-[46px] sm:min-w-[58px] md:h-[50px]"
+                title="Tìm kiếm"
+                aria-label="Tìm kiếm"
+              >
+                <Search className="w-5 h-5" aria-hidden="true" />
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Keep the language menu portal mounted while its trigger sits beside 123. */}
+        <div className="hidden" aria-hidden="true">
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            {/* Globe language switcher */}
+            <div className="relative">
               {/* Language Selection Popup Menu - Portaled to document.body with identical sidebar blur, opacity, and animation */}
               {typeof document !== 'undefined' &&
                 createPortal(
@@ -1038,7 +1039,11 @@ export const NativeKeyboard: React.FC = () => {
                         className={`fixed z-[2147483647] w-[232px] ${flyoutPanelClassName} fluent-context-menu`}
                         style={{
                           ...flyoutPanelStyle,
+                          backgroundColor: 'rgba(255, 255, 255, 0.92)',
+                          border: '1px solid rgba(15, 23, 42, 0.12)',
                           borderRadius: '10px',
+                          boxShadow: '0 14px 32px rgba(15, 23, 42, 0.14)',
+                          color: '#1f2937',
                           left: `${langMenuPos.left}px`,
                           bottom: `${langMenuPos.bottom}px`,
                         }}
@@ -1050,7 +1055,7 @@ export const NativeKeyboard: React.FC = () => {
                             y: 0,
                             transition: { duration: 0.38, delay: 0, ease: [0.16, 1, 0.3, 1] },
                           }}
-                          className="px-3 py-1.5 text-[11px] font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider"
+                          className="px-3 py-1.5 text-[11px] font-semibold text-[#6b7280] uppercase tracking-wider"
                         >
                           Ngôn ngữ gõ
                         </motion.div>
@@ -1062,7 +1067,7 @@ export const NativeKeyboard: React.FC = () => {
                             scaleX: 1,
                             transition: { duration: 0.38, delay: 0.03, ease: [0.16, 1, 0.3, 1] },
                           }}
-                          className="h-px bg-black/10 dark:bg-white/10 my-1 mx-1 origin-left"
+                          className="h-px bg-black/10 my-1 mx-1 origin-left"
                         />
                         <div className="space-y-0.5 mt-0.5">
                           {LANGUAGE_OPTIONS.map((lang, idx) => {
@@ -1091,7 +1096,7 @@ export const NativeKeyboard: React.FC = () => {
                                   setInputMethod(lang.id);
                                   setShowLanguageMenu(false);
                                 }}
-                                className="w-full h-[36px] px-3 rounded-[6px] flex items-center justify-between text-[13px] font-medium text-left outline-none transition-colors cursor-pointer hover:bg-black/[0.05] dark:hover:bg-white/[0.08] focus-visible:bg-black/[0.05] dark:focus-visible:bg-white/[0.08] active:bg-black/[0.08] dark:active:bg-white/[0.12] text-[#111827] dark:text-white"
+                                className="w-full h-[36px] px-3 rounded-[6px] flex items-center justify-between text-[13px] font-medium text-left outline-none transition-colors cursor-pointer hover:bg-black/[0.05] focus-visible:bg-black/[0.05] active:bg-black/[0.08] text-[#111827]"
                               >
                                 <div className="flex items-center gap-2.5 min-w-0">
                                   <span className="text-base leading-none shrink-0">{lang.flag}</span>
@@ -1112,37 +1117,6 @@ export const NativeKeyboard: React.FC = () => {
             </div>
           </div>
 
-          {/* Right section: SF Symbol Microphone - Pure black icon */}
-          <div className="flex items-center gap-1">
-            <button
-              type="button"
-              onMouseDown={(e) => e.preventDefault()}
-              onPointerDown={(e) => {
-                e.preventDefault();
-                playSound('action');
-              }}
-              onClick={toggleMic}
-              className={`p-1.5 rounded-full transition-colors cursor-default flex items-center justify-center ${
-                isMicListening
-                  ? 'bg-red-500/25 ring-2 ring-red-500/50'
-                  : 'hover:bg-black/10'
-              }`}
-              title={isMicListening ? 'Đang nghe...' : 'Nhập bằng giọng nói'}
-              aria-label="Microphone"
-            >
-              <img
-                src={SF_MIC_ICON_URL}
-                alt="Mic"
-                className={`w-5 h-5 sm:w-5.5 sm:h-5.5 object-contain select-none pointer-events-none transition-opacity filter brightness-0 ${
-                  isMicListening ? 'opacity-100' : 'opacity-90 hover:opacity-100'
-                }`}
-                referrerPolicy="no-referrer"
-                onError={(e) => {
-                  (e.target as HTMLImageElement).src = '/icons/sf-mic.png';
-                }}
-              />
-            </button>
-          </div>
         </div>
       </div>
     </div>

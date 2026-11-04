@@ -19,6 +19,7 @@ import { SfCheckmark } from '../components/SfCheckmark';
 import { KEYBIND_DEFINITIONS, DEFAULT_KEYBINDS, eventToKeyString, validateKeybind } from '../utils/keybinds';
 import { KeybindAction } from '../types';
 import { showAppToast } from '../utils/toast';
+import { FluentEmoji } from '../components/FluentEmoji';
 
 const SETTING_LABELS: Partial<Record<keyof SystemSettings, string>> = {
   theme: 'App theme',
@@ -31,7 +32,7 @@ const SETTING_LABELS: Partial<Record<keyof SystemSettings, string>> = {
   spatialGlassBlur: 'Spatial glass blur',
   autoHideSidebar: 'Auto-hide sidebar',
   hoverToExpand: 'Hover to expand',
-  nativeKeyboard: 'Native keyboard',
+  nativeKeyboard: 'Touch keyboard',
   keyboardNumberRow: 'Keyboard number row',
   keyboardClipboard: 'Keyboard clipboard',
   keyboardSoundEnabled: 'Keyboard sound',
@@ -39,6 +40,7 @@ const SETTING_LABELS: Partial<Record<keyof SystemSettings, string>> = {
   newWatchTab: 'Watch tab layout',
   fluentIcons: 'Fluent icons',
   dynamicSidebarIcons: 'Dynamic sidebar icons',
+  useFlumojs: 'Use Flumojs',
   pageAnimation: 'Page animation',
   pageLoading: 'Page loading',
   loadPagesSequentially: 'Load pages sequentially',
@@ -183,8 +185,8 @@ export const Settings: React.FC<SettingsProps> = ({
     return texts.some((t) => t && t.toLowerCase().includes(query));
   };
 
-  const matchesExperimental = 
-    matchesSearch(['Insider experiments', 'Insider Flags', 'thử nghiệm', 'native keyboard', 'bàn phím ảo', 'immersive search', 'fluent icons', '3d icons', 'animated boot screen', 'boot screen', 'khởi động', 'video khởi động']);
+  const matchesExperimental =
+    matchesSearch(['Insider experiments', 'Insider Flags', 'thử nghiệm', 'touch keyboard', 'native keyboard', 'bàn phím cảm ứng', 'bàn phím ảo', 'immersive search', 'fluent icons', 'flumojs', 'fluent emojis', 'emoji', '3d icons', 'animated boot screen', 'boot screen', 'khởi động', 'video khởi động']);
   const matchesInterface = 
     matchesSearch(['Appearance', 'Interface', 'giao diện', 'chế độ ứng dụng', 'ban ngày', 'ban đêm', 'light', 'dark', 'thanh điều hướng', 'navigation', 'side view', 'top view', 'tab view', 'thu phóng giao diện', 'font', 'vị trí thanh bên', 'siêu chế độ tối', 'super dark']);
   const matchesAccessibility = matchesSearch(['Accessibility', 'trợ năng', 'hover to expand']);
@@ -289,27 +291,39 @@ export const Settings: React.FC<SettingsProps> = ({
               className="overflow-hidden"
             >
               <div className="space-y-2.5 bg-transparent pt-0.5">
-                {/* 1. Native keyboard */}
-                {false && matchesSearch(['Native keyboard', 'bàn phím', 'cảm ứng']) && (
-                  <motion.div 
+                {/* Touch keyboard */}
+                {matchesSearch(['Touch keyboard', 'Native keyboard', 'bàn phím cảm ứng', 'bàn phím ảo']) && (
+                  <motion.div
                     variants={slideUpVariant}
                     initial="hidden"
                     animate="visible"
                     custom={elementIndex++}
-                    id="setting-experimental-native-keyboard"
+                    id="setting-experimental-touch-keyboard"
                     onClick={() => updateDraft('nativeKeyboard', !draftSettings.nativeKeyboard)}
                     className="settings-block-card rounded-[6px] bg-white dark:bg-[#2c3037] shadow-xs px-4 py-3 sm:py-3.5 flex items-center justify-between gap-4 settings-block-card cursor-pointer hover:bg-black/[0.02] dark:hover:bg-[#363b43] transition-colors border-none"
                   >
                     <div className="min-w-0 flex-1 pr-2">
-                      <div className="font-normal text-sm text-[#111827] dark:text-white" style={{ fontWeight: 400 }}>
-                        Native keyboard
+                      <div
+                        id="touch-keyboard-label"
+                        className="font-normal text-sm text-[#111827] dark:text-white"
+                        style={{ fontWeight: 400 }}
+                      >
+                        Touch keyboard
                       </div>
+                      <p
+                        id="touch-keyboard-description"
+                        className="mt-1 text-xs leading-relaxed text-[#6B7280] dark:text-[#9CA3AF]"
+                      >
+                        Shows an on-screen keyboard when you focus a text field. On by default on mobile and off by default on desktop; you can change it anytime.
+                      </p>
                     </div>
 
                     <button
-                      id="toggle-native-keyboard"
+                      id="toggle-touch-keyboard"
                       type="button"
                       role="switch"
+                      aria-labelledby="touch-keyboard-label"
+                      aria-describedby="touch-keyboard-description"
                       aria-checked={draftSettings.nativeKeyboard}
                       onClick={(e) => {
                         e.stopPropagation();
@@ -417,6 +431,52 @@ export const Settings: React.FC<SettingsProps> = ({
                       </div>
                     </div>
                     <button id="toggle-new-watch-tab" type="button" role="switch" aria-checked={draftSettings.newWatchTab} onClick={(e) => { e.stopPropagation(); updateDraft('newWatchTab', !draftSettings.newWatchTab); }} className="toggle-switch-btn focus:outline-none shrink-0 border-none"><span className="toggle-switch-thumb" /></button>
+                  </motion.div>
+                )}
+
+                {/* Use Flumojs */}
+                {matchesSearch(['Use Flumojs', 'Flumojs', 'Fluent Emojis', 'emoji']) && (
+                  <motion.div
+                    variants={slideUpVariant}
+                    initial="hidden"
+                    animate="visible"
+                    custom={elementIndex++}
+                    id="setting-use-flumojs"
+                    onClick={() => updateDraft('useFlumojs', !draftSettings.useFlumojs)}
+                    className="settings-block-card rounded-[6px] bg-white dark:bg-[#2c3037] shadow-xs px-4 py-3 sm:py-3.5 flex items-center justify-between gap-4 settings-block-card cursor-pointer hover:bg-black/[0.02] dark:hover:bg-[#363b43] transition-colors border-none"
+                  >
+                    <div className="flex items-center gap-3 min-w-0 flex-1 pr-2">
+                      <div className="w-9 h-9 flex items-center justify-center shrink-0">
+                        <FluentEmoji emoji="😀" isDecorative className="w-7 h-7 text-[28px]" />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div id="use-flumojs-label" className="font-normal text-sm text-[#111827] dark:text-white flex items-center gap-2">
+                          <span>Use Flumojs</span>
+                          <span className="text-[10px] px-1.5 py-0.5 rounded-[6px] uppercase tracking-wider bg-[#0078d4]/10 dark:bg-[#4cc2ff]/20 text-[#0078d4] dark:text-[#4cc2ff] font-medium">
+                            New
+                          </span>
+                        </div>
+                        <p id="use-flumojs-description" className="text-xs text-[#6b7280] dark:text-[#9ca3af] mt-0.5">
+                          Render app emoji with Fluent 3D artwork from Fluent Deck.
+                        </p>
+                      </div>
+                    </div>
+
+                    <button
+                      id="toggle-use-flumojs"
+                      type="button"
+                      role="switch"
+                      aria-labelledby="use-flumojs-label"
+                      aria-describedby="use-flumojs-description"
+                      aria-checked={draftSettings.useFlumojs}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        updateDraft('useFlumojs', !draftSettings.useFlumojs);
+                      }}
+                      className="toggle-switch-btn focus:outline-none shrink-0 border-none"
+                    >
+                      <span className="toggle-switch-thumb" />
+                    </button>
                   </motion.div>
                 )}
 
@@ -1467,10 +1527,10 @@ export const Settings: React.FC<SettingsProps> = ({
             >
               <div className="space-y-2.5 bg-transparent pt-0.5">
                 {/* 1. Version information */}
-                {matchesSearch(['Update version', 'Build number', 'Branch', 'Channel', 'Insider Preview', 'co_release', '26103.11', '26.12']) && (
+                {matchesSearch(['Update version', 'Build number', 'Branch', 'Channel', 'Insider Preview', 'co_release', '26105.11', '26.12']) && (
                   <motion.div variants={slideUpVariant} initial="hidden" animate="visible" custom={elementIndex++} className="settings-block-card rounded-[6px] bg-white dark:bg-[#2c3037] shadow-xs p-4 sm:p-5 space-y-3 select-text hover:bg-black/[0.02] dark:hover:bg-[#363b43] transition-colors border-none">
                     <div className="flex items-center justify-between text-xs sm:text-sm"><span className="text-[#111827] dark:text-white">Update version</span><span className="font-semibold text-[#9CA3AF]">26.12</span></div>
-                    <div className="flex items-center justify-between text-xs sm:text-sm"><span className="text-[#111827] dark:text-white">Build number</span><span className="font-semibold text-[#9CA3AF]">26103.11</span></div>
+                    <div className="flex items-center justify-between text-xs sm:text-sm"><span className="text-[#111827] dark:text-white">Build number</span><span className="font-semibold text-[#9CA3AF]">26105.11</span></div>
                     <div className="flex items-center justify-between text-xs sm:text-sm"><span className="text-[#111827] dark:text-white">Branch</span><span className="font-semibold text-[#9CA3AF]">co_release</span></div>
                     <div className="flex items-center justify-between text-xs sm:text-sm"><span className="text-[#111827] dark:text-white">Channel</span><span className="font-semibold text-[#4cc2ff]">Insider Preview</span></div>
                   </motion.div>
