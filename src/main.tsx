@@ -1,6 +1,7 @@
 import {StrictMode} from 'react';
 import {createRoot} from 'react-dom/client';
 import App from './App.tsx';
+import { FlumojsProvider } from './components/FluentEmoji';
 import './index.css';
 import { initBrowserTooltipSuppressor } from './utils/suppressBrowserTooltips';
 
@@ -9,6 +10,8 @@ initBrowserTooltipSuppressor();
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <App />
+    <FlumojsProvider>
+      <App />
+    </FlumojsProvider>
   </StrictMode>,
 );

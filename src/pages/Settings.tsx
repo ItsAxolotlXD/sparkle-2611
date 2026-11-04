@@ -19,6 +19,7 @@ import { SfCheckmark } from '../components/SfCheckmark';
 import { KEYBIND_DEFINITIONS, DEFAULT_KEYBINDS, eventToKeyString, validateKeybind } from '../utils/keybinds';
 import { KeybindAction } from '../types';
 import { showAppToast } from '../utils/toast';
+import { FluentEmoji } from '../components/FluentEmoji';
 
 const SETTING_LABELS: Partial<Record<keyof SystemSettings, string>> = {
   theme: 'App theme',
@@ -39,6 +40,7 @@ const SETTING_LABELS: Partial<Record<keyof SystemSettings, string>> = {
   newWatchTab: 'Watch tab layout',
   fluentIcons: 'Fluent icons',
   dynamicSidebarIcons: 'Dynamic sidebar icons',
+  useFlumojs: 'Use Flumojs',
   pageAnimation: 'Page animation',
   pageLoading: 'Page loading',
   loadPagesSequentially: 'Load pages sequentially',
@@ -183,8 +185,8 @@ export const Settings: React.FC<SettingsProps> = ({
     return texts.some((t) => t && t.toLowerCase().includes(query));
   };
 
-  const matchesExperimental = 
-    matchesSearch(['Insider experiments', 'Insider Flags', 'thử nghiệm', 'native keyboard', 'bàn phím ảo', 'immersive search', 'fluent icons', '3d icons', 'animated boot screen', 'boot screen', 'khởi động', 'video khởi động']);
+  const matchesExperimental =
+    matchesSearch(['Insider experiments', 'Insider Flags', 'thử nghiệm', 'native keyboard', 'bàn phím ảo', 'immersive search', 'fluent icons', 'flumojs', 'fluent emojis', 'emoji', '3d icons', 'animated boot screen', 'boot screen', 'khởi động', 'video khởi động']);
   const matchesInterface = 
     matchesSearch(['Appearance', 'Interface', 'giao diện', 'chế độ ứng dụng', 'ban ngày', 'ban đêm', 'light', 'dark', 'thanh điều hướng', 'navigation', 'side view', 'top view', 'tab view', 'thu phóng giao diện', 'font', 'vị trí thanh bên', 'siêu chế độ tối', 'super dark']);
   const matchesAccessibility = matchesSearch(['Accessibility', 'trợ năng', 'hover to expand']);
@@ -417,6 +419,52 @@ export const Settings: React.FC<SettingsProps> = ({
                       </div>
                     </div>
                     <button id="toggle-new-watch-tab" type="button" role="switch" aria-checked={draftSettings.newWatchTab} onClick={(e) => { e.stopPropagation(); updateDraft('newWatchTab', !draftSettings.newWatchTab); }} className="toggle-switch-btn focus:outline-none shrink-0 border-none"><span className="toggle-switch-thumb" /></button>
+                  </motion.div>
+                )}
+
+                {/* Use Flumojs */}
+                {matchesSearch(['Use Flumojs', 'Flumojs', 'Fluent Emojis', 'emoji']) && (
+                  <motion.div
+                    variants={slideUpVariant}
+                    initial="hidden"
+                    animate="visible"
+                    custom={elementIndex++}
+                    id="setting-use-flumojs"
+                    onClick={() => updateDraft('useFlumojs', !draftSettings.useFlumojs)}
+                    className="settings-block-card rounded-[6px] bg-white dark:bg-[#2c3037] shadow-xs px-4 py-3 sm:py-3.5 flex items-center justify-between gap-4 settings-block-card cursor-pointer hover:bg-black/[0.02] dark:hover:bg-[#363b43] transition-colors border-none"
+                  >
+                    <div className="flex items-center gap-3 min-w-0 flex-1 pr-2">
+                      <div className="w-9 h-9 flex items-center justify-center shrink-0">
+                        <FluentEmoji emoji="😀" isDecorative className="w-7 h-7 text-[28px]" />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div id="use-flumojs-label" className="font-normal text-sm text-[#111827] dark:text-white flex items-center gap-2">
+                          <span>Use Flumojs</span>
+                          <span className="text-[10px] px-1.5 py-0.5 rounded-[6px] uppercase tracking-wider bg-[#0078d4]/10 dark:bg-[#4cc2ff]/20 text-[#0078d4] dark:text-[#4cc2ff] font-medium">
+                            New
+                          </span>
+                        </div>
+                        <p id="use-flumojs-description" className="text-xs text-[#6b7280] dark:text-[#9ca3af] mt-0.5">
+                          Render app emoji with Fluent 3D artwork from Fluent Deck.
+                        </p>
+                      </div>
+                    </div>
+
+                    <button
+                      id="toggle-use-flumojs"
+                      type="button"
+                      role="switch"
+                      aria-labelledby="use-flumojs-label"
+                      aria-describedby="use-flumojs-description"
+                      aria-checked={draftSettings.useFlumojs}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        updateDraft('useFlumojs', !draftSettings.useFlumojs);
+                      }}
+                      className="toggle-switch-btn focus:outline-none shrink-0 border-none"
+                    >
+                      <span className="toggle-switch-thumb" />
+                    </button>
                   </motion.div>
                 )}
 

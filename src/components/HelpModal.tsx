@@ -2,6 +2,7 @@ import React from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { X, Keyboard, HelpCircle, Tv, Moon, Bookmark, Share2 } from 'lucide-react';
 import { useSettings } from '../hooks/useSettings';
+import { FluentEmoji } from './FluentEmoji';
 import { modalDialogVariants, modalBackdropVariants } from '../utils/animations';
 
 interface HelpModalProps {
@@ -73,7 +74,10 @@ export const HelpModal: React.FC<HelpModalProps> = ({ isOpen, onClose }) => {
                 </div>
 
                 <div className="p-3 rounded-lg bg-[#F9F9F9] dark:bg-[#2B2B2B] border border-black/[0.06] dark:border-white/[0.08] text-[12px] text-[#555555] dark:text-[#AAAAAA] space-y-1 leading-relaxed">
-                  <p className="font-semibold text-[#111827] dark:text-[#FFFFFF]">💡 Quick Tips:</p>
+                  <p className="font-semibold text-[#111827] dark:text-[#FFFFFF]">
+                    <FluentEmoji emoji="💡" isDecorative className="mr-1 h-[1em] w-[1em]" />
+                    Quick Tips:
+                  </p>
                   <p>• Use the Tools menu on the toolbar to import custom M3U8 streams or export playlists.</p>
                   <p>• When reading articles, Tools provides instant AI summaries and Microsoft Word (.docx) export.</p>
                 </div>

@@ -40,6 +40,7 @@ import {
   Link2
 } from 'lucide-react';
 import { FluentScreenbugIcon, FluentVlcIcon, FluentArrowUploadIcon, FluentDeleteIcon } from '../components/FluentIcons';
+import { FluentEmoji } from '../components/FluentEmoji';
 import { flyoutPanelClassName, flyoutPanelStyle } from '../components/FlyoutDropdown';
 
 export interface VlcPlaylistItem {
@@ -2346,7 +2347,8 @@ export const VLC: React.FC<VLCProps> = ({ navigate }) => {
                       }}
                       className="px-2 py-1 rounded-[5px] bg-black/5 dark:bg-white/10 hover:bg-black/10 dark:hover:bg-white/15 text-sky-600 dark:text-sky-400 text-[11px] font-medium transition-colors cursor-pointer"
                     >
-                      ⚡ Shazam
+                      <FluentEmoji emoji="⚡" isDecorative className="mr-1 h-[1em] w-[1em]" />
+                      Shazam
                     </button>
                     <button
                       type="button"
@@ -2396,7 +2398,8 @@ export const VLC: React.FC<VLCProps> = ({ navigate }) => {
                       }}
                       className="px-2 py-1 rounded-[5px] bg-black/5 dark:bg-white/10 hover:bg-black/10 dark:hover:bg-white/15 text-orange-600 dark:text-orange-400 text-[11px] font-medium transition-colors cursor-pointer"
                     >
-                      🎬 Direct MP4
+                      <FluentEmoji emoji="🎬" isDecorative className="mr-1 h-[1em] w-[1em]" />
+                      Direct MP4
                     </button>
                   </div>
                 </div>

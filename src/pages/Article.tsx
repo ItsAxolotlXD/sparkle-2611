@@ -3,6 +3,7 @@ import { motion } from 'motion/react';
 import { NEWS_DATA } from '../data/news';
 import { NewsCard } from '../components/NewsCard';
 import { CategoryIcon } from '../components/CategoryIcon';
+import { containsEmoji, FluentEmojiText } from '../components/FluentEmoji';
 import { 
   Calendar, 
   Lock, 
@@ -100,7 +101,7 @@ const renderFormattedContent = (text: string, onNavigate?: (url: string) => void
         </span>
       );
     }
-    return part;
+    return containsEmoji(part) ? <FluentEmojiText key={i}>{part}</FluentEmojiText> : part;
   });
 };
 

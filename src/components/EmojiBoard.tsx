@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Delete } from 'lucide-react';
 import { motion } from 'motion/react';
 import { EMOJI_CATEGORIES } from '../data/emojiCategories';
+import { FluentEmoji } from './FluentEmoji';
 import { keyboardSound } from '../utils/keyboardSound';
 
 interface EmojiBoardProps {
@@ -254,7 +255,7 @@ export const EmojiBoard: React.FC<EmojiBoardProps> = ({
           >
             {/* Category header - Title is displayed in FULL without any truncation or ellipsis */}
             <div className="flex items-center gap-1.5 px-1 py-0.5 select-none shrink-0 whitespace-nowrap">
-              <span className="text-sm leading-none">{category.icon}</span>
+              <FluentEmoji emoji={category.icon} isDecorative className="w-4 h-4 text-sm" />
               <span className="text-xs sm:text-[13px] font-bold text-black tracking-tight whitespace-nowrap">
                 {category.name}
               </span>
@@ -269,6 +270,7 @@ export const EmojiBoard: React.FC<EmojiBoardProps> = ({
                 <button
                   key={`${category.id}-${idx}-${emoji}`}
                   type="button"
+                  aria-label={`Insert ${emoji} emoji`}
                   onMouseDown={(e) => e.preventDefault()}
                   onPointerDown={(e) => {
                     e.preventDefault();
@@ -276,7 +278,7 @@ export const EmojiBoard: React.FC<EmojiBoardProps> = ({
                   }}
                   className="w-[46px] h-[40px] sm:w-[54px] sm:h-[46px] flex items-center justify-center text-[28px] sm:text-[32px] leading-none transition-opacity active:opacity-75 cursor-default select-none bg-transparent border-0 shadow-none p-0 outline-none"
                 >
-                  {emoji}
+                  <FluentEmoji emoji={emoji} isDecorative className="w-8 h-8 text-[28px] sm:text-[32px]" />
                 </button>
               ))}
             </div>
@@ -332,7 +334,7 @@ export const EmojiBoard: React.FC<EmojiBoardProps> = ({
                 }`}
                 title={cat.name}
               >
-                <span className="text-base leading-none select-none">{cat.icon}</span>
+                <FluentEmoji emoji={cat.icon} isDecorative className="w-5 h-5 text-base select-none" />
                 {isActive && (
                   <span className="text-[11px] font-bold text-black whitespace-nowrap">
                     {cat.name}
