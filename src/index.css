@@ -5790,11 +5790,37 @@ html.light-mode .settings-ios-group .text-white {
 }
 
 /* Category icon badges must always retain pure white icons and 100% circular radius */
-/* Native keyboard: white background 70% opacity and 20% blur (20px) */
+/* Floating charcoal shell for the desktop touch keyboard reference. */
 #vplay-native-keyboard {
-  background-color: rgba(255, 255, 255, 0.70) !important;
-  backdrop-filter: blur(20px) !important;
-  -webkit-backdrop-filter: blur(20px) !important;
+  background-color: rgba(26, 30, 31, 0.96) !important;
+  backdrop-filter: blur(22px) saturate(120%) !important;
+  -webkit-backdrop-filter: blur(22px) saturate(120%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 22px 64px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.06) !important;
+  color-scheme: dark;
+  max-height: calc(100dvh - 20px) !important;
+}
+
+@media (min-width: 768px) {
+  #vplay-native-keyboard {
+    left: 0 !important;
+    right: 0 !important;
+    top: 50% !important;
+    bottom: auto !important;
+    width: min(90vw, 920px) !important;
+    margin-inline: auto !important;
+    transform: translateY(-50%) !important;
+  }
+}
+
+@media (max-width: 767px) {
+  #vplay-native-keyboard {
+    border-left: 0 !important;
+    border-right: 0 !important;
+    border-bottom: 0 !important;
+    border-radius: 14px 14px 0 0 !important;
+  }
 }
 
 /* Category icons in settings */
@@ -6653,7 +6679,90 @@ html:not(.light-mode) #vplay-tools-dropdown-card svg.fill-current {
   filter: brightness(0.95) !important;
 }
 
-/* Native Keyboard Blue Search Button - Absolutely No Glow */
+#vplay-native-keyboard [class~="text-black"] {
+  color: #edf2f3 !important;
+}
+
+#vplay-native-keyboard [class*="text-black/"] {
+  color: rgba(237, 242, 243, 0.62) !important;
+}
+
+#vplay-native-keyboard [class*="text-[#71717a]"] {
+  color: #aab4b7 !important;
+}
+
+#vplay-native-keyboard [class*="bg-white"] {
+  background-color: rgba(54, 60, 62, 0.88) !important;
+}
+
+#vplay-native-keyboard [class*="hover:bg-white"]:hover {
+  background-color: rgba(70, 77, 79, 0.96) !important;
+}
+
+#vplay-native-keyboard [class*="active:bg-white"]:active {
+  background-color: rgba(81, 90, 92, 0.98) !important;
+}
+
+#vplay-native-keyboard [class*="border-black"],
+#vplay-native-keyboard [class*="border-white"] {
+  border-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+#vplay-native-keyboard [class*="bg-black/"] {
+  background-color: rgba(255, 255, 255, 0.06) !important;
+}
+
+#vplay-native-keyboard [class*="hover:bg-black/"]:hover {
+  background-color: rgba(255, 255, 255, 0.11) !important;
+}
+
+#vplay-native-keyboard input {
+  color: #edf2f3 !important;
+  caret-color: #55c5f4 !important;
+}
+
+#vplay-native-keyboard input::placeholder {
+  color: #aab4b7 !important;
+}
+
+#vplay-native-keyboard .touch-keycap {
+  color: #edf2f3 !important;
+  background: linear-gradient(180deg, rgba(65, 71, 73, 0.98), rgba(49, 54, 56, 0.98)) !important;
+  border: 1px solid rgba(255, 255, 255, 0.09) !important;
+  border-radius: 4px !important;
+  box-shadow: 0 2px 0 rgba(13, 16, 17, 0.88), inset 0 1px 0 rgba(255, 255, 255, 0.06) !important;
+}
+
+#vplay-native-keyboard .touch-keycap:hover:not(.touch-keycap-active),
+#vplay-native-keyboard .touch-keycap:focus-visible:not(.touch-keycap-active) {
+  color: #08212a !important;
+  background: #48c3f2 !important;
+  border-color: rgba(145, 225, 255, 0.9) !important;
+  box-shadow: 0 2px 0 #14516a, inset 0 1px 0 rgba(255, 255, 255, 0.24) !important;
+}
+
+#vplay-native-keyboard .touch-keycap:active {
+  transform: translateY(1px) !important;
+  color: #08212a !important;
+  background: #48c3f2 !important;
+  border-color: rgba(145, 225, 255, 0.9) !important;
+  box-shadow: 0 1px 0 #14516a, inset 0 1px 0 rgba(255, 255, 255, 0.24) !important;
+  filter: none !important;
+}
+
+#vplay-native-keyboard .touch-keycap-active {
+  color: #08212a !important;
+  background: #48c3f2 !important;
+  border-color: rgba(145, 225, 255, 0.9) !important;
+  box-shadow: 0 2px 0 #14516a, inset 0 1px 0 rgba(255, 255, 255, 0.24) !important;
+}
+
+#vplay-native-keyboard .touch-keycap svg {
+  color: currentColor !important;
+  stroke: currentColor !important;
+}
+
+/* Keep the submit key icon crisp without a glow. */
 #btn-native-keyboard-search {
   box-shadow: none !important;
   filter: none !important;

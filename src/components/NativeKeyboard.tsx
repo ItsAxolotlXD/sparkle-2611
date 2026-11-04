@@ -417,13 +417,18 @@ export const NativeKeyboard: React.FC = () => {
           setActiveBubbleKey(null);
         }}
         onClick={() => handleCharPress(char)}
-        className={`relative flex-1 min-w-0 ${keyHeightClass} rounded-[7px] sm:rounded-[9px] bg-white/60 hover:bg-white/70 active:bg-white/80 text-black border border-white/35 shadow-[0_1px_2px_rgba(0,0,0,0.16)] font-semibold ${
+        className={`touch-keycap relative flex-1 min-w-0 ${keyHeightClass} rounded-[4px] font-semibold ${
           hasNumberRow ? 'text-[17px] sm:text-[19px] md:text-[21px]' : 'text-[19px] sm:text-[21px] md:text-[23px]'
         } flex items-center justify-center transition-colors cursor-default font-sans select-none ${
-          isBubbleActive ? 'z-40 bg-white/85' : 'z-10'
+          isBubbleActive ? 'touch-keycap-active z-40' : 'z-10'
         }`}
       >
-        {displayChar}
+        {!hasNumberRow && layoutMode === 'alpha' && rowIndex === 1 && (
+          <span aria-hidden="true" className="absolute left-1.5 top-1 text-[9px] sm:text-[10px] font-medium text-white/55">
+            {rowNumbers[colIndex]}
+          </span>
+        )}
+        <span className="relative z-10">{displayChar}</span>
 
         {/* iOS-Style Key Press Bubble Tooltip */}
         {isBubbleActive && (
@@ -437,7 +442,7 @@ export const NativeKeyboard: React.FC = () => {
             }`}
             style={{ filter: 'drop-shadow(0 8px 18px rgba(0, 0, 0, 0.32))' }}
           >
-            {/* Bubble body with bold black enlarged letter */}
+            {/* Enlarged key press bubble */}
             <div className="w-[48px] sm:w-[54px] h-[50px] sm:h-[56px] rounded-[14px] sm:rounded-[16px] bg-white border border-black/10 flex items-center justify-center shadow-xs">
               <span className="text-black font-semibold text-[26px] sm:text-[30px] font-sans leading-none select-none">
                 {displayChar}
@@ -461,19 +466,23 @@ export const NativeKeyboard: React.FC = () => {
       aria-label="Sparkle Native Keyboard"
       style={{
         height: `${keyboardHeight}px`,
-        backgroundColor: 'rgba(255, 255, 255, 0.70)',
-        backdropFilter: 'blur(20px)',
-        WebkitBackdropFilter: 'blur(20px)',
+        backgroundColor: 'rgba(27, 31, 32, 0.96)',
+        backdropFilter: 'blur(22px)',
+        WebkitBackdropFilter: 'blur(22px)',
         zIndex: 2147483647,
       }}
-      className={`fixed bottom-0 left-0 right-0 z-50 rounded-t-xl bg-white/70 backdrop-blur-[20px] border-t border-black/10 shadow-[0_-8px_30px_rgba(0,0,0,0.25)] transition-all duration-[440ms] [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] will-change-transform select-none flex flex-col justify-between ${
+      className={`touch-keyboard-shell fixed bottom-0 left-0 right-0 z-50 rounded-t-xl bg-[#1b1f20] backdrop-blur-[22px] border border-white/10 shadow-[0_22px_64px_rgba(0,0,0,0.5)] transition-all duration-[440ms] [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] will-change-transform select-none flex flex-col justify-between ${
         isOpen ? 'translate-y-0 opacity-100 pointer-events-auto' : 'translate-y-full opacity-0 pointer-events-none'
       }`}
     >
-      <div className="w-full max-w-full md:max-w-4xl lg:max-w-5xl xl:max-w-6xl mx-auto flex flex-col justify-between h-full px-2 sm:px-3 md:px-5 pt-1.5 pb-2">
+      <div className="w-full max-w-full md:max-w-4xl lg:max-w-5xl xl:max-w-6xl mx-auto flex flex-col justify-between h-full px-2 sm:px-2 md:px-2 pt-1.5 pb-2">
         {/* Top bar with Switch to device's keyboard button and emoji search bar when in emoji mode */}
-        <div className="relative flex items-center justify-center gap-2 px-1 pt-0.5 pb-1 select-none min-h-[34px]">
-          {/* Switch to device's keyboard button - Hide title text when in emoji board */}
+        <div className="touch-keyboard-header relative flex items-center justify-between gap-2 px-1 pt-0.5 pb-1 select-none min-h-[36px] border-b border-white/10">
+          <span
+            aria-hidden="true"
+            className={`absolute left-1/2 top-2.5 h-[2px] w-12 -translate-x-1/2 rounded-full bg-white/35 transition-opacity ${showEmojiPicker ? 'opacity-0' : 'opacity-100'}`}
+          />
+          {/* Compact switch to the device keyboard button */}
           <button
             type="button"
             id="btn-switch-to-device-keyboard"
@@ -485,30 +494,23 @@ export const NativeKeyboard: React.FC = () => {
             onClick={() => {
               switchToDeviceKeyboard();
             }}
-            className={`flex items-center gap-1.5 rounded-full bg-black/10 hover:bg-black/15 text-black tracking-tight transition-all cursor-default shadow-xs shrink-0 ${
-              showEmojiPicker
-                ? 'p-2'
-                : 'px-3 py-1 text-[11px] sm:text-xs font-semibold'
-            }`}
+            className="flex h-7 w-7 items-center justify-center rounded-md bg-transparent text-white/75 hover:bg-white/10 active:bg-white/15 transition-colors cursor-default shrink-0"
             title="Switch to device's keyboard"
             aria-label="Switch to device's keyboard"
           >
-            <Keyboard className="w-3.5 h-3.5 text-black shrink-0" />
-            {!showEmojiPicker && (
-              <span className="text-black whitespace-nowrap">Switch to device's keyboard</span>
-            )}
+            <Keyboard className="w-4 h-4 text-white/75 shrink-0" />
           </button>
 
-          {/* Emoji search bar matching TopBar search box design style with PURE WHITE background */}
+          {/* Dark search pill for the emoji board */}
           {showEmojiPicker && (
-            <div className="relative flex items-center shrink-0 w-48 xs:w-56 sm:w-72 md:w-84 h-8 rounded-[100px] bg-white border border-black/15 px-3 gap-2 transition-all focus-within:bg-white focus-within:border-[#ff01ff] focus-within:ring-1 focus-within:ring-[#ff01ff]/40 shadow-xs">
-              <FluentSearchIcon className="w-[15px] h-[15px] text-[#71717a] shrink-0 pointer-events-none select-none" />
+            <div className="absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 items-center shrink-0 w-48 xs:w-56 sm:w-72 md:w-84 h-8 rounded-[10px] bg-[#282d2f] border border-white/10 px-3 gap-2 transition-all focus-within:bg-[#282d2f] focus-within:border-[#55c5f4] focus-within:ring-1 focus-within:ring-[#55c5f4]/35 shadow-xs">
+              <FluentSearchIcon className="w-[15px] h-[15px] text-[#aab4b7] shrink-0 pointer-events-none select-none" />
               <input
                 type="text"
                 value={emojiSearchQuery}
                 onChange={(e) => setEmojiSearchQuery(e.target.value)}
                 placeholder="Tìm kiếm emoji..."
-                className="flex-1 min-w-0 bg-transparent text-xs sm:text-[13px] text-[#111827] placeholder-[#71717a] outline-none border-none py-0.5 pr-1 font-sans"
+                className="flex-1 min-w-0 bg-transparent text-xs sm:text-[13px] text-[#f2f5f6] placeholder-[#aab4b7] outline-none border-none py-0.5 pr-1 font-sans"
               />
               {emojiSearchQuery && (
                 <button
@@ -527,7 +529,7 @@ export const NativeKeyboard: React.FC = () => {
           {/* Active input hint / indicator & Dismiss button - Pinned to right */}
           <div className="absolute right-1 top-1/2 -translate-y-1/2 flex items-center gap-2">
             {!showEmojiPicker && (
-              <span className="text-[11px] font-medium text-black truncate max-w-[100px] sm:max-w-[180px] select-none hidden xs:inline">
+              <span className="sr-only">
                 {activeInput?.placeholder || 'Sparkle Keyboard'}
               </span>
             )}
@@ -541,11 +543,11 @@ export const NativeKeyboard: React.FC = () => {
                 playSound('action');
               }}
               onClick={closeKeyboard}
-              className="p-1 rounded-full text-black hover:bg-black/10 transition-colors cursor-default"
+              className="p-1 rounded-md text-white/75 hover:bg-white/10 transition-colors cursor-default"
               title="Đóng bàn phím"
               aria-label="Đóng bàn phím"
             >
-              <X className="w-4 h-4 text-black" />
+              <X className="w-4 h-4 text-white/75" />
             </button>
           </div>
         </div>
@@ -611,8 +613,8 @@ export const NativeKeyboard: React.FC = () => {
               </div>
             </div>
 
-            {/* Clipboard Search Bar - Pure white background pill matching TopBar & emoji search bar */}
-            <div className="relative flex items-center w-full h-7.5 rounded-[100px] bg-white border border-black/15 px-3 gap-2 transition-all focus-within:bg-white focus-within:border-[#ff01ff] focus-within:ring-1 focus-within:ring-[#ff01ff]/40 shadow-xs my-1 shrink-0">
+            {/* Clipboard search pill */}
+            <div className="relative flex items-center w-full h-7.5 rounded-[100px] bg-white border border-black/15 px-3 gap-2 transition-all focus-within:bg-white focus-within:border-[#55c5f4] focus-within:ring-1 focus-within:ring-[#55c5f4]/35 shadow-xs my-1 shrink-0">
               <FluentSearchIcon className="w-3.5 h-3.5 text-[#71717a] shrink-0 pointer-events-none select-none" />
               <input
                 type="text"
@@ -753,7 +755,7 @@ export const NativeKeyboard: React.FC = () => {
                 onMouseDown={(e) => e.preventDefault()}
                 onPointerDown={() => playSound('action')}
                 onClick={closeKeyboard}
-                className="px-4 py-1.5 rounded-xl bg-[#ff01ff] hover:bg-[#ff33ff] active:bg-[#e600e6] text-xs font-bold text-white shadow-xs transition-colors cursor-default"
+                className="px-4 py-1.5 rounded-lg bg-[#48c3f2] hover:bg-[#66d0f7] active:bg-[#34a9d7] text-xs font-bold text-[#08212a] shadow-xs transition-colors cursor-default"
               >
                 Xong
               </button>
@@ -772,7 +774,7 @@ export const NativeKeyboard: React.FC = () => {
             }}
           />
         ) : (
-          /* Standard Keyboard Grid - 40% Opacity Keys, Black Text & Icons, Bubble Tooltips */
+          /* Standard keyboard grid with charcoal keycaps and press bubbles */
           <div className="flex flex-col gap-1 sm:gap-1.5 md:gap-2 flex-1 justify-center">
             {/* ROW 0: Dedicated Number Row (Bàn phím số: 0 đến 9 trên dải phím chữ) */}
             {hasNumberRow && (
@@ -800,7 +802,7 @@ export const NativeKeyboard: React.FC = () => {
             {/* ROW 3: Shift / Mode, Characters, Backspace */}
             <div className="flex items-center justify-between gap-1 sm:gap-1.5 md:gap-2 w-full">
               {layoutMode === 'alpha' ? (
-                /* Shift Key - Black text and icon with slightly boosted opacity */
+                /* Shift key with an accent state for Caps Lock and Shift */
                 <button
                   type="button"
                   onMouseDown={(e) => e.preventDefault()}
@@ -812,10 +814,8 @@ export const NativeKeyboard: React.FC = () => {
                     }
                   }}
                   onClick={handleShiftTap}
-                  className={`w-[13.5%] min-w-[38px] sm:min-w-[48px] ${keyHeightClass} rounded-[7px] sm:rounded-[9px] flex items-center justify-center shadow-[0_1px_2px_rgba(0,0,0,0.16)] transition-colors cursor-default border ${
-                    isCapsLock || isShiftActive
-                      ? 'bg-white/85 text-black border-white/60 shadow-sm'
-                      : 'bg-white/60 hover:bg-white/70 active:bg-white/80 text-black border-white/35'
+                  className={`touch-keycap w-[13.5%] min-w-[38px] sm:min-w-[48px] ${keyHeightClass} rounded-[4px] flex items-center justify-center transition-colors cursor-default border ${
+                    isCapsLock || isShiftActive ? 'touch-keycap-active' : ''
                   }`}
                   title={isCapsLock ? 'Caps Lock BẬT' : isShiftActive ? 'Shift BẬT' : 'Shift'}
                   aria-label="Shift"
@@ -823,7 +823,7 @@ export const NativeKeyboard: React.FC = () => {
                   <ArrowBigUp className={`w-5 h-5 text-black ${isCapsLock || isShiftActive ? 'fill-black' : ''}`} />
                 </button>
               ) : (
-                /* #+= or 123 Toggle - Black text with boosted opacity */
+                /* #+= or 123 layout toggle */
                 <button
                   type="button"
                   onMouseDown={(e) => e.preventDefault()}
@@ -834,7 +834,7 @@ export const NativeKeyboard: React.FC = () => {
                   onClick={() => {
                     setLayoutMode(layoutMode === 'numeric' ? 'symbols' : 'numeric');
                   }}
-                  className={`w-[13.5%] min-w-[38px] sm:min-w-[48px] ${keyHeightClass} rounded-[7px] sm:rounded-[9px] bg-white/60 hover:bg-white/70 active:bg-white/80 text-black border border-white/35 text-xs sm:text-sm font-semibold flex items-center justify-center shadow-[0_1px_2px_rgba(0,0,0,0.16)] transition-colors cursor-default font-sans`}
+                  className={`touch-keycap w-[13.5%] min-w-[38px] sm:min-w-[48px] ${keyHeightClass} rounded-[4px] text-xs sm:text-sm font-semibold flex items-center justify-center transition-colors cursor-default font-sans`}
                 >
                   {layoutMode === 'numeric' ? '#+=' : '123'}
                 </button>
@@ -845,7 +845,7 @@ export const NativeKeyboard: React.FC = () => {
                 renderCharKey(char, 3, colIndex, arr.length)
               )}
 
-              {/* Backspace Key - Black icon with boosted opacity */}
+              {/* Backspace key */}
               <button
                 type="button"
                 onMouseDown={(e) => e.preventDefault()}
@@ -856,7 +856,7 @@ export const NativeKeyboard: React.FC = () => {
                 onPointerUp={handleDeleteUp}
                 onPointerLeave={handleDeleteUp}
                 onPointerCancel={handleDeleteUp}
-                className={`w-[13.5%] min-w-[38px] sm:min-w-[48px] ${keyHeightClass} rounded-[7px] sm:rounded-[9px] bg-white/60 hover:bg-white/70 active:bg-white/80 text-black border border-white/35 flex items-center justify-center shadow-[0_1px_2px_rgba(0,0,0,0.16)] transition-colors cursor-default`}
+                className={`touch-keycap w-[13.5%] min-w-[38px] sm:min-w-[48px] ${keyHeightClass} rounded-[4px] flex items-center justify-center transition-colors cursor-default`}
                 title="Xóa"
                 aria-label="Xóa"
               >
@@ -864,9 +864,9 @@ export const NativeKeyboard: React.FC = () => {
               </button>
             </div>
 
-            {/* ROW 4: 123 / ABC, Spacebar, Magenta Search Button */}
+            {/* ROW 4: 123 / ABC, Spacebar, Search action */}
             <div className="flex items-center justify-between gap-1.5 w-full">
-              {/* Layout Switch: 123 or ABC - Black text */}
+              {/* Layout switch: 123 or ABC */}
               <button
                 type="button"
                 onMouseDown={(e) => e.preventDefault()}
@@ -877,12 +877,12 @@ export const NativeKeyboard: React.FC = () => {
                 onClick={() => {
                   setLayoutMode(layoutMode === 'alpha' ? 'numeric' : 'alpha');
                 }}
-                className={`w-[18%] sm:w-[16%] min-w-[50px] sm:min-w-[70px] ${keyHeightClass} rounded-[7px] sm:rounded-[9px] bg-white/60 hover:bg-white/70 active:bg-white/80 text-black border border-white/35 font-semibold text-sm sm:text-base flex items-center justify-center shadow-[0_1px_2px_rgba(0,0,0,0.16)] transition-colors cursor-default font-sans`}
+                className={`touch-keycap w-[18%] sm:w-[16%] min-w-[50px] sm:min-w-[70px] ${keyHeightClass} rounded-[4px] font-semibold text-sm sm:text-base flex items-center justify-center transition-colors cursor-default font-sans`}
               >
                 {layoutMode === 'alpha' ? '123' : 'ABC'}
               </button>
 
-              {/* Spacebar - Boosted Opacity, Black text */}
+              {/* Spacebar */}
               <button
                 type="button"
                 onMouseDown={(e) => e.preventDefault()}
@@ -894,7 +894,7 @@ export const NativeKeyboard: React.FC = () => {
                   }
                 }}
                 onClick={handleSpacePress}
-                className={`flex-1 min-w-0 ${keyHeightClass} rounded-[7px] sm:rounded-[9px] bg-white/60 hover:bg-white/70 active:bg-white/80 text-black border border-white/35 font-semibold text-sm flex items-center justify-center shadow-[0_1px_2px_rgba(0,0,0,0.16)] transition-colors cursor-default`}
+                className={`touch-keycap flex-1 min-w-0 ${keyHeightClass} rounded-[4px] font-semibold text-sm flex items-center justify-center transition-colors cursor-default`}
                 aria-label="Phím cách"
               >
                 <span className="text-[11px] sm:text-xs text-black font-semibold font-sans tracking-wide truncate px-2">
@@ -906,7 +906,7 @@ export const NativeKeyboard: React.FC = () => {
                 </span>
               </button>
 
-              {/* Magenta Search / Action Button (WinUI light mode magenta #ff01ff) */}
+              {/* Search / action button */}
               <button
                 type="button"
                 id="btn-native-keyboard-search"
@@ -919,7 +919,7 @@ export const NativeKeyboard: React.FC = () => {
                   }
                 }}
                 onClick={handleSearchAction}
-                className={`w-[22%] sm:w-[20%] min-w-[65px] sm:min-w-[85px] ${keyHeightClass} rounded-[7px] sm:rounded-[9px] bg-[#ff01ff] hover:bg-[#ff33ff] active:bg-[#e600e6] text-white flex items-center justify-center shadow-none border-0 transition-colors cursor-default`}
+                className={`touch-keycap w-[22%] sm:w-[20%] min-w-[65px] sm:min-w-[85px] ${keyHeightClass} rounded-[4px] flex items-center justify-center transition-colors cursor-default`}
                 title="Tìm kiếm"
                 aria-label="Tìm kiếm"
               >
@@ -937,11 +937,11 @@ export const NativeKeyboard: React.FC = () => {
           </div>
         )}
 
-        {/* ROW 5: Bottom Utility Bar - All text and icons black */}
+        {/* ROW 5: Bottom utility bar */}
         <div className="relative flex items-center justify-between px-2 pt-1 pb-1 select-none">
           {/* Left section: Emoji, Globe language switcher, and Clipboard button */}
           <div className="flex items-center gap-1.5 sm:gap-2">
-            {/* Emoji toggle - Black icon */}
+            {/* Emoji toggle */}
             <button
               type="button"
               onMouseDown={(e) => e.preventDefault()}
@@ -986,7 +986,7 @@ export const NativeKeyboard: React.FC = () => {
               </button>
             )}
 
-            {/* Globe Language Switcher Button - Black icon and text */}
+            {/* Globe language switcher */}
             <div className="relative">
               <button
                 ref={globeBtnRef}
@@ -1112,7 +1112,7 @@ export const NativeKeyboard: React.FC = () => {
             </div>
           </div>
 
-          {/* Right section: SF Symbol Microphone - Pure black icon */}
+          {/* Right section: Microphone */}
           <div className="flex items-center gap-1">
             <button
               type="button"
@@ -1133,7 +1133,7 @@ export const NativeKeyboard: React.FC = () => {
               <img
                 src={SF_MIC_ICON_URL}
                 alt="Mic"
-                className={`w-5 h-5 sm:w-5.5 sm:h-5.5 object-contain select-none pointer-events-none transition-opacity filter brightness-0 ${
+                className={`w-5 h-5 sm:w-5.5 sm:h-5.5 object-contain select-none pointer-events-none transition-opacity filter brightness-0 invert ${
                   isMicListening ? 'opacity-100' : 'opacity-90 hover:opacity-100'
                 }`}
                 referrerPolicy="no-referrer"
