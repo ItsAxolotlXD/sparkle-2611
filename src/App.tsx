@@ -111,37 +111,101 @@ export default function App() {
     }));
   };
 
-  // Channels State (base channels + imported channels from localStorage)
-  const [channels, setChannels] = useState<Channel[]>(() => {
-    const saved = localStorage.getItem('waves_custom_channels');
-    if (saved) {
-      try {
+  // Helper to load channels with custom channels, overrides and exclusions
+  const loadInitialChannels = (): Channel[] => {
+    let list = CHANNELS_DATA;
+    try {
+      const saved = localStorage.getItem('waves_custom_channels');
+      if (saved) {
         const parsed = JSON.parse(saved);
-        return [...CHANNELS_DATA, ...parsed];
-      } catch {
-        return CHANNELS_DATA;
+        list = [...list, ...parsed];
       }
-    }
-    return CHANNELS_DATA;
-  });
+    } catch {}
+
+    try {
+      const deletedSaved = localStorage.getItem('waves_deleted_channels');
+      if (deletedSaved) {
+        const deletedIds = new Set<string>(JSON.parse(deletedSaved));
+        list = list.filter((c) => !deletedIds.has(c.id));
+      }
+    } catch {}
+
+    try {
+      const overridesSaved = localStorage.getItem('waves_channel_overrides');
+      if (overridesSaved) {
+        const overrides: Record<string, Partial<Channel>> = JSON.parse(overridesSaved);
+        list = list.map((c) => {
+          if (overrides[c.id]) {
+            return {
+              ...c,
+              ...(overrides[c.id].name ? { name: overrides[c.id].name } : {}),
+              ...(overrides[c.id].streamUrl ? { streamUrl: overrides[c.id].streamUrl } : {}),
+            };
+          }
+          return c;
+        });
+      }
+    } catch {}
+
+    return list;
+  };
+
+  // Channels State (base channels + imported channels from localStorage)
+  const [channels, setChannels] = useState<Channel[]>(loadInitialChannels);
+
+  // Channel update & deletion handlers
+  const handleUpdateChannel = useCallback((channelId: string, updates: { name: string; streamUrl: string }) => {
+    setChannels((prev) => {
+      const updated = prev.map((ch) => (ch.id === channelId ? { ...ch, ...updates } : ch));
+      try {
+        const existing = JSON.parse(localStorage.getItem('waves_channel_overrides') || '{}');
+        existing[channelId] = { ...(existing[channelId] || {}), ...updates };
+        localStorage.setItem('waves_channel_overrides', JSON.stringify(existing));
+      } catch {}
+      return updated;
+    });
+    setCurrentChannel((prev) => (prev?.id === channelId ? { ...prev, ...updates } : prev));
+  }, []);
+
+  const handleRemoveChannel = useCallback((channelId: string) => {
+    setChannels((prev) => {
+      const updated = prev.filter((ch) => ch.id !== channelId);
+      try {
+        const existing: string[] = JSON.parse(localStorage.getItem('waves_deleted_channels') || '[]');
+        if (!existing.includes(channelId)) {
+          existing.push(channelId);
+          localStorage.setItem('waves_deleted_channels', JSON.stringify(existing));
+        }
+      } catch {}
+      return updated;
+    });
+    setCurrentChannel((prev) => {
+      if (prev?.id === channelId) {
+        const remaining = channels.filter((ch) => ch.id !== channelId);
+        return remaining.length > 0 ? remaining[0] : prev;
+      }
+      return prev;
+    });
+  }, [channels]);
 
   // Current Active Channel for Live TV Player
   const [currentChannel, setCurrentChannel] = useState<Channel>(() => {
+    const list = loadInitialChannels();
     // Check if URL has ?channel=slug
     const urlParams = new URLSearchParams(window.location.search);
     const channelSlug = urlParams.get('channel');
     if (channelSlug) {
-      const matched = CHANNELS_DATA.find((c) => c.slug === channelSlug);
+      const matched = list.find((c) => c.slug === channelSlug);
       if (matched) return matched;
     }
     try {
       const savedRecentId = localStorage.getItem('vplay_recent_channel_id');
       if (savedRecentId) {
-        const found = CHANNELS_DATA.find((c) => c.id === savedRecentId);
+        const found = list.find((c) => c.id === savedRecentId);
         if (found) return found;
       }
     } catch {}
-    return CHANNELS_DATA[0];
+    return list[0] || CHANNELS_DATA[0];
   });
 
   // Track recent channel in localStorage
@@ -676,6 +740,8 @@ export default function App() {
             searchQuery={currentTabSearchQuery}
             onSearchChange={handleTabSearchChange}
             navigate={navigate}
+            onUpdateChannel={handleUpdateChannel}
+            onRemoveChannel={handleRemoveChannel}
           />
         );
 

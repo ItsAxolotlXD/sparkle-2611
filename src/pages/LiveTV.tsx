@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef } from 'react';
 import { VideoPlayer } from '../components/VideoPlayer';
 import { CategoryIcon } from '../components/CategoryIcon';
 import { Channel } from '../types';
@@ -8,6 +8,8 @@ import { SequentialSection } from '../components/SequentialSection';
 import { useSettings } from '../hooks/useSettings';
 import { EpgScheduleWidget } from '../components/EpgScheduleWidget';
 import { showAppToast } from '../utils/toast';
+import { WatchChannelContextMenu, ChannelContextAction } from '../components/WatchChannelContextMenu';
+import { EditChannelModal } from '../components/EditChannelModal';
 
 interface LiveTVProps {
   currentChannel: Channel;
@@ -17,6 +19,8 @@ interface LiveTVProps {
   searchQuery?: string;
   onSearchChange?: (query: string) => void;
   navigate?: (route: string) => void;
+  onUpdateChannel?: (channelId: string, updates: { name: string; streamUrl: string }) => void;
+  onRemoveChannel?: (channelId: string) => void;
 }
 
 export const LiveTV: React.FC<LiveTVProps> = ({
@@ -26,12 +30,61 @@ export const LiveTV: React.FC<LiveTVProps> = ({
   onOpenCustomStreamModal,
   searchQuery,
   onSearchChange,
-  navigate = () => {}
+  navigate = () => {},
+  onUpdateChannel,
+  onRemoveChannel,
 }) => {
   const { settings } = useSettings();
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [isTheaterMode, setIsTheaterMode] = useState(false);
   const [isEpgSidebarOpen, setIsEpgSidebarOpen] = useState(false);
+
+  // Context menu & Edit channel modal states
+  const [contextMenu, setContextMenu] = useState<{ channel: Channel; x: number; y: number } | null>(null);
+  const [editingChannel, setEditingChannel] = useState<Channel | null>(null);
+
+  const longPressTimer = useRef<number | null>(null);
+  const longPressTriggered = useRef(false);
+  const LONG_PRESS_MS = 500;
+
+  const clearLongPress = () => {
+    if (longPressTimer.current !== null) {
+      window.clearTimeout(longPressTimer.current);
+      longPressTimer.current = null;
+    }
+  };
+
+  const handleTouchStart = (channel: Channel, e: React.TouchEvent) => {
+    longPressTriggered.current = false;
+    const touch = e.touches[0];
+    const { clientX, clientY } = touch;
+    clearLongPress();
+    longPressTimer.current = window.setTimeout(() => {
+      longPressTriggered.current = true;
+      if (navigator.vibrate) navigator.vibrate(10);
+      setContextMenu({ channel, x: clientX, y: clientY });
+    }, LONG_PRESS_MS);
+  };
+
+  const handleContextAction = (action: ChannelContextAction) => {
+    if (!contextMenu) return;
+    const targetChannel = contextMenu.channel;
+    if (action === 'edit') {
+      setEditingChannel(targetChannel);
+    } else if (action === 'remove') {
+      if (onRemoveChannel) {
+        onRemoveChannel(targetChannel.id);
+      }
+      showAppToast(`Removed channel "${targetChannel.name}"`, { source: 'live-tv' });
+    }
+  };
+
+  const handleSaveEdit = (channelId: string, updates: { name: string; streamUrl: string }) => {
+    if (onUpdateChannel) {
+      onUpdateChannel(channelId, updates);
+    }
+    showAppToast(`Updated channel info for "${updates.name}"`, { source: 'live-tv' });
+  };
 
   // Distinct category list maintaining natural broadcast order
   const distinctCategories = useMemo(() => {
@@ -252,7 +305,22 @@ export const LiveTV: React.FC<LiveTVProps> = ({
                         <div
                           key={ch.id}
                           id={`livetv-channel-card-${ch.id}`}
-                          onClick={() => handleSelectChannel(ch)}
+                          onContextMenu={(e) => {
+                            e.preventDefault();
+                            clearLongPress();
+                            setContextMenu({ channel: ch, x: e.clientX, y: e.clientY });
+                          }}
+                          onTouchStart={(e) => handleTouchStart(ch, e)}
+                          onTouchMove={clearLongPress}
+                          onTouchEnd={clearLongPress}
+                          onTouchCancel={clearLongPress}
+                          onClick={() => {
+                            if (longPressTriggered.current) {
+                              longPressTriggered.current = false;
+                              return;
+                            }
+                            handleSelectChannel(ch);
+                          }}
                           className={`fluent-reveal-item onair-card channel-card group relative w-full aspect-[136/78] rounded-[6px] sm:rounded-[8px] transition-colors cursor-pointer overflow-hidden flex items-center justify-center p-1.5 sm:p-2.5 select-none bg-white dark:bg-[#38383d] border shadow-xs ${
                             isSelected
                               ? 'border-[#4cc2ff] ring-1 ring-[#4cc2ff]'
@@ -341,6 +409,28 @@ export const LiveTV: React.FC<LiveTVProps> = ({
           </div>
         )}
       </AnimatePresence>
+
+      {/* Channel Context Menu */}
+      <AnimatePresence>
+        {contextMenu && (
+          <WatchChannelContextMenu
+            key={`${contextMenu.channel.id}-${contextMenu.x}-${contextMenu.y}`}
+            x={contextMenu.x}
+            y={contextMenu.y}
+            channel={contextMenu.channel}
+            onAction={handleContextAction}
+            onClose={() => setContextMenu(null)}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Edit Channel URL Modal */}
+      <EditChannelModal
+        isOpen={!!editingChannel}
+        channel={editingChannel}
+        onSave={handleSaveEdit}
+        onClose={() => setEditingChannel(null)}
+      />
     </div>
   );
 };

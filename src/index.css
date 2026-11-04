@@ -6644,7 +6644,7 @@ html:not(.light-mode) #vplay-tools-dropdown-card svg.fill-current {
 #vplay-native-keyboard button,
 #native-keyboard button {
   cursor: default !important;
-  transition: transform 0.06s ease, box-shadow 0.06s ease, background-color 0.06s ease !important;
+  transition: transform 0.07s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.07s ease, background-color 0.07s ease !important;
 }
 
 #vplay-native-keyboard button:hover,
@@ -6657,13 +6657,14 @@ html:not(.light-mode) #vplay-tools-dropdown-card svg.fill-current {
   cursor: default !important;
 }
 
-/* Key pressed-down tactile effect (chỉ có hiệu ứng khi nhấn phím, lún xuống nhẹ 2px) */
+/* Key pressed-down tactile sink animation (hiệu ứng lún xuống khi nhấn thay vì nổi phím) */
 #vplay-native-keyboard button:active,
-#native-keyboard button:active {
-  transform: translateY(2px) !important;
-  scale: 1 !important;
-  box-shadow: 0 0 1px rgba(0, 0, 0, 0.25) !important;
-  filter: brightness(0.95) !important;
+#vplay-native-keyboard button.touch-keycap-pressed,
+#native-keyboard button:active,
+#native-keyboard button.touch-keycap-pressed {
+  transform: translateY(2.5px) scale(0.96) !important;
+  box-shadow: inset 0 2px 4px rgba(15, 23, 42, 0.22), inset 0 1px 2px rgba(15, 23, 42, 0.16) !important;
+  filter: brightness(0.93) !important;
 }
 
 #vplay-native-keyboard [class~="text-black"] {
@@ -6702,34 +6703,36 @@ html:not(.light-mode) #vplay-tools-dropdown-card svg.fill-current {
 
 #vplay-native-keyboard .touch-keycap {
   color: #1f2937 !important;
-  background: rgba(255, 255, 255, 0.7) !important;
+  background: rgba(255, 255, 255, 0.72) !important;
   border: 1px solid rgba(15, 23, 42, 0.12) !important;
-  border-radius: 4px !important;
+  border-radius: 6px !important;
   box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.72) !important;
+  transition: transform 0.07s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.07s ease, background-color 0.07s ease !important;
 }
 
-#vplay-native-keyboard .touch-keycap:hover:not(.touch-keycap-active),
-#vplay-native-keyboard .touch-keycap:focus-visible:not(.touch-keycap-active) {
+#vplay-native-keyboard .touch-keycap:hover:not(.touch-keycap-pressed):not(.touch-keycap-active),
+#vplay-native-keyboard .touch-keycap:focus-visible:not(.touch-keycap-pressed):not(.touch-keycap-active) {
   color: #1f2937 !important;
-  background: rgba(255, 255, 255, 0.7) !important;
+  background: rgba(255, 255, 255, 0.82) !important;
   border-color: rgba(0, 120, 212, 0.42) !important;
   box-shadow: 0 0 0 2px rgba(0, 120, 212, 0.1), 0 1px 2px rgba(15, 23, 42, 0.08) !important;
 }
 
-#vplay-native-keyboard .touch-keycap:active {
-  transform: translateY(1px) !important;
+#vplay-native-keyboard .touch-keycap:active,
+#vplay-native-keyboard .touch-keycap.touch-keycap-pressed {
+  transform: translateY(2.5px) scale(0.96) !important;
   color: #1f2937 !important;
-  background: rgba(255, 255, 255, 0.58) !important;
-  border-color: rgba(0, 120, 212, 0.48) !important;
-  box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.12) !important;
+  background: rgba(216, 222, 230, 0.95) !important;
+  border-color: rgba(15, 23, 42, 0.22) !important;
+  box-shadow: inset 0 2px 5px rgba(15, 23, 42, 0.22), inset 0 1px 2px rgba(15, 23, 42, 0.15) !important;
   filter: none !important;
 }
 
 #vplay-native-keyboard .touch-keycap-active {
   color: #005a9e !important;
-  background: rgba(0, 120, 212, 0.12) !important;
-  border-color: rgba(0, 120, 212, 0.35) !important;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7) !important;
+  background: rgba(0, 120, 212, 0.14) !important;
+  border-color: rgba(0, 120, 212, 0.38) !important;
+  box-shadow: inset 0 1px 2px rgba(0, 120, 212, 0.2) !important;
 }
 
 #vplay-native-keyboard .touch-keycap svg {
