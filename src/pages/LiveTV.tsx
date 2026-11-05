@@ -19,7 +19,7 @@ interface LiveTVProps {
   searchQuery?: string;
   onSearchChange?: (query: string) => void;
   navigate?: (route: string) => void;
-  onUpdateChannel?: (channelId: string, updates: { name: string; streamUrl: string }) => void;
+  onUpdateChannel?: (channelId: string, updates: { name: string; streamUrl: string; logo?: string }) => void;
   onRemoveChannel?: (channelId: string) => void;
 }
 
@@ -79,7 +79,7 @@ export const LiveTV: React.FC<LiveTVProps> = ({
     }
   };
 
-  const handleSaveEdit = (channelId: string, updates: { name: string; streamUrl: string }) => {
+  const handleSaveEdit = (channelId: string, updates: { name: string; streamUrl: string; logo?: string }) => {
     if (onUpdateChannel) {
       onUpdateChannel(channelId, updates);
     }

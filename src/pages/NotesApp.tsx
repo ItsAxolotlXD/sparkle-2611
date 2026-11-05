@@ -68,10 +68,10 @@ export const PRESET_FONTS: FontOption[] = [
 const PRESET_SIZES = [12, 14, 16, 18, 20, 24, 28, 32];
 
 const slideUpVariant = {
-  hidden: { opacity: 0, y: 22 },
+  hidden: { opacity: 0, x: 40 },
   visible: (i: number) => ({
     opacity: 1,
-    y: 0,
+    x: 0,
     transition: {
       duration: 0.52,
       ease: [0.16, 1, 0.3, 1],

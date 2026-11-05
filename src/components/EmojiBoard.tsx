@@ -270,19 +270,8 @@ export const EmojiBoard: React.FC<EmojiBoardProps> = ({
                 ref={(el) => {
                   categorySectionRefs.current[category.id] = el;
                 }}
-                className="flex flex-col shrink-0 h-full justify-between"
+                className="flex flex-col shrink-0 h-full justify-center"
               >
-                {/* Category header - Title is displayed in FULL without any truncation or ellipsis */}
-                <div className="flex items-center gap-1.5 px-1 py-0.5 select-none shrink-0 whitespace-nowrap">
-                  <FluentEmoji emoji={category.icon} isDecorative className="w-4 h-4 text-sm" />
-                  <span className="text-xs sm:text-[13px] font-bold text-[#111827] dark:text-white tracking-tight whitespace-nowrap">
-                    {category.name}
-                  </span>
-                  <span className="text-[11px] font-mono text-[#6b7280] dark:text-[#9ca3af]">
-                    ({category.emojis.length})
-                  </span>
-                </div>
-
                 {/* 3-Row horizontal grid for ONLY this active category - lightweight & zero lag */}
                 <div className="grid grid-rows-3 grid-flow-col auto-cols-[46px] sm:auto-cols-[54px] gap-1.5 sm:gap-2 flex-1 items-center content-center py-1">
                   {category.emojis.map((emoji, idx) => (
@@ -337,8 +326,8 @@ export const EmojiBoard: React.FC<EmojiBoardProps> = ({
 
       {/* BOTTOM: Category Emoji Tabs (Bên dưới) & Action Controls */}
       <div className="flex flex-col gap-1 pt-1 px-1 border-t border-black/10 dark:border-white/10 shrink-0">
-        {/* Category Emoji Bar placed below the emoji grid with Underline style matching Watch tab */}
-        <div className="relative flex items-center gap-1 overflow-x-auto no-scrollbar scroll-smooth py-0.5 w-full border-0">
+        {/* Category Emoji Bar placed below the emoji grid with Underline style matching Watch tab - centered */}
+        <div className="relative flex items-center justify-center gap-0.5 sm:gap-1.5 overflow-x-auto no-scrollbar scroll-smooth py-0.5 w-full border-0">
           {EMOJI_CATEGORIES.map((cat) => {
             const isActive = activeCategoryId === cat.id && !searchQuery.trim();
             return (
@@ -348,19 +337,15 @@ export const EmojiBoard: React.FC<EmojiBoardProps> = ({
                 onMouseDown={(e) => e.preventDefault()}
                 onPointerDown={() => playSound('modifier')}
                 onClick={() => handleSelectCategory(cat.id)}
-                className={`relative px-3 py-1.5 flex items-center gap-1.5 transition-colors shrink-0 cursor-default !bg-transparent !border-0 !shadow-none hover:!bg-transparent ${
+                className={`relative px-2.5 sm:px-3 py-1.5 flex items-center justify-center transition-colors shrink-0 cursor-default !bg-transparent !border-0 !shadow-none hover:!bg-transparent ${
                   isActive
                     ? 'text-[#111827] dark:text-white font-bold'
                     : 'text-[#6b7280] dark:text-[#9ca3af] hover:text-[#111827] dark:hover:text-white font-medium'
                 }`}
                 title={cat.name}
+                aria-label={cat.name}
               >
                 <FluentEmoji emoji={cat.icon} isDecorative className="w-5 h-5 text-base select-none" />
-                {isActive && (
-                  <span className="text-[11px] font-bold text-[#111827] dark:text-white whitespace-nowrap">
-                    {cat.name}
-                  </span>
-                )}
                 {isActive && (
                   <motion.div
                     layoutId="emoji-category-active-underline"

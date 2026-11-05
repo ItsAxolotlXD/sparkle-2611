@@ -519,7 +519,7 @@ export const NativeKeyboard: React.FC = () => {
         isOpen ? 'translate-y-0 opacity-100 pointer-events-auto' : 'translate-y-full opacity-0 pointer-events-none'
       }`}
     >
-      <div className="w-full max-w-full mx-auto flex flex-col justify-between h-full px-0.5 sm:px-1 md:px-1.5 lg:px-2 pt-0.5 pb-1 sm:pb-1.5">
+      <div className="w-full max-w-full mx-auto flex flex-col justify-between h-full px-0.5 sm:px-1 md:px-3 lg:px-4 pt-0.5 pb-1 sm:pb-1.5">
         {/* Top bar with Windows 11 Touch Keyboard header icons */}
         <div className="touch-keyboard-header relative flex items-center justify-between gap-2 px-1 pt-0.5 pb-1 select-none min-h-[30px] sm:min-h-[34px] border-b border-black/10 dark:border-white/10 text-black/75 dark:text-white/75">
           {/* Top-left: Settings gear & layout switch icon */}
@@ -656,64 +656,35 @@ export const NativeKeyboard: React.FC = () => {
                 transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
                 className="flex-1 flex flex-col justify-between px-1.5 py-1 min-h-0 overflow-hidden w-full h-full"
               >
-                {/* Clipboard Header */}
-                <div className="flex items-center justify-between pb-1 px-1 border-b border-black/10 shrink-0">
-              <div className="flex items-center gap-2">
-                <ClipboardList className="w-4 h-4 text-black" />
-                <span className="text-xs font-bold text-black tracking-tight">Lịch sử sao chép (Clipboard)</span>
-                {copiedFeedback && (
-                  <span className="text-[11px] font-semibold text-emerald-700 bg-emerald-100/90 px-2 py-0.5 rounded-full animate-in fade-in duration-150">
-                    {copiedFeedback}
-                  </span>
+                {/* Clipboard Header Actions if items or feedback exist */}
+                {(copiedFeedback || clipboardList.length > 0) && (
+                  <div className="flex items-center justify-between pb-1 px-1 border-b border-black/10 dark:border-white/10 shrink-0">
+                    <div className="flex items-center gap-2">
+                      {copiedFeedback && (
+                        <span className="text-[11px] font-semibold text-emerald-700 dark:text-emerald-300 bg-emerald-100/90 dark:bg-emerald-950/60 px-2 py-0.5 rounded-full animate-in fade-in duration-150">
+                          {copiedFeedback}
+                        </span>
+                      )}
+                    </div>
+                    {clipboardList.length > 0 && (
+                      <div className="flex items-center gap-1.5 ml-auto">
+                        <button
+                          type="button"
+                          onMouseDown={(e) => e.preventDefault()}
+                          onPointerDown={() => {
+                            playSound('delete');
+                          }}
+                          onClick={handleClearAllClipboard}
+                          className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-red-500/10 hover:bg-red-500/20 active:bg-red-500/30 text-red-700 dark:text-red-400 text-[11px] font-medium transition-colors cursor-default"
+                          title="Xóa tất cả lịch sử sao chép"
+                        >
+                          <FluentDeleteIcon className="w-3.5 h-3.5" />
+                          <span className="hidden xs:inline">Xóa tất cả</span>
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 )}
-              </div>
-              <div className="flex items-center gap-1.5">
-                {/* Paste from device button */}
-                <button
-                  type="button"
-                  onMouseDown={(e) => e.preventDefault()}
-                  onPointerDown={(e) => {
-                    playSound('action');
-                  }}
-                  onClick={handlePasteFromDevice}
-                  className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-black/10 hover:bg-black/15 active:bg-black/20 text-black text-[11px] font-medium transition-colors cursor-default"
-                  title="Dán từ bộ nhớ tạm của thiết bị"
-                >
-                  <Copy className="w-3 h-3 text-black" />
-                  <span>Dán từ thiết bị</span>
-                </button>
-
-                {/* Clear all if items exist */}
-                {clipboardList.length > 0 && (
-                  <button
-                    type="button"
-                    onMouseDown={(e) => e.preventDefault()}
-                    onPointerDown={(e) => {
-                      playSound('delete');
-                    }}
-                    onClick={handleClearAllClipboard}
-                    className="flex items-center gap-1 px-2 py-1 rounded-full bg-red-500/10 hover:bg-red-500/20 active:bg-red-500/30 text-red-700 text-[11px] font-medium transition-colors cursor-default"
-                    title="Xóa tất cả lịch sử sao chép"
-                  >
-                    <FluentDeleteIcon className="w-3.5 h-3.5" />
-                    <span className="hidden xs:inline">Xóa tất cả</span>
-                  </button>
-                )}
-
-                {/* Close panel */}
-                <button
-                  type="button"
-                  onMouseDown={(e) => e.preventDefault()}
-                  onPointerDown={() => playSound('modifier')}
-                  onClick={() => setShowClipboard(false)}
-                  className="h-7.5 w-7.5 rounded-[6px] bg-white/70 dark:bg-white/10 hover:bg-black/5 dark:hover:bg-white/15 active:bg-black/10 dark:active:bg-white/20 text-[#111827] dark:text-white border-0 border-none outline-none focus:outline-none focus:ring-0 flex items-center justify-center transition-colors cursor-default"
-                  title="Quay lại bàn phím"
-                  aria-label="Quay lại bàn phím"
-                >
-                  <X className="w-3.5 h-3.5 text-current" />
-                </button>
-              </div>
-            </div>
 
             {/* Clipboard search box - WinUI 3 Search Box style */}
             <div
@@ -759,13 +730,12 @@ export const NativeKeyboard: React.FC = () => {
                 className="flex-1 overflow-y-auto py-1 space-y-1.5 pr-0.5 max-h-[185px] no-scrollbar [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
               >
                 {clipboardList.length === 0 ? (
-                  <div className="h-full flex flex-col items-center justify-center py-6 text-center text-black/70 space-y-1.5">
-                    <div className="w-9 h-9 rounded-full bg-black/5 flex items-center justify-center text-black/50">
-                      <ClipboardList className="w-4.5 h-4.5" />
+                  <div className="h-full flex flex-col items-center justify-center py-8 text-center space-y-2 select-none">
+                    <div className="flex items-center justify-center">
+                      <ClipboardList className="w-8 h-8 text-black dark:text-white stroke-[1.8]" />
                     </div>
-                    <div className="text-xs font-semibold text-black">Chưa có nội dung sao chép nào</div>
-                    <div className="text-[11px] text-black/60 max-w-sm px-4 leading-normal">
-                      Mọi văn bản bạn sao chép trong ứng dụng sẽ tự động lưu lại đây để chạm và dán nhanh.
+                    <div className="text-xs sm:text-[13px] font-semibold text-black dark:text-white">
+                      Nothing to see here... yet
                     </div>
                   </div>
                 ) : clipboardList.filter((item) =>

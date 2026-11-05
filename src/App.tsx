@@ -22,7 +22,6 @@ import { NativeKeyboard } from './components/NativeKeyboard';
 import { NativeKeyboardProvider } from './context/NativeKeyboardContext';
 import { NotesProvider } from './context/NotesContext';
 import { StickyNoteWidget } from './components/StickyNoteWidget';
-import { TabLoadingScreen } from './components/TabLoadingScreen';
 import { AppScrollbar } from './components/AppScrollbar';
 import { GlobalToast } from './components/GlobalToast';
 import { EvaluationWatermark } from './components/EvaluationWatermark';
@@ -89,17 +88,6 @@ export default function App() {
   });
   const [routeState, setRouteState] = useState<any>(null);
   const previousRouteRef = useRef<string>('/');
-  const [isTabLoading, setIsTabLoading] = useState(false);
-  const [tabLoadCount, setTabLoadCount] = useState(0);
-  const tabLoadingTimerRef = useRef<NodeJS.Timeout | null>(null);
-
-  useEffect(() => {
-    return () => {
-      if (tabLoadingTimerRef.current) clearTimeout(tabLoadingTimerRef.current);
-    };
-  }, []);
-
-
 
   // Tab-specific search state for Floating Search Bar
   const [tabSearchQueries, setTabSearchQueries] = useState<Record<string, string>>({});
@@ -140,6 +128,7 @@ export default function App() {
               ...c,
               ...(overrides[c.id].name ? { name: overrides[c.id].name } : {}),
               ...(overrides[c.id].streamUrl ? { streamUrl: overrides[c.id].streamUrl } : {}),
+              ...(overrides[c.id].logo ? { logo: overrides[c.id].logo } : {}),
             };
           }
           return c;
@@ -154,7 +143,7 @@ export default function App() {
   const [channels, setChannels] = useState<Channel[]>(loadInitialChannels);
 
   // Channel update & deletion handlers
-  const handleUpdateChannel = useCallback((channelId: string, updates: { name: string; streamUrl: string }) => {
+  const handleUpdateChannel = useCallback((channelId: string, updates: { name: string; streamUrl: string; logo?: string }) => {
     setChannels((prev) => {
       const updated = prev.map((ch) => (ch.id === channelId ? { ...ch, ...updates } : ch));
       try {
@@ -491,16 +480,6 @@ export default function App() {
 
     // Scroll to top on navigation
     window.scrollTo({ top: 0, behavior: 'smooth' });
-
-    // Tab Splash screen: displays centered tab icon with spinning ring for 1 second on tab switch
-    if (isDifferentTab) {
-      if (tabLoadingTimerRef.current) clearTimeout(tabLoadingTimerRef.current);
-      setIsTabLoading(true);
-      tabLoadingTimerRef.current = setTimeout(() => {
-        setIsTabLoading(false);
-        setTabLoadCount((c) => c + 1);
-      }, 1000);
-    }
   }, [channels, currentRoute]);
 
   // Navigation handler
@@ -647,15 +626,6 @@ export default function App() {
         if (matched) setCurrentChannel(matched);
       }
       setCurrentRoute(path);
-
-      if (isTabSwitch) {
-        if (tabLoadingTimerRef.current) clearTimeout(tabLoadingTimerRef.current);
-        setIsTabLoading(true);
-        tabLoadingTimerRef.current = setTimeout(() => {
-          setIsTabLoading(false);
-          setTabLoadCount((c) => c + 1);
-        }, 1000);
-      }
     };
 
     window.addEventListener('popstate', handlePopState);
@@ -968,8 +938,8 @@ export default function App() {
           onDismissUnsavedTooltip={() => setShowUnsavedTooltip(false)}
         />}
 
-        {/* Dynamic Page Content with smooth slide-up transition - Bo cong 10px góc trên trái ở desktop, không bo ở mobile */}
-        <main className={`main-tab-page flex-1 w-full mx-auto rounded-tl-none md:rounded-tl-[10px] rounded-tr-none rounded-br-none rounded-bl-none overflow-hidden bg-[#f9f9f9] dark:bg-[#282c31] ${
+        {/* Dynamic Page Content with slide transition between tab pages like touch keyboard (no splash screen) */}
+        <main className={`main-tab-page relative flex-1 w-full mx-auto rounded-tl-none md:rounded-tl-[10px] rounded-tr-none rounded-br-none rounded-bl-none overflow-hidden bg-[#f9f9f9] dark:bg-[#282c31] ${
           currentRoute === '/' || currentRoute === '/home' || currentRoute === '/news' || currentRoute === '/updates' || isOfficeRoute || currentRoute === '/craftmine' || currentRoute === '/photopea' || currentRoute === '/vlc' || currentRoute === '/screenbox' || currentRoute === '/screenbug' || currentRoute === '/gallery' || currentRoute === '/draws' || currentRoute.startsWith('/draws/') || currentRoute === '/camera'
             ? 'p-0 max-w-none pt-0' 
             : 'px-4 sm:px-6 md:px-8 py-5 max-w-7xl'
@@ -978,27 +948,18 @@ export default function App() {
             ? 'pb-28 sm:pb-32'
             : ''
         }`}>
-          {/* Dynamic Page Content with 1-second splash screen transition on tab switch */}
-          {isTabLoading ? (
-            <div
-              key={`tab-loading-${currentRoute}`}
-              className="w-full flex-1 flex flex-col items-center justify-center min-h-[60vh] sm:min-h-[70vh]"
-            >
-              <TabLoadingScreen route={currentRoute} />
-            </div>
-          ) : (
+          <AnimatePresence mode="wait" initial={false}>
             <motion.div
-              key={`tab-loaded-${currentRoute}-${tabLoadCount}-${isSplashFinished ? 'booted' : 'booting'}`}
-              initial={{ opacity: 0, y: 22 }}
-              animate={isSplashFinished ? { opacity: 1, y: 0 } : { opacity: 0, y: 22 }}
-              transition={{ duration: 0.44, ease: [0.16, 1, 0.3, 1] }}
-              className={`tab-element-slide-up-container w-full h-full rounded-tl-none md:rounded-tl-[10px] rounded-tr-none rounded-br-none rounded-bl-none overflow-hidden ${
-                settings.pageAnimation === 'zoomIn' ? 'page-anim-zoom origin-center' : ''
-              }`}
+              key={currentRoute}
+              initial={{ opacity: 0, x: 80 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -80 }}
+              transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+              className="tab-page-slide-wrapper w-full h-full rounded-tl-none md:rounded-tl-[10px] rounded-tr-none rounded-br-none rounded-bl-none overflow-hidden"
             >
               {renderContent()}
             </motion.div>
-          )}
+          </AnimatePresence>
         </main>
 
       </div>

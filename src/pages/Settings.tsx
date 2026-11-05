@@ -67,12 +67,12 @@ interface SettingsProps {
   onRestartOobe?: () => void;
 }
 
-// Staggered slide up variant for cascading entrance animation matching sidebar context menu
+// Staggered slide variant for cascading entrance animation from right matching sidebar context menu
 const slideUpVariant = {
-  hidden: { opacity: 0, y: 20 },
+  hidden: { opacity: 0, x: 40 },
   visible: (i: number) => ({
     opacity: 1,
-    y: 0,
+    x: 0,
     transition: {
       duration: 0.38,
       ease: [0.16, 1, 0.3, 1],

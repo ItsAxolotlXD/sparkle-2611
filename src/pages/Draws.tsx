@@ -68,12 +68,12 @@ const PRESET_COLORS = [
 
 const PRESET_SIZES = [1, 2, 4, 8, 12, 16, 24, 32];
 
-// Staggered slide up variant for cascading entrance animation from top to bottom
+// Staggered slide variant for cascading entrance animation from right
 const slideUpVariant = {
-  hidden: { opacity: 0, y: 22 },
+  hidden: { opacity: 0, x: 40 },
   visible: (i: number) => ({
     opacity: 1,
-    y: 0,
+    x: 0,
     transition: {
       duration: 0.52,
       ease: [0.16, 1, 0.3, 1],
