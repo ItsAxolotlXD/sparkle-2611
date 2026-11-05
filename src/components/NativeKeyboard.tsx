@@ -19,6 +19,41 @@ import { EmojiBoard } from './EmojiBoard';
 
 type KeyboardLayoutMode = 'alpha' | 'numeric' | 'symbols';
 
+const WindowsBackspaceIcon: React.FC<{ className?: string }> = ({ className = 'w-5 h-5' }) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z" />
+    <line x1="18" y1="9" x2="12" y2="15" />
+    <line x1="12" y1="9" x2="18" y2="15" />
+  </svg>
+);
+
+const WindowsEnterIcon: React.FC<{ className?: string }> = ({ className = 'w-5 h-5' }) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <polyline points="9 10 4 15 9 20" />
+    <path d="M20 4v7a4 4 0 0 1-4 4H4" />
+  </svg>
+);
+
+const WindowsShiftIcon: React.FC<{ className?: string; filled?: boolean }> = ({ className = 'w-5 h-5', filled }) => (
+  <svg viewBox="0 0 24 24" fill={filled ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <path d="M12 3l7 7h-4v9h-6v-9H5l7-7z" />
+  </svg>
+);
+
+const WindowsSettingsIcon: React.FC<{ className?: string }> = ({ className = 'w-4 h-4' }) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <circle cx="12" cy="12" r="3" />
+    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
+  </svg>
+);
+
+const WindowsLayoutIcon: React.FC<{ className?: string }> = ({ className = 'w-4 h-4' }) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <rect x="3" y="3" width="18" height="18" rx="2" />
+    <rect x="7" y="7" width="10" height="7" rx="1" />
+  </svg>
+);
+
 const LANGUAGE_OPTIONS: { id: VietnameseInputMethod; label: string; short: string; flag: string }[] = [
   { id: 'vi-telex', label: 'Tiếng Việt (Telex)', short: 'Telex', flag: '🇻🇳' },
   { id: 'vi-vni', label: 'Tiếng Việt (VNI)', short: 'VNI', flag: '🇻🇳' },
@@ -26,7 +61,7 @@ const LANGUAGE_OPTIONS: { id: VietnameseInputMethod; label: string; short: strin
 ];
 
 export const NativeKeyboard: React.FC = () => {
-  const { settings } = useSettings();
+  const { settings, updateSetting } = useSettings();
   const {
     isOpen,
     keyboardHeight,
@@ -47,14 +82,16 @@ export const NativeKeyboard: React.FC = () => {
   const [isMicListening, setIsMicListening] = useState(false);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [emojiSearchQuery, setEmojiSearchQuery] = useState('');
+  const [isEmojiSearchFocused, setIsEmojiSearchFocused] = useState(false);
   const [showClipboard, setShowClipboard] = useState(false);
   const [clipboardSearchQuery, setClipboardSearchQuery] = useState('');
+  const [isClipboardSearchFocused, setIsClipboardSearchFocused] = useState(false);
   const [clipboardList, setClipboardList] = useState<ClipboardItem[]>([]);
   const [copiedFeedback, setCopiedFeedback] = useState<string | null>(null);
   const [pressedKeyId, setPressedKeyId] = useState<string | null>(null);
-  const plusBtnRef = useRef<HTMLButtonElement>(null);
-  const [showPlusMenu, setShowPlusMenu] = useState(false);
-  const [plusMenuPos, setPlusMenuPos] = useState<{ left: number; bottom: number }>({ left: 16, bottom: 60 });
+  const settingsBtnRef = useRef<HTMLButtonElement>(null);
+  const [showSettingsMenu, setShowSettingsMenu] = useState(false);
+  const [settingsMenuPos, setSettingsMenuPos] = useState<{ left: number; top: number }>({ left: 16, top: 120 });
 
   // In-app custom vertical scroller for Clipboard
   const [clipboardScrollProgress, setClipboardScrollProgress] = useState(0);
@@ -70,6 +107,33 @@ export const NativeKeyboard: React.FC = () => {
   const backspaceTimerRef = useRef<NodeJS.Timeout | null>(null);
   const backspaceIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const lastSoundTimeRef = useRef<number>(0);
+
+  // Close Settings Menu on outside click or escape
+  useEffect(() => {
+    if (!showSettingsMenu) return;
+    const handleClickOutside = (e: MouseEvent | PointerEvent) => {
+      const menu = document.getElementById('native-keyboard-settings-menu');
+      if (
+        menu &&
+        !menu.contains(e.target as Node) &&
+        settingsBtnRef.current &&
+        !settingsBtnRef.current.contains(e.target as Node)
+      ) {
+        setShowSettingsMenu(false);
+      }
+    };
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setShowSettingsMenu(false);
+      }
+    };
+    window.addEventListener('pointerdown', handleClickOutside);
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('pointerdown', handleClickOutside);
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [showSettingsMenu]);
 
   // Play key sound with throttling to avoid double clicks between pointerdown and click
   const playSound = useCallback((type: 'char' | 'space' | 'delete' | 'action' | 'modifier' = 'char') => {
@@ -93,33 +157,6 @@ export const NativeKeyboard: React.FC = () => {
     };
   }, []);
 
-  // Close plus context menu on outside click or escape
-  useEffect(() => {
-    if (!showPlusMenu) return;
-    const handlePointer = (e: PointerEvent) => {
-      const target = e.target as HTMLElement | null;
-      if (
-        plusBtnRef.current?.contains(target as Node) ||
-        target?.closest('#native-keyboard-plus-menu')
-      ) {
-        return;
-      }
-      setShowPlusMenu(false);
-    };
-    const handleKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setShowPlusMenu(false);
-    };
-    document.addEventListener('pointerdown', handlePointer);
-    document.addEventListener('keydown', handleKey);
-    const handleResize = () => setShowPlusMenu(false);
-    window.addEventListener('resize', handleResize);
-    return () => {
-      document.removeEventListener('pointerdown', handlePointer);
-      document.removeEventListener('keydown', handleKey);
-      window.removeEventListener('resize', handleResize);
-    };
-  }, [showPlusMenu]);
-
   // Reset states when keyboard opens
   useEffect(() => {
     if (isOpen) {
@@ -128,7 +165,7 @@ export const NativeKeyboard: React.FC = () => {
       setIsCapsLock(false);
       setShowEmojiPicker(false);
       setEmojiSearchQuery('');
-      setShowPlusMenu(false);
+      setShowSettingsMenu(false);
       setShowClipboard(false);
       setClipboardSearchQuery('');
       setPressedKeyId(null);
@@ -348,31 +385,84 @@ export const NativeKeyboard: React.FC = () => {
     }
   };
 
-  // Keyboard Rows definition
+  const handleEscPress = () => {
+    playSound('action');
+    if (activeInput) {
+      activeInput.blur();
+    }
+    closeKeyboard();
+  };
+
+  const handleTabPress = () => {
+    playSound('char');
+    insertText('\t');
+  };
+
+  const handleEnterPress = () => {
+    playSound('action');
+    if (activeInput?.tagName === 'TEXTAREA') {
+      insertText('\n');
+    } else {
+      submitAction();
+    }
+  };
+
+  const handleArrowLeft = () => {
+    playSound('modifier');
+    const input = activeInput;
+    if (!input) return;
+    const pos = input.selectionStart ?? input.value.length;
+    const newPos = Math.max(0, pos - 1);
+    input.focus();
+    input.setSelectionRange(newPos, newPos);
+  };
+
+  const handleArrowRight = () => {
+    playSound('modifier');
+    const input = activeInput;
+    if (!input) return;
+    const pos = input.selectionEnd ?? input.value.length;
+    const newPos = Math.min(input.value.length, pos + 1);
+    input.focus();
+    input.setSelectionRange(newPos, newPos);
+  };
+
+  // Windows 11 Keyboard Rows definition
   const rowNumbers = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'];
   const row1Alpha = ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'];
-  const row2Alpha = ['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l'];
-  const row3Alpha = ['z', 'x', 'c', 'v', 'b', 'n', 'm'];
+  const row2Alpha = ['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ';'];
+  const row3Alpha = ['z', 'x', 'c', 'v', 'b', 'n', 'm', ',', '.', '?'];
 
   const row1Num = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'];
   const row2Num = ['-', '/', ':', ';', '(', ')', '$', '&', '@', '"'];
-  const row3Num = ['.', ',', '?', '!', "'"];
+  const row3Num = ['.', ',', '?', '!', "'", '[', ']', '{', '}'];
 
-  const row1Sym = ['[', ']', '{', '}', '#', '%', '^', '*', '+', '='];
-  const row2Sym = ['_', '\\', '|', '~', '<', '>', '€', '£', '¥', '•'];
-  const row3Sym = ['.', ',', '?', '!', "'"];
+  const SECONDARY_LABELS: Record<string, string> = {
+    q: '1',
+    w: '2',
+    e: '3',
+    r: '4',
+    t: '5',
+    y: '6',
+    u: '7',
+    i: '8',
+    o: '9',
+    p: '0',
+    ';': ':',
+    ',': '<',
+    '.': '>',
+    '?': '!',
+  };
 
-  const hasNumberRow = Boolean(settings.keyboardNumberRow && layoutMode === 'alpha');
-  const keyHeightClass = hasNumberRow
-    ? 'h-[36px] sm:h-[40px] md:h-[44px]'
-    : 'h-[42px] sm:h-[46px] md:h-[50px]';
+  const keyHeightClass = 'h-[40px] sm:h-[44px] md:h-[48px]';
 
-  // Render individual character key with tactile sink-down animation on press (no pop-up balloon)
-  const renderCharKey = (char: string, rowIndex: number, colIndex: number, _totalCols?: number) => {
+  // Render individual character key with tactile sink-down animation on press
+  const renderCharKey = (char: string, rowIndex: number, colIndex: number) => {
     const keyId = `${layoutMode}-${rowIndex}-${char}-${colIndex}`;
     const isNumber = !isNaN(Number(char));
     const displayChar = (!isNumber && (isShiftActive || isCapsLock)) ? char.toUpperCase() : char;
     const isPressed = pressedKeyId === keyId;
+    const secondary = layoutMode === 'alpha' ? SECONDARY_LABELS[char] : undefined;
 
     return (
       <button
@@ -397,18 +487,21 @@ export const NativeKeyboard: React.FC = () => {
           setPressedKeyId(null);
         }}
         onClick={() => handleCharPress(char)}
-        className={`touch-keycap relative flex-1 min-w-0 ${keyHeightClass} rounded-[6px] font-semibold ${
-          hasNumberRow ? 'text-[17px] sm:text-[19px] md:text-[21px]' : 'text-[19px] sm:text-[21px] md:text-[23px]'
-        } flex items-center justify-center transition-colors cursor-default font-sans select-none ${
+        className={`touch-keycap relative flex-1 min-w-0 ${keyHeightClass} rounded-[3px] font-medium flex items-center justify-center transition-colors cursor-default font-sans select-none ${
           isPressed ? 'touch-keycap-pressed z-20' : 'z-10'
         }`}
       >
-        {!hasNumberRow && layoutMode === 'alpha' && rowIndex === 1 && (
-          <span aria-hidden="true" className="absolute left-1.5 top-1 text-[9px] sm:text-[10px] font-medium text-black/45">
-            {rowNumbers[colIndex]}
+        {secondary && (
+          <span
+            aria-hidden="true"
+            className="absolute left-1.5 top-0.5 sm:top-1 text-[10px] sm:text-[11px] font-normal leading-none opacity-50 select-none pointer-events-none"
+          >
+            {secondary}
           </span>
         )}
-        <span className="relative z-10">{displayChar}</span>
+        <span className="relative z-10 text-[16px] sm:text-[18px] md:text-[20px] font-medium leading-none">
+          {displayChar}
+        </span>
       </button>
     );
   };
@@ -422,50 +515,92 @@ export const NativeKeyboard: React.FC = () => {
         height: `${keyboardHeight}px`,
         zIndex: 2147483647,
       }}
-      className={`touch-keyboard-shell fixed inset-x-0 bottom-0 z-50 rounded-none bg-white/50 backdrop-blur-2xl border-t border-black/10 transition-all duration-[440ms] [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] will-change-transform select-none flex flex-col justify-between ${
+      className={`touch-keyboard-shell fixed inset-x-0 bottom-0 z-50 rounded-none transition-all duration-[440ms] [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] will-change-transform select-none flex flex-col justify-between ${
         isOpen ? 'translate-y-0 opacity-100 pointer-events-auto' : 'translate-y-full opacity-0 pointer-events-none'
       }`}
     >
-      <div className="w-full max-w-full md:max-w-full lg:max-w-[98%] xl:max-w-[97%] 2xl:max-w-[96%] mx-auto flex flex-col justify-between h-full px-1.5 sm:px-2 md:px-2.5 lg:px-3 pt-1 pb-1.5 sm:pb-2">
-        {/* Top bar with Switch to device's keyboard button and emoji search bar when in emoji mode */}
-        <div className="touch-keyboard-header relative flex items-center justify-between gap-2 px-1 pt-0.5 pb-1 select-none min-h-[36px] border-b border-black/10">
-          {/* Compact switch to the device keyboard button */}
-          <button
-            type="button"
-            id="btn-switch-to-device-keyboard"
-            onMouseDown={(e) => e.preventDefault()}
-            onPointerDown={(e) => {
-              e.preventDefault();
-              playSound('action');
-            }}
-            onClick={() => {
-              switchToDeviceKeyboard();
-            }}
-            className="flex h-7 w-7 items-center justify-center rounded-md bg-transparent text-black/70 hover:bg-black/[0.06] active:bg-black/[0.1] transition-colors cursor-default shrink-0"
-            title="Switch to device's keyboard"
-            aria-label="Switch to device's keyboard"
-          >
-              <Keyboard className="w-4 h-4 text-black/70 shrink-0" />
-          </button>
+      <div className="w-full max-w-full mx-auto flex flex-col justify-between h-full px-0.5 sm:px-1 md:px-1.5 lg:px-2 pt-0.5 pb-1 sm:pb-1.5">
+        {/* Top bar with Windows 11 Touch Keyboard header icons */}
+        <div className="touch-keyboard-header relative flex items-center justify-between gap-2 px-1 pt-0.5 pb-1 select-none min-h-[30px] sm:min-h-[34px] border-b border-black/10 dark:border-white/10 text-black/75 dark:text-white/75">
+          {/* Top-left: Settings gear & layout switch icon */}
+          <div className="flex items-center gap-1">
+            <button
+              ref={settingsBtnRef}
+              type="button"
+              id="btn-native-keyboard-settings"
+              onMouseDown={(e) => e.preventDefault()}
+              onPointerDown={(e) => {
+                e.preventDefault();
+                playSound('action');
+              }}
+              onClick={(e) => {
+                e.stopPropagation();
+                if (!showSettingsMenu && settingsBtnRef.current) {
+                  const rect = settingsBtnRef.current.getBoundingClientRect();
+                  const topOffset = rect.bottom + 6;
+                  const leftOffset = Math.max(8, Math.min(rect.left, window.innerWidth - 248));
+                  setSettingsMenuPos({ left: leftOffset, top: topOffset });
+                }
+                setShowSettingsMenu((prev) => !prev);
+              }}
+              className="flex h-6.5 w-6.5 items-center justify-center rounded-md hover:bg-black/10 dark:hover:bg-white/10 active:bg-black/15 dark:active:bg-white/15 transition-colors cursor-default border-0 border-none outline-none focus:outline-none focus:ring-0"
+              title="Cài đặt bàn phím"
+              aria-label="Cài đặt bàn phím"
+              aria-haspopup="menu"
+              aria-expanded={showSettingsMenu}
+            >
+              <WindowsSettingsIcon className="w-4 h-4 text-current" />
+            </button>
 
-          {/* Search field for the emoji board */}
+            <button
+              type="button"
+              onMouseDown={(e) => e.preventDefault()}
+              onPointerDown={(e) => {
+                e.preventDefault();
+                playSound('action');
+              }}
+              onClick={() => {
+                setLayoutMode((prev) => (prev === 'alpha' ? 'numeric' : 'alpha'));
+              }}
+              className="flex h-6.5 w-6.5 items-center justify-center rounded-md hover:bg-black/10 dark:hover:bg-white/10 active:bg-black/15 dark:active:bg-white/15 transition-colors cursor-default"
+              title="Đổi kiểu ký tự"
+              aria-label="Đổi kiểu ký tự"
+            >
+              <WindowsLayoutIcon className="w-4 h-4 text-current" />
+            </button>
+          </div>
+
+          {/* Search field for the emoji board - WinUI 3 Search Box style */}
           {showEmojiPicker && (
-            <div className="absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 items-center shrink-0 w-48 xs:w-56 sm:w-72 md:w-84 h-8 rounded-[10px] bg-white/70 border border-black/10 px-3 gap-2 transition-all focus-within:bg-white/85 focus-within:border-[#0078d4] focus-within:ring-1 focus-within:ring-[#0078d4]/25 shadow-xs">
-              <FluentSearchIcon className="w-[15px] h-[15px] text-[#6b7280] shrink-0 pointer-events-none select-none" />
+            <div
+              className={`fluent-search-box group absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 items-center shrink-0 w-48 xs:w-56 sm:w-72 md:w-84 h-7.5 sm:h-8 px-3 gap-2 transition-all select-none ${
+                isEmojiSearchFocused || emojiSearchQuery
+                  ? 'is-focused bg-white dark:bg-[#282c31]'
+                  : 'bg-[#fbfbfb] dark:bg-[#282c31]'
+              }`}
+            >
+              <FluentSearchIcon className="w-4 h-4 text-black dark:text-white shrink-0 pointer-events-none select-none" />
               <input
                 type="text"
                 value={emojiSearchQuery}
+                spellCheck={false}
+                autoCapitalize="off"
+                autoComplete="off"
+                autoCorrect="off"
+                onFocus={() => setIsEmojiSearchFocused(true)}
+                onBlur={() => setIsEmojiSearchFocused(false)}
                 onChange={(e) => setEmojiSearchQuery(e.target.value)}
-                placeholder="Tìm kiếm emoji..."
-                className="flex-1 min-w-0 bg-transparent text-xs sm:text-[13px] text-[#1f2937] placeholder-[#6b7280] outline-none border-none py-0.5 pr-1 font-sans"
+                placeholder="Search for emojis"
+                className="flex-1 min-w-0 bg-transparent text-xs sm:text-[13px] text-black dark:text-white placeholder-black/75 dark:placeholder-white outline-none border-none py-0.5 pr-1 font-sans"
               />
               {emojiSearchQuery && (
                 <button
                   type="button"
                   onMouseDown={(e) => e.preventDefault()}
                   onClick={() => setEmojiSearchQuery('')}
-                  className="p-0.5 text-[#71717a] hover:text-black transition-colors cursor-pointer"
+                  className="text-black dark:text-white hover:text-black dark:hover:text-white p-0.5 transition-colors cursor-pointer shrink-0"
                   title="Xóa tìm kiếm"
+                  aria-label="Xóa tìm kiếm"
                 >
                   <X className="w-3.5 h-3.5" />
                 </button>
@@ -473,15 +608,24 @@ export const NativeKeyboard: React.FC = () => {
             </div>
           )}
 
-          {/* Active input hint / indicator & Dismiss button - Pinned to right */}
-          <div className="absolute right-1 top-1/2 -translate-y-1/2 flex items-center gap-2">
-            {!showEmojiPicker && (
-              <span className="sr-only">
-                {activeInput?.placeholder || 'Sparkle Keyboard'}
-              </span>
-            )}
+          {/* Right side: Switch to device keyboard and Close button */}
+          <div className="flex items-center gap-1">
+            <button
+              type="button"
+              id="btn-switch-to-device-keyboard"
+              onMouseDown={(e) => e.preventDefault()}
+              onPointerDown={(e) => {
+                e.preventDefault();
+                playSound('action');
+              }}
+              onClick={switchToDeviceKeyboard}
+              className="flex h-6.5 w-6.5 items-center justify-center rounded-md hover:bg-black/10 dark:hover:bg-white/10 active:bg-black/15 dark:active:bg-white/15 transition-colors cursor-default"
+              title="Switch to device's keyboard"
+              aria-label="Switch to device's keyboard"
+            >
+              <Keyboard className="w-4 h-4 text-current" />
+            </button>
 
-            {/* Dismiss button */}
             <button
               type="button"
               onMouseDown={(e) => e.preventDefault()}
@@ -490,20 +634,30 @@ export const NativeKeyboard: React.FC = () => {
                 playSound('action');
               }}
               onClick={closeKeyboard}
-              className="p-1 rounded-md text-black/70 hover:bg-black/[0.06] transition-colors cursor-default"
+              className="flex h-6.5 w-6.5 items-center justify-center rounded-md hover:bg-black/10 dark:hover:bg-white/10 active:bg-black/15 dark:active:bg-white/15 transition-colors cursor-default"
               title="Đóng bàn phím"
               aria-label="Đóng bàn phím"
             >
-              <X className="w-4 h-4" />
+              <X className="w-4 h-4 text-current" />
             </button>
           </div>
         </div>
 
-        {showClipboard ? (
-          /* Clipboard History Tray */
-          <div className="flex-1 flex flex-col justify-between px-1.5 py-1 min-h-0 overflow-hidden">
-            {/* Clipboard Header */}
-            <div className="flex items-center justify-between pb-1 px-1 border-b border-black/10 shrink-0">
+        {/* Main Keyboard Body with Right-to-Left Slide Transitions across Keyboard, Emoji, and Clipboard */}
+        <div className="relative flex-1 overflow-hidden flex flex-col justify-center w-full min-h-0">
+          <AnimatePresence mode="wait" initial={false}>
+            {showClipboard ? (
+              /* Clipboard History Tray */
+              <motion.div
+                key="clipboard-view"
+                initial={{ opacity: 0, x: 80 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -80 }}
+                transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+                className="flex-1 flex flex-col justify-between px-1.5 py-1 min-h-0 overflow-hidden w-full h-full"
+              >
+                {/* Clipboard Header */}
+                <div className="flex items-center justify-between pb-1 px-1 border-b border-black/10 shrink-0">
               <div className="flex items-center gap-2">
                 <ClipboardList className="w-4 h-4 text-black" />
                 <span className="text-xs font-bold text-black tracking-tight">Lịch sử sao chép (Clipboard)</span>
@@ -552,33 +706,47 @@ export const NativeKeyboard: React.FC = () => {
                   onMouseDown={(e) => e.preventDefault()}
                   onPointerDown={() => playSound('modifier')}
                   onClick={() => setShowClipboard(false)}
-                  className="p-1 rounded-full text-black hover:bg-black/10 transition-colors cursor-default"
+                  className="h-7.5 w-7.5 rounded-[6px] bg-white/70 dark:bg-white/10 hover:bg-black/5 dark:hover:bg-white/15 active:bg-black/10 dark:active:bg-white/20 text-[#111827] dark:text-white border-0 border-none outline-none focus:outline-none focus:ring-0 flex items-center justify-center transition-colors cursor-default"
                   title="Quay lại bàn phím"
+                  aria-label="Quay lại bàn phím"
                 >
-                  <X className="w-4 h-4 text-black" />
+                  <X className="w-3.5 h-3.5 text-current" />
                 </button>
               </div>
             </div>
 
-            {/* Clipboard search pill */}
-            <div className="relative flex items-center w-full h-7.5 rounded-[100px] bg-white border border-black/15 px-3 gap-2 transition-all focus-within:bg-white focus-within:border-[#55c5f4] focus-within:ring-1 focus-within:ring-[#55c5f4]/35 shadow-xs my-1 shrink-0">
-              <FluentSearchIcon className="w-3.5 h-3.5 text-[#71717a] shrink-0 pointer-events-none select-none" />
+            {/* Clipboard search box - WinUI 3 Search Box style */}
+            <div
+              className={`fluent-search-box group relative flex items-center w-full h-8 sm:h-8.5 px-3.5 gap-2 transition-all my-1 shrink-0 select-none ${
+                isClipboardSearchFocused || clipboardSearchQuery
+                  ? 'is-focused bg-white dark:bg-[#282c31]'
+                  : 'bg-[#fbfbfb] dark:bg-[#282c31]'
+              }`}
+            >
+              <FluentSearchIcon className="w-4 h-4 text-black dark:text-white shrink-0 pointer-events-none select-none" />
               <input
                 type="text"
                 value={clipboardSearchQuery}
+                spellCheck={false}
+                autoCapitalize="off"
+                autoComplete="off"
+                autoCorrect="off"
+                onFocus={() => setIsClipboardSearchFocused(true)}
+                onBlur={() => setIsClipboardSearchFocused(false)}
                 onChange={(e) => setClipboardSearchQuery(e.target.value)}
-                placeholder="Tìm kiếm trong lịch sử sao chép..."
-                className="flex-1 min-w-0 bg-transparent text-xs text-[#111827] placeholder-[#71717a] outline-none border-none py-0.5 font-sans"
+                placeholder="Search for clipboard history"
+                className="flex-1 min-w-0 bg-transparent text-xs sm:text-[13px] text-black dark:text-white placeholder-black/75 dark:placeholder-white outline-none border-none py-0.5 pr-1 font-sans"
               />
               {clipboardSearchQuery && (
                 <button
                   type="button"
                   onMouseDown={(e) => e.preventDefault()}
                   onClick={() => setClipboardSearchQuery('')}
-                  className="p-0.5 text-[#71717a] hover:text-black transition-colors cursor-pointer"
+                  className="text-black dark:text-white hover:text-black dark:hover:text-white p-0.5 transition-colors cursor-pointer shrink-0"
                   title="Xóa tìm kiếm"
+                  aria-label="Xóa tìm kiếm"
                 >
-                  <X className="w-3 h-3" />
+                  <X className="w-3.5 h-3.5" />
                 </button>
               )}
             </div>
@@ -686,14 +854,14 @@ export const NativeKeyboard: React.FC = () => {
               )}
             </div>
 
-            {/* Bottom bar of Clipboard view */}
-            <div className="flex items-center justify-between pt-1 border-t border-black/10 shrink-0">
+            {/* Bottom bar of Clipboard view: WinUI 3 styled buttons */}
+            <div className="flex items-center justify-between pt-1 border-t border-black/10 dark:border-white/10 shrink-0">
               <button
                 type="button"
                 onMouseDown={(e) => e.preventDefault()}
                 onPointerDown={() => playSound('modifier')}
                 onClick={() => setShowClipboard(false)}
-                className="px-4 py-1.5 rounded-xl bg-white/50 text-xs font-semibold text-black border border-white/25 hover:bg-white/70 transition-colors cursor-default"
+                className="h-8 px-4 rounded-[6px] bg-white/70 dark:bg-white/10 hover:bg-black/5 dark:hover:bg-white/15 active:bg-black/10 dark:active:bg-white/20 text-xs font-semibold text-[#111827] dark:text-white border-0 border-none outline-none focus:outline-none focus:ring-0 transition-colors cursor-default"
               >
                 Bàn phím
               </button>
@@ -702,104 +870,71 @@ export const NativeKeyboard: React.FC = () => {
                 onMouseDown={(e) => e.preventDefault()}
                 onPointerDown={() => playSound('action')}
                 onClick={closeKeyboard}
-                className="px-4 py-1.5 rounded-lg bg-[#48c3f2] hover:bg-[#66d0f7] active:bg-[#34a9d7] text-xs font-bold text-[#08212a] shadow-xs transition-colors cursor-default"
+                className="h-8 px-4 rounded-[6px] bg-[#005fb8] dark:bg-[#4cc2ff] hover:bg-[#106ebe] dark:hover:bg-[#6bd0ff] active:bg-[#005a9e] dark:active:bg-[#3bb2ef] text-xs font-semibold text-white dark:text-black transition-colors cursor-default border-0 border-none outline-none focus:outline-none focus:ring-0"
               >
                 Xong
               </button>
             </div>
-          </div>
+          </motion.div>
         ) : showEmojiPicker ? (
           /* Full Horizontal Scrolling Emoji Board with Unicode Categories */
-          <EmojiBoard
-            searchQuery={emojiSearchQuery}
-            onInsertEmoji={(emoji) => handleCharPress(emoji)}
-            onDeleteChar={deleteChar}
-            onCloseKeyboard={closeKeyboard}
-            onSwitchToABC={() => {
-              setShowEmojiPicker(false);
-              setEmojiSearchQuery('');
-            }}
-          />
+          <motion.div
+            key="emoji-view"
+            initial={{ opacity: 0, x: 80 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -80 }}
+            transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+            className="w-full h-full flex flex-col min-h-0"
+          >
+            <EmojiBoard
+              searchQuery={emojiSearchQuery}
+              onInsertEmoji={(emoji) => handleCharPress(emoji)}
+              onDeleteChar={deleteChar}
+              onCloseKeyboard={closeKeyboard}
+              onSwitchToABC={() => {
+                setShowEmojiPicker(false);
+                setEmojiSearchQuery('');
+                setIsEmojiSearchFocused(false);
+              }}
+            />
+          </motion.div>
         ) : (
-          /* Standard keyboard grid with charcoal keycaps and press bubbles */
-          <div className="flex flex-col gap-1 sm:gap-1.5 md:gap-2 flex-1 justify-center">
-            {/* ROW 0: Dedicated Number Row (Bàn phím số: 0 đến 9 trên dải phím chữ) */}
-            {hasNumberRow && (
-              <div className="flex items-center justify-between gap-1 sm:gap-1.5 md:gap-2 w-full">
-                {rowNumbers.map((char, colIndex, arr) =>
-                  renderCharKey(char, 0, colIndex, arr.length)
-                )}
-              </div>
-            )}
-
-            {/* ROW 1 */}
+          /* Windows 11 Touch Keyboard grid */
+          <motion.div
+            key="keyboard-view"
+            initial={{ opacity: 0, x: 80 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -80 }}
+            transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+            className="flex flex-col gap-1 sm:gap-1.5 md:gap-2 flex-1 justify-center py-0.5 w-full"
+          >
+            {/* ROW 1: Esc, q..p with 1..0 superscripts, Backspace */}
             <div className="flex items-center justify-between gap-1 sm:gap-1.5 md:gap-2 w-full">
-              {(layoutMode === 'alpha' ? row1Alpha : layoutMode === 'numeric' ? row1Num : row1Sym).map((char, colIndex, arr) =>
-                renderCharKey(char, 1, colIndex, arr.length)
-              )}
-            </div>
+              {/* Esc key */}
+              <button
+                type="button"
+                onMouseDown={(e) => e.preventDefault()}
+                onPointerDown={(e) => {
+                  e.preventDefault();
+                  playSound('action');
+                  setPressedKeyId('esc-btn');
+                }}
+                onPointerUp={() => setPressedKeyId(null)}
+                onPointerLeave={() => setPressedKeyId(null)}
+                onPointerCancel={() => setPressedKeyId(null)}
+                onClick={handleEscPress}
+                className={`touch-keycap w-[8%] sm:w-[7.6%] min-w-[36px] sm:min-w-[42px] ${keyHeightClass} rounded-[3px] text-xs sm:text-[13px] font-medium flex items-center justify-center transition-colors cursor-default ${
+                  pressedKeyId === 'esc-btn' ? 'touch-keycap-pressed' : ''
+                }`}
+                title="Escape"
+                aria-label="Escape"
+              >
+                Esc
+              </button>
 
-            {/* ROW 2 (indented with reduced safe area) */}
-            <div className="flex items-center justify-between gap-1 sm:gap-1.5 md:gap-2 w-full px-[2.5%] sm:px-[2.5%] md:px-[2.5%]">
-              {(layoutMode === 'alpha' ? row2Alpha : layoutMode === 'numeric' ? row2Num : row2Sym).map((char, colIndex, arr) =>
-                renderCharKey(char, 2, colIndex, arr.length)
-              )}
-            </div>
-
-            {/* ROW 3: Shift / Mode, Characters, Backspace */}
-            <div className="flex items-center justify-between gap-1 sm:gap-1.5 md:gap-2 w-full">
-              {layoutMode === 'alpha' ? (
-                /* Shift key with an accent state for Caps Lock and Shift */
-                <button
-                  type="button"
-                  onMouseDown={(e) => e.preventDefault()}
-                  onPointerDown={(e) => {
-                    e.preventDefault();
-                    playSound('modifier');
-                    setPressedKeyId('shift');
-                    if (navigator.vibrate) {
-                      try { navigator.vibrate(10); } catch {}
-                    }
-                  }}
-                  onPointerUp={() => setPressedKeyId(null)}
-                  onPointerLeave={() => setPressedKeyId(null)}
-                  onPointerCancel={() => setPressedKeyId(null)}
-                  onClick={handleShiftTap}
-                  className={`touch-keycap w-[13.5%] min-w-[38px] sm:min-w-[48px] ${keyHeightClass} rounded-[6px] flex items-center justify-center transition-colors cursor-default border ${
-                    isCapsLock || isShiftActive ? 'touch-keycap-active' : ''
-                  } ${pressedKeyId === 'shift' ? 'touch-keycap-pressed' : ''}`}
-                  title={isCapsLock ? 'Caps Lock BẬT' : isShiftActive ? 'Shift BẬT' : 'Shift'}
-                  aria-label="Shift"
-                >
-                  <ArrowBigUp className={`w-5 h-5 text-black ${isCapsLock || isShiftActive ? 'fill-black' : ''}`} />
-                </button>
-              ) : (
-                /* #+= or 123 layout toggle */
-                <button
-                  type="button"
-                  onMouseDown={(e) => e.preventDefault()}
-                  onPointerDown={(e) => {
-                    e.preventDefault();
-                    playSound('modifier');
-                    setPressedKeyId('sym-mode');
-                  }}
-                  onPointerUp={() => setPressedKeyId(null)}
-                  onPointerLeave={() => setPressedKeyId(null)}
-                  onPointerCancel={() => setPressedKeyId(null)}
-                  onClick={() => {
-                    setLayoutMode(layoutMode === 'numeric' ? 'symbols' : 'numeric');
-                  }}
-                  className={`touch-keycap w-[13.5%] min-w-[38px] sm:min-w-[48px] ${keyHeightClass} rounded-[6px] text-xs sm:text-sm font-semibold flex items-center justify-center transition-colors cursor-default font-sans ${
-                    pressedKeyId === 'sym-mode' ? 'touch-keycap-pressed' : ''
-                  }`}
-                >
-                  {layoutMode === 'numeric' ? '#+=' : '123'}
-                </button>
-              )}
-
-              {/* Characters */}
-              {(layoutMode === 'alpha' ? row3Alpha : layoutMode === 'numeric' ? row3Num : row3Sym).map((char, colIndex, arr) =>
-                renderCharKey(char, 3, colIndex, arr.length)
+              {/* Characters q..p */}
+              {(layoutMode === 'alpha' ? row1Alpha : row1Num).map((char, colIndex) =>
+                renderCharKey(char, 1, colIndex)
               )}
 
               {/* Backspace key */}
@@ -823,19 +958,129 @@ export const NativeKeyboard: React.FC = () => {
                   setPressedKeyId(null);
                   handleDeleteUp();
                 }}
-                className={`touch-keycap w-[13.5%] min-w-[38px] sm:min-w-[48px] ${keyHeightClass} rounded-[6px] flex items-center justify-center transition-colors cursor-default ${
+                className={`touch-keycap w-[8.8%] sm:w-[8.4%] min-w-[40px] sm:min-w-[46px] ${keyHeightClass} rounded-[3px] flex items-center justify-center transition-colors cursor-default ${
                   pressedKeyId === 'backspace' ? 'touch-keycap-pressed' : ''
                 }`}
-                title="Xóa"
-                aria-label="Xóa"
+                title="Xóa lùi (Backspace)"
+                aria-label="Xóa lùi"
               >
-                <Delete className="w-5 h-5 text-black" />
+                <WindowsBackspaceIcon className="w-5 h-5 text-current" />
               </button>
             </div>
 
-            {/* ROW 4: Layout, merged tools (+), space, voice and search */}
+            {/* ROW 2: Tab, a..l, ;, Enter */}
+            <div className="flex items-center justify-between gap-1 sm:gap-1.5 md:gap-2 w-full">
+              {/* Tab key */}
+              <button
+                type="button"
+                onMouseDown={(e) => e.preventDefault()}
+                onPointerDown={(e) => {
+                  e.preventDefault();
+                  playSound('char');
+                  setPressedKeyId('tab-btn');
+                }}
+                onPointerUp={() => setPressedKeyId(null)}
+                onPointerLeave={() => setPressedKeyId(null)}
+                onPointerCancel={() => setPressedKeyId(null)}
+                onClick={handleTabPress}
+                className={`touch-keycap w-[8.8%] sm:w-[8.4%] min-w-[40px] sm:min-w-[46px] ${keyHeightClass} rounded-[3px] text-xs sm:text-[13px] font-medium flex items-center justify-center transition-colors cursor-default ${
+                  pressedKeyId === 'tab-btn' ? 'touch-keycap-pressed' : ''
+                }`}
+                title="Tab"
+                aria-label="Tab"
+              >
+                Tab
+              </button>
+
+              {/* Characters a..l and ; */}
+              {(layoutMode === 'alpha' ? row2Alpha : row2Num).map((char, colIndex) =>
+                renderCharKey(char, 2, colIndex)
+              )}
+
+              {/* Enter key */}
+              <button
+                type="button"
+                onMouseDown={(e) => e.preventDefault()}
+                onPointerDown={(e) => {
+                  e.preventDefault();
+                  playSound('action');
+                  setPressedKeyId('enter-btn');
+                }}
+                onPointerUp={() => setPressedKeyId(null)}
+                onPointerLeave={() => setPressedKeyId(null)}
+                onPointerCancel={() => setPressedKeyId(null)}
+                onClick={handleEnterPress}
+                className={`touch-keycap w-[9.8%] sm:w-[9.4%] min-w-[44px] sm:min-w-[50px] ${keyHeightClass} rounded-[3px] flex items-center justify-center transition-colors cursor-default ${
+                  pressedKeyId === 'enter-btn' ? 'touch-keycap-pressed' : ''
+                }`}
+                title="Enter"
+                aria-label="Enter"
+              >
+                <WindowsEnterIcon className="w-5 h-5 text-current" />
+              </button>
+            </div>
+
+            {/* ROW 3: Left Shift, z..m, ,, ., ?, Right Shift */}
+            <div className="flex items-center justify-between gap-1 sm:gap-1.5 md:gap-2 w-full">
+              {/* Left Shift key */}
+              <button
+                type="button"
+                onMouseDown={(e) => e.preventDefault()}
+                onPointerDown={(e) => {
+                  e.preventDefault();
+                  playSound('modifier');
+                  setPressedKeyId('shift-left');
+                  if (navigator.vibrate) {
+                    try { navigator.vibrate(10); } catch {}
+                  }
+                }}
+                onPointerUp={() => setPressedKeyId(null)}
+                onPointerLeave={() => setPressedKeyId(null)}
+                onPointerCancel={() => setPressedKeyId(null)}
+                onClick={handleShiftTap}
+                className={`touch-keycap w-[10.6%] sm:w-[10.2%] min-w-[44px] sm:min-w-[50px] ${keyHeightClass} rounded-[3px] flex items-center justify-center transition-colors cursor-default ${
+                  isCapsLock || isShiftActive ? 'touch-keycap-active' : ''
+                } ${pressedKeyId === 'shift-left' ? 'touch-keycap-pressed' : ''}`}
+                title={isCapsLock ? 'Caps Lock BẬT' : isShiftActive ? 'Shift BẬT' : 'Shift'}
+                aria-label="Shift trái"
+              >
+                <WindowsShiftIcon className="w-5 h-5 text-current" filled={isCapsLock || isShiftActive} />
+              </button>
+
+              {/* Characters z..m, ,, ., ? */}
+              {(layoutMode === 'alpha' ? row3Alpha : row3Num).map((char, colIndex) =>
+                renderCharKey(char, 3, colIndex)
+              )}
+
+              {/* Right Shift key */}
+              <button
+                type="button"
+                onMouseDown={(e) => e.preventDefault()}
+                onPointerDown={(e) => {
+                  e.preventDefault();
+                  playSound('modifier');
+                  setPressedKeyId('shift-right');
+                  if (navigator.vibrate) {
+                    try { navigator.vibrate(10); } catch {}
+                  }
+                }}
+                onPointerUp={() => setPressedKeyId(null)}
+                onPointerLeave={() => setPressedKeyId(null)}
+                onPointerCancel={() => setPressedKeyId(null)}
+                onClick={handleShiftTap}
+                className={`touch-keycap w-[10.6%] sm:w-[10.2%] min-w-[44px] sm:min-w-[50px] ${keyHeightClass} rounded-[3px] flex items-center justify-center transition-colors cursor-default ${
+                  isCapsLock || isShiftActive ? 'touch-keycap-active' : ''
+                } ${pressedKeyId === 'shift-right' ? 'touch-keycap-pressed' : ''}`}
+                title={isCapsLock ? 'Caps Lock BẬT' : isShiftActive ? 'Shift BẬT' : 'Shift'}
+                aria-label="Shift phải"
+              >
+                <WindowsShiftIcon className="w-5 h-5 text-current" filled={isCapsLock || isShiftActive} />
+              </button>
+            </div>
+
+            {/* ROW 4: &123, Emoji, Clipboard, Space, Mic, <, > */}
             <div className="flex w-full items-center gap-1 sm:gap-1.5 md:gap-2">
-              {/* Layout switch: 123 or ABC */}
+              {/* &123 / ABC layout mode switch */}
               <button
                 type="button"
                 onMouseDown={(e) => e.preventDefault()}
@@ -850,46 +1095,68 @@ export const NativeKeyboard: React.FC = () => {
                 onClick={() => {
                   setLayoutMode(layoutMode === 'alpha' ? 'numeric' : 'alpha');
                 }}
-                className={`touch-keycap h-[42px] w-[7%] min-w-[42px] shrink-0 rounded-[6px] flex items-center justify-center text-xs font-semibold transition-colors cursor-default font-sans sm:h-[46px] sm:min-w-[50px] sm:text-sm md:h-[50px] md:min-w-[56px] ${
+                className={`touch-keycap h-[40px] sm:h-[44px] md:h-[48px] w-[7.4%] min-w-[38px] sm:min-w-[44px] shrink-0 rounded-[3px] flex items-center justify-center text-xs sm:text-[13px] font-medium transition-colors cursor-default ${
                   pressedKeyId === 'layout-mode' ? 'touch-keycap-pressed' : ''
                 }`}
-                aria-label={layoutMode === 'alpha' ? 'Chuyển sang phím số' : 'Chuyển sang phím chữ'}
+                title="Chuyển sang ký tự số / chữ"
+                aria-label="Chuyển chế độ ký tự"
               >
-                {layoutMode === 'alpha' ? '123' : 'ABC'}
+                {layoutMode === 'alpha' ? '&123' : 'ABC'}
               </button>
 
-              {/* Merged Tools Key (+): Combines Emoji, Clipboard, and Language into 1 key with context menu flyout */}
+              {/* Emoji key (chuyển ra ngoài từ context menu phím dấu +, thay phím Windows) */}
               <button
-                ref={plusBtnRef}
                 type="button"
-                id="btn-native-keyboard-tools"
+                id="btn-native-keyboard-emoji"
                 onMouseDown={(e) => e.preventDefault()}
                 onPointerDown={(e) => {
                   e.preventDefault();
-                  playSound('modifier');
-                  setPressedKeyId('plus-btn');
+                  playSound('action');
+                  setPressedKeyId('emoji-btn');
                 }}
                 onPointerUp={() => setPressedKeyId(null)}
                 onPointerLeave={() => setPressedKeyId(null)}
                 onPointerCancel={() => setPressedKeyId(null)}
                 onClick={() => {
-                  if (!showPlusMenu && plusBtnRef.current) {
-                    const rect = plusBtnRef.current.getBoundingClientRect();
-                    const bottomOffset = window.innerHeight - rect.top + 8;
-                    const leftOffset = Math.max(8, Math.min(rect.left, window.innerWidth - 248));
-                    setPlusMenuPos({ left: leftOffset, bottom: bottomOffset });
-                  }
-                  setShowPlusMenu((prev) => !prev);
+                  setShowClipboard(false);
+                  setShowSettingsMenu(false);
+                  setShowEmojiPicker((prev) => !prev);
+                  setEmojiSearchQuery('');
                 }}
-                className={`touch-keycap h-[42px] w-[7%] min-w-[44px] shrink-0 rounded-[6px] flex items-center justify-center transition-colors cursor-default sm:h-[46px] sm:min-w-[50px] md:h-[50px] md:min-w-[54px] ${
-                  showPlusMenu ? 'touch-keycap-active' : ''
-                } ${pressedKeyId === 'plus-btn' ? 'touch-keycap-pressed' : ''}`}
-                title="Tiện ích & Ngôn ngữ (+)"
-                aria-label="Tiện ích & Ngôn ngữ (+)"
-                aria-haspopup="menu"
-                aria-expanded={showPlusMenu}
+                className={`touch-keycap h-[40px] sm:h-[44px] md:h-[48px] w-[6.4%] min-w-[34px] sm:min-w-[40px] shrink-0 rounded-[3px] flex items-center justify-center transition-colors cursor-default ${
+                  showEmojiPicker ? 'touch-keycap-active' : ''
+                } ${pressedKeyId === 'emoji-btn' ? 'touch-keycap-pressed' : ''}`}
+                title="Biểu tượng cảm xúc (Emoji)"
+                aria-label="Biểu tượng cảm xúc"
               >
-                <Plus className="w-5 h-5 text-black stroke-[2.2]" />
+                <Smile className="w-5 h-5 text-current stroke-[1.8]" />
+              </button>
+
+              {/* Clipboard key (chuyển ra ngoài từ context menu phím dấu +, thay phím Alt) */}
+              <button
+                type="button"
+                id="btn-native-keyboard-clipboard"
+                onMouseDown={(e) => e.preventDefault()}
+                onPointerDown={(e) => {
+                  e.preventDefault();
+                  playSound('action');
+                  setPressedKeyId('clipboard-btn');
+                }}
+                onPointerUp={() => setPressedKeyId(null)}
+                onPointerLeave={() => setPressedKeyId(null)}
+                onPointerCancel={() => setPressedKeyId(null)}
+                onClick={() => {
+                  setShowEmojiPicker(false);
+                  setShowSettingsMenu(false);
+                  setShowClipboard((prev) => !prev);
+                }}
+                className={`touch-keycap h-[40px] sm:h-[44px] md:h-[48px] w-[6.4%] min-w-[34px] sm:min-w-[40px] shrink-0 rounded-[3px] flex items-center justify-center transition-colors cursor-default ${
+                  showClipboard ? 'touch-keycap-active' : ''
+                } ${pressedKeyId === 'clipboard-btn' ? 'touch-keycap-pressed' : ''}`}
+                title="Lịch sử sao chép (Clipboard)"
+                aria-label="Lịch sử sao chép"
+              >
+                <ClipboardList className="w-5 h-5 text-current stroke-[1.8]" />
               </button>
 
               {/* Spacebar */}
@@ -908,21 +1175,21 @@ export const NativeKeyboard: React.FC = () => {
                 onPointerLeave={() => setPressedKeyId(null)}
                 onPointerCancel={() => setPressedKeyId(null)}
                 onClick={handleSpacePress}
-                className={`touch-keycap flex-1 min-w-[32px] h-[42px] sm:h-[46px] md:h-[50px] rounded-[6px] font-semibold text-sm flex items-center justify-center transition-colors cursor-default ${
+                className={`touch-keycap flex-1 min-w-[90px] h-[40px] sm:h-[44px] md:h-[48px] rounded-[3px] font-semibold text-sm flex items-center justify-center transition-colors cursor-default ${
                   pressedKeyId === 'spacebar' ? 'touch-keycap-pressed' : ''
                 }`}
                 aria-label="Phím cách"
               >
-                <span className="text-[11px] sm:text-xs text-black font-semibold font-sans tracking-wide truncate px-1 sm:px-2">
+                <span className="text-[11px] sm:text-xs font-normal opacity-60 tracking-wider select-none pointer-events-none truncate px-2">
                   {inputMethod === 'vi-telex'
-                    ? 'cách • Tiếng Việt (Telex)'
+                    ? 'Tiếng Việt (Telex)'
                     : inputMethod === 'vi-vni'
-                    ? 'cách • Tiếng Việt (VNI)'
-                    : 'space • Tiếng Anh'}
+                    ? 'Tiếng Việt (VNI)'
+                    : 'English'}
                 </span>
               </button>
 
-              {/* Microphone, adjacent to search */}
+              {/* Microphone (Dictation) */}
               <button
                 type="button"
                 id="btn-native-keyboard-mic"
@@ -936,163 +1203,205 @@ export const NativeKeyboard: React.FC = () => {
                 onPointerLeave={() => setPressedKeyId(null)}
                 onPointerCancel={() => setPressedKeyId(null)}
                 onClick={toggleMic}
-                className={`touch-keycap h-[42px] w-[7%] min-w-[38px] shrink-0 rounded-[6px] flex items-center justify-center transition-colors cursor-default sm:h-[46px] sm:min-w-[46px] md:h-[50px] ${
+                className={`touch-keycap h-[40px] sm:h-[44px] md:h-[48px] w-[5.8%] min-w-[32px] sm:min-w-[38px] shrink-0 rounded-[3px] flex items-center justify-center transition-colors cursor-default ${
                   isMicListening ? 'touch-keycap-active' : ''
                 } ${pressedKeyId === 'mic-btn' ? 'touch-keycap-pressed' : ''}`}
                 title={isMicListening ? 'Đang nghe...' : 'Nhập bằng giọng nói'}
                 aria-label={isMicListening ? 'Đang nghe, dừng nhập bằng giọng nói' : 'Nhập bằng giọng nói'}
                 aria-pressed={isMicListening}
               >
-                <Mic className="w-5 h-5" />
+                <Mic className="w-4.5 h-4.5 text-current" />
               </button>
 
-              {/* Search / action button */}
+              {/* Cursor Left < */}
               <button
                 type="button"
-                id="btn-native-keyboard-search"
                 onMouseDown={(e) => e.preventDefault()}
                 onPointerDown={(e) => {
                   e.preventDefault();
-                  playSound('action');
-                  setPressedKeyId('search-btn');
-                  if (navigator.vibrate) {
-                    try { navigator.vibrate(16); } catch {}
-                  }
+                  playSound('modifier');
+                  setPressedKeyId('arrow-left');
                 }}
                 onPointerUp={() => setPressedKeyId(null)}
                 onPointerLeave={() => setPressedKeyId(null)}
                 onPointerCancel={() => setPressedKeyId(null)}
-                onClick={handleSearchAction}
-                className={`touch-keycap h-[42px] w-[8%] min-w-[50px] shrink-0 rounded-[6px] flex items-center justify-center transition-colors cursor-default sm:h-[46px] sm:min-w-[58px] md:h-[50px] ${
-                  pressedKeyId === 'search-btn' ? 'touch-keycap-pressed' : ''
+                onClick={handleArrowLeft}
+                className={`touch-keycap h-[40px] sm:h-[44px] md:h-[48px] w-[5.4%] min-w-[30px] sm:min-w-[36px] shrink-0 rounded-[3px] flex items-center justify-center text-sm font-semibold transition-colors cursor-default ${
+                  pressedKeyId === 'arrow-left' ? 'touch-keycap-pressed' : ''
                 }`}
-                title="Tìm kiếm"
-                aria-label="Tìm kiếm"
+                title="Di chuyển sang trái"
+                aria-label="Sang trái"
               >
-                <Search className="w-5 h-5" aria-hidden="true" />
+                &lt;
+              </button>
+
+              {/* Cursor Right > */}
+              <button
+                type="button"
+                onMouseDown={(e) => e.preventDefault()}
+                onPointerDown={(e) => {
+                  e.preventDefault();
+                  playSound('modifier');
+                  setPressedKeyId('arrow-right');
+                }}
+                onPointerUp={() => setPressedKeyId(null)}
+                onPointerLeave={() => setPressedKeyId(null)}
+                onPointerCancel={() => setPressedKeyId(null)}
+                onClick={handleArrowRight}
+                className={`touch-keycap h-[40px] sm:h-[44px] md:h-[48px] w-[5.6%] min-w-[32px] sm:min-w-[38px] shrink-0 rounded-[3px] flex items-center justify-center text-sm font-semibold transition-colors cursor-default ${
+                  pressedKeyId === 'arrow-right' ? 'touch-keycap-pressed' : ''
+                }`}
+                title="Di chuyển sang phải"
+                aria-label="Sang phải"
+              >
+                &gt;
               </button>
             </div>
-          </div>
+          </motion.div>
         )}
+      </AnimatePresence>
+    </div>
 
-        {/* Plus Tools & Language Selection Flyout Context Menu (Styled and animated exactly like GalleryContextMenu) */}
+        {/* Settings Flyout Context Menu */}
         {typeof document !== 'undefined' &&
           createPortal(
             <AnimatePresence>
-              {showPlusMenu && (
+              {showSettingsMenu && (
                 <motion.div
-                  id="native-keyboard-plus-menu"
+                  id="native-keyboard-settings-menu"
                   role="menu"
-                  aria-label="Tiện ích & Ngôn ngữ"
-                  initial={{ opacity: 0, y: 22 }}
+                  aria-label="Cài đặt bàn phím"
+                  initial={{ opacity: 0, y: -12 }}
                   animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 14 }}
-                  transition={{ duration: 0.38, ease: [0.16, 1, 0.3, 1] }}
+                  exit={{ opacity: 0, y: -8 }}
+                  transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
                   onContextMenu={(e) => e.preventDefault()}
-                  className={`fixed z-[2147483647] w-[232px] ${flyoutPanelClassName} fluent-context-menu select-none`}
+                  className={`fixed z-[2147483647] w-[236px] max-h-[calc(100vh-80px)] overflow-y-auto ${flyoutPanelClassName} fluent-context-menu select-none`}
                   style={{
                     ...flyoutPanelStyle,
-                    left: `${plusMenuPos.left}px`,
-                    bottom: `${plusMenuPos.bottom}px`,
+                    left: `${settingsMenuPos.left}px`,
+                    top: `${settingsMenuPos.top}px`,
                   }}
                 >
+                  {/* Header */}
                   <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0, transition: { duration: 0.38, delay: 0, ease: [0.16, 1, 0.3, 1] } }}
-                    className="px-3 py-1.5 text-[11px] font-semibold text-[#6b7280] uppercase tracking-wider"
+                    initial={{ opacity: 0, y: -8 }}
+                    animate={{ opacity: 1, y: 0, transition: { duration: 0.28, delay: 0, ease: [0.16, 1, 0.3, 1] } }}
+                    className="px-3 py-1.5 text-[11px] font-semibold text-[#6b7280] dark:text-[#9ca3af] uppercase tracking-wider flex items-center justify-between"
                   >
-                    Tiện ích
-                  </motion.div>
-
-                  {/* Emoji option */}
-                  <motion.button
-                    type="button"
-                    role="menuitem"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{
-                      opacity: 1,
-                      y: 0,
-                      transition: { duration: 0.38, delay: 0.04, ease: [0.16, 1, 0.3, 1] },
-                    }}
-                    onMouseDown={(e) => e.preventDefault()}
-                    onPointerDown={(e) => {
-                      e.preventDefault();
-                      playSound('action');
-                    }}
-                    onClick={() => {
-                      setShowPlusMenu(false);
-                      setShowClipboard(false);
-                      setShowEmojiPicker(true);
-                    }}
-                    className="w-full h-[36px] px-3 rounded-[6px] flex items-center gap-3 text-[13px] font-medium text-left outline-none transition-colors cursor-pointer hover:bg-black/[0.05] focus-visible:bg-black/[0.05] active:bg-black/[0.08] text-[#111827]"
-                  >
-                    <Smile className="w-4 h-4 shrink-0 text-black stroke-black" />
-                    <span className="truncate">Biểu tượng cảm xúc</span>
-                  </motion.button>
-
-                  {/* Clipboard option */}
-                  <motion.button
-                    type="button"
-                    role="menuitem"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{
-                      opacity: 1,
-                      y: 0,
-                      transition: { duration: 0.38, delay: 0.08, ease: [0.16, 1, 0.3, 1] },
-                    }}
-                    onMouseDown={(e) => e.preventDefault()}
-                    onPointerDown={(e) => {
-                      e.preventDefault();
-                      playSound('action');
-                    }}
-                    onClick={() => {
-                      setShowPlusMenu(false);
-                      setShowEmojiPicker(false);
-                      setShowClipboard(true);
-                    }}
-                    className="w-full h-[36px] px-3 rounded-[6px] flex items-center gap-3 text-[13px] font-medium text-left outline-none transition-colors cursor-pointer hover:bg-black/[0.05] focus-visible:bg-black/[0.05] active:bg-black/[0.08] text-[#111827]"
-                  >
-                    <ClipboardList className="w-4 h-4 shrink-0 text-black stroke-black" />
-                    <span className="truncate">Lịch sử sao chép</span>
-                  </motion.button>
-
-                  {/* Separator */}
-                  <motion.div
-                    role="separator"
-                    initial={{ opacity: 0, scaleX: 0.8 }}
-                    animate={{
-                      opacity: 1,
-                      scaleX: 1,
-                      transition: { duration: 0.38, delay: 0.12, ease: [0.16, 1, 0.3, 1] },
-                    }}
-                    className="h-px bg-black/10 my-1 mx-1 origin-left"
-                  />
-
-                  {/* Languages Section */}
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0, transition: { duration: 0.38, delay: 0.16, ease: [0.16, 1, 0.3, 1] } }}
-                    className="px-3 py-1.5 text-[11px] font-semibold text-[#6b7280] uppercase tracking-wider flex items-center justify-between"
-                  >
-                    <span>Ngôn ngữ gõ</span>
-                    <Globe className="w-3.5 h-3.5 text-black stroke-black" />
+                    <span>Cài đặt bàn phím</span>
+                    <WindowsSettingsIcon className="w-3.5 h-3.5 text-black dark:text-white" />
                   </motion.div>
 
                   <div className="space-y-0.5 mt-0.5">
-                    {LANGUAGE_OPTIONS.map((lang, idx) => {
+                    {/* 1. Use Flumojis toggle */}
+                    <motion.button
+                      type="button"
+                      role="menuitemcheckbox"
+                      aria-checked={settings.useFlumojs}
+                      initial={{ opacity: 0, y: -8 }}
+                      animate={{
+                        opacity: 1,
+                        y: 0,
+                        transition: { duration: 0.28, delay: 0.03, ease: [0.16, 1, 0.3, 1] },
+                      }}
+                      onMouseDown={(e) => e.preventDefault()}
+                      onPointerDown={(e) => {
+                        e.preventDefault();
+                        playSound('action');
+                      }}
+                      onClick={() => {
+                        updateSetting('useFlumojs', !settings.useFlumojs);
+                      }}
+                      className="w-full h-[36px] px-3 rounded-[6px] flex items-center justify-between text-[13px] font-medium text-left outline-none transition-colors cursor-pointer hover:bg-black/[0.05] dark:hover:bg-white/[0.08] focus-visible:bg-black/[0.05] dark:focus-visible:bg-white/[0.08] active:bg-black/[0.08] dark:active:bg-white/[0.12] text-[#111827] dark:text-white"
+                    >
+                      <div className="flex items-center gap-2">
+                        <Smile className="w-4 h-4 text-black dark:text-white stroke-[1.8]" />
+                        <span>Use Flumojis</span>
+                      </div>
+                      <div
+                        className={`w-7 h-4 rounded-full transition-colors relative flex items-center p-0.5 ${
+                          settings.useFlumojs
+                            ? 'bg-[#0078d4] dark:bg-[#4cc2ff]'
+                            : 'bg-black/20 dark:bg-white/20'
+                        }`}
+                      >
+                        <div
+                          className={`w-3 h-3 rounded-full bg-white dark:bg-black transition-transform ${
+                            settings.useFlumojs ? 'translate-x-3' : 'translate-x-0'
+                          }`}
+                        />
+                      </div>
+                    </motion.button>
+
+                    {/* 2. Play haptic and sounds toggle */}
+                    <motion.button
+                      type="button"
+                      role="menuitemcheckbox"
+                      aria-checked={settings.keyboardSoundEnabled}
+                      initial={{ opacity: 0, y: -8 }}
+                      animate={{
+                        opacity: 1,
+                        y: 0,
+                        transition: { duration: 0.28, delay: 0.06, ease: [0.16, 1, 0.3, 1] },
+                      }}
+                      onMouseDown={(e) => e.preventDefault()}
+                      onPointerDown={(e) => {
+                        e.preventDefault();
+                        playSound('action');
+                      }}
+                      onClick={() => {
+                        const nextVal = !settings.keyboardSoundEnabled;
+                        updateSetting('keyboardSoundEnabled', nextVal);
+                        keyboardSound.setEnabled(nextVal);
+                        if (navigator.vibrate) {
+                          try { navigator.vibrate(10); } catch {}
+                        }
+                      }}
+                      className="w-full h-[36px] px-3 rounded-[6px] flex items-center justify-between text-[13px] font-medium text-left outline-none transition-colors cursor-pointer hover:bg-black/[0.05] dark:hover:bg-white/[0.08] focus-visible:bg-black/[0.05] dark:focus-visible:bg-white/[0.08] active:bg-black/[0.08] dark:active:bg-white/[0.12] text-[#111827] dark:text-white"
+                    >
+                      <div className="flex items-center gap-2">
+                        <Mic className="w-4 h-4 text-black dark:text-white stroke-[1.8]" />
+                        <span>Play haptic and sounds</span>
+                      </div>
+                      <div
+                        className={`w-7 h-4 rounded-full transition-colors relative flex items-center p-0.5 ${
+                          settings.keyboardSoundEnabled
+                            ? 'bg-[#0078d4] dark:bg-[#4cc2ff]'
+                            : 'bg-black/20 dark:bg-white/20'
+                        }`}
+                      >
+                        <div
+                          className={`w-3 h-3 rounded-full bg-white dark:bg-black transition-transform ${
+                            settings.keyboardSoundEnabled ? 'translate-x-3' : 'translate-x-0'
+                          }`}
+                        />
+                      </div>
+                    </motion.button>
+
+                    {/* <div> Divider */}
+                    <div className="my-1 border-t border-black/10 dark:border-white/10" />
+
+                    {/* 3. Language Options: ENG, VIE (Telex), VIE (VNI) */}
+                    {[
+                      { id: 'en' as VietnameseInputMethod, label: 'ENG' },
+                      { id: 'vi-telex' as VietnameseInputMethod, label: 'VIE (Telex)' },
+                      { id: 'vi-vni' as VietnameseInputMethod, label: 'VIE (VNI)' },
+                    ].map((lang, idx) => {
                       const isSelected = inputMethod === lang.id;
                       return (
                         <motion.button
                           key={lang.id}
                           type="button"
-                          role="menuitem"
-                          initial={{ opacity: 0, y: 20 }}
+                          role="menuitemradio"
+                          aria-checked={isSelected}
+                          initial={{ opacity: 0, y: -8 }}
                           animate={{
                             opacity: 1,
                             y: 0,
                             transition: {
-                              duration: 0.38,
-                              delay: 0.2 + idx * 0.04,
+                              duration: 0.28,
+                              delay: 0.09 + idx * 0.03,
                               ease: [0.16, 1, 0.3, 1],
                             },
                           }}
@@ -1103,16 +1412,20 @@ export const NativeKeyboard: React.FC = () => {
                           }}
                           onClick={() => {
                             setInputMethod(lang.id);
-                            setShowPlusMenu(false);
+                            setShowSettingsMenu(false);
                           }}
-                          className="w-full h-[36px] px-3 rounded-[6px] flex items-center justify-between text-[13px] font-medium text-left outline-none transition-colors cursor-pointer hover:bg-black/[0.05] focus-visible:bg-black/[0.05] active:bg-black/[0.08] text-[#111827]"
+                          className={`w-full h-[36px] px-3 rounded-[6px] flex items-center justify-between text-[13px] font-medium text-left outline-none transition-colors cursor-pointer hover:bg-black/[0.05] dark:hover:bg-white/[0.08] focus-visible:bg-black/[0.05] dark:focus-visible:bg-white/[0.08] active:bg-black/[0.08] dark:active:bg-white/[0.12] ${
+                            isSelected
+                              ? 'bg-black/[0.04] dark:bg-white/[0.06] text-[#0078d4] dark:text-[#4cc2ff] font-semibold'
+                              : 'text-[#111827] dark:text-white'
+                          }`}
                         >
-                          <div className="flex items-center gap-2.5 min-w-0">
-                            <span className="text-base leading-none shrink-0">{lang.flag}</span>
-                            <span className="truncate">{lang.label}</span>
+                          <div className="flex items-center gap-2">
+                            <Globe className="w-3.5 h-3.5 text-black dark:text-white stroke-[1.8]" />
+                            <span>{lang.label}</span>
                           </div>
                           {isSelected && (
-                            <Check className="w-4 h-4 shrink-0 text-black stroke-black" />
+                            <Check className="w-4 h-4 text-[#0078d4] dark:text-[#4cc2ff] stroke-[2.5]" />
                           )}
                         </motion.button>
                       );

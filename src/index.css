@@ -5791,6 +5791,7 @@ html.light-mode .settings-ios-group .text-white {
 
 /* Category icon badges must always retain pure white icons and 100% circular radius */
 /* WinUI 3-inspired keyboard surface docked flush to the viewport edges. */
+/* WinUI 3 / Windows 11 Touch Keyboard surface (background opacity 60%) */
 #vplay-native-keyboard {
   left: 0 !important;
   right: 0 !important;
@@ -5799,15 +5800,23 @@ html.light-mode .settings-ios-group .text-white {
   width: auto !important;
   margin: 0 !important;
   max-height: 100dvh !important;
-  background-color: rgba(255, 255, 255, 0.5) !important;
-  backdrop-filter: blur(24px) saturate(140%) !important;
-  -webkit-backdrop-filter: blur(24px) saturate(140%) !important;
+  background-color: rgba(22, 27, 36, 0.60) !important;
+  backdrop-filter: blur(32px) saturate(140%) !important;
+  -webkit-backdrop-filter: blur(32px) saturate(140%) !important;
   border: 0 !important;
-  border-top: 1px solid rgba(15, 23, 42, 0.12) !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.10) !important;
   border-radius: 0 !important;
-  box-shadow: none !important;
-  color-scheme: light;
+  box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.28) !important;
+  color-scheme: dark;
   overscroll-behavior: contain;
+}
+
+/* Light mode support: Windows 11 light acrylic surface (background opacity 60%) */
+html.light-mode #vplay-native-keyboard {
+  background-color: rgba(240, 243, 248, 0.60) !important;
+  border-top: 1px solid rgba(0, 0, 0, 0.10) !important;
+  box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.08) !important;
+  color-scheme: light;
 }
 
 /* Category icons in settings */
@@ -6657,82 +6666,142 @@ html:not(.light-mode) #vplay-tools-dropdown-card svg.fill-current {
   cursor: default !important;
 }
 
-/* Key pressed-down tactile sink animation (hiệu ứng lún xuống khi nhấn thay vì nổi phím) */
+/* Key pressed-down tactile shrink animation (animation shrink nhỏ lại khi nhấn các phím, không nổi 3D) */
+/* All buttons and keycaps on keyboard: no outline, no border, no ring shadow */
+#vplay-native-keyboard button,
+#native-keyboard button,
+#vplay-native-keyboard .touch-keycap,
+#native-keyboard .touch-keycap {
+  border: none !important;
+  outline: none !important;
+  outline-style: none !important;
+  box-shadow: none !important;
+}
+
+#vplay-native-keyboard button:focus,
+#vplay-native-keyboard button:focus-visible,
+#native-keyboard button:focus,
+#native-keyboard button:focus-visible,
+#vplay-native-keyboard .touch-keycap:focus,
+#vplay-native-keyboard .touch-keycap:focus-visible {
+  border: none !important;
+  outline: none !important;
+  outline-style: none !important;
+  box-shadow: none !important;
+}
+
 #vplay-native-keyboard button:active,
 #vplay-native-keyboard button.touch-keycap-pressed,
 #native-keyboard button:active,
 #native-keyboard button.touch-keycap-pressed {
-  transform: translateY(2.5px) scale(0.96) !important;
-  box-shadow: inset 0 2px 4px rgba(15, 23, 42, 0.22), inset 0 1px 2px rgba(15, 23, 42, 0.16) !important;
-  filter: brightness(0.93) !important;
+  transform: scale(0.90) !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  filter: brightness(0.90) !important;
+  transition: transform 0.05s cubic-bezier(0.2, 0, 0, 1), filter 0.05s ease !important;
 }
 
-#vplay-native-keyboard [class~="text-black"] {
-  color: #1f2937 !important;
-}
-
-#vplay-native-keyboard [class*="text-black/"] {
-  color: rgba(31, 41, 55, 0.68) !important;
-}
-
-#vplay-native-keyboard [class*="text-[#71717a]"] {
-  color: #6b7280 !important;
-}
-
-#vplay-native-keyboard [class*="border-black"],
-#vplay-native-keyboard [class*="border-white"] {
-  border-color: rgba(15, 23, 42, 0.12) !important;
-}
-
-#vplay-native-keyboard [class*="bg-black/"] {
-  background-color: rgba(15, 23, 42, 0.06) !important;
-}
-
-#vplay-native-keyboard [class*="hover:bg-black/"]:hover {
-  background-color: rgba(15, 23, 42, 0.1) !important;
-}
-
-#vplay-native-keyboard input {
-  color: #1f2937 !important;
-  caret-color: #0078d4 !important;
-}
-
-#vplay-native-keyboard input::placeholder {
-  color: #6b7280 !important;
-}
-
+/* Touch keycap: Flat modern translucent keycaps with 80% opacity, no 3D shelf, 3px border-radius, zero border/outline */
 #vplay-native-keyboard .touch-keycap {
-  color: #1f2937 !important;
-  background: rgba(255, 255, 255, 0.72) !important;
-  border: 1px solid rgba(15, 23, 42, 0.12) !important;
-  border-radius: 6px !important;
-  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.72) !important;
-  transition: transform 0.07s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.07s ease, background-color 0.07s ease !important;
+  color: #ffffff !important;
+  background: rgba(43, 52, 66, 0.80) !important; /* keys opacity 80% */
+  border: none !important;
+  outline: none !important;
+  border-radius: 3px !important;
+  transform: scale(1) !important;
+  box-shadow: none !important;
+  transition: transform 0.07s cubic-bezier(0.2, 0, 0, 1), background-color 0.07s ease, filter 0.07s ease !important;
+}
+
+/* In dark mode, ensure all text and labels across the touch keyboard are pure crisp white */
+html:not(.light-mode) #vplay-native-keyboard,
+html.dark #vplay-native-keyboard,
+html:not(.light-mode) #vplay-native-keyboard .touch-keycap,
+html.dark #vplay-native-keyboard .touch-keycap,
+html:not(.light-mode) #vplay-native-keyboard span:not([role="img"]),
+html.dark #vplay-native-keyboard span:not([role="img"]),
+html:not(.light-mode) #vplay-native-keyboard p,
+html.dark #vplay-native-keyboard p {
+  color: #ffffff !important;
 }
 
 #vplay-native-keyboard .touch-keycap:hover:not(.touch-keycap-pressed):not(.touch-keycap-active),
 #vplay-native-keyboard .touch-keycap:focus-visible:not(.touch-keycap-pressed):not(.touch-keycap-active) {
-  color: #1f2937 !important;
-  background: rgba(255, 255, 255, 0.82) !important;
-  border-color: rgba(0, 120, 212, 0.42) !important;
-  box-shadow: 0 0 0 2px rgba(0, 120, 212, 0.1), 0 1px 2px rgba(15, 23, 42, 0.08) !important;
+  color: #ffffff !important;
+  background: rgba(56, 67, 84, 0.85) !important;
+  border: none !important;
+  outline: none !important;
+  transform: scale(1) !important;
+  box-shadow: none !important;
 }
 
 #vplay-native-keyboard .touch-keycap:active,
 #vplay-native-keyboard .touch-keycap.touch-keycap-pressed {
-  transform: translateY(2.5px) scale(0.96) !important;
-  color: #1f2937 !important;
-  background: rgba(216, 222, 230, 0.95) !important;
-  border-color: rgba(15, 23, 42, 0.22) !important;
-  box-shadow: inset 0 2px 5px rgba(15, 23, 42, 0.22), inset 0 1px 2px rgba(15, 23, 42, 0.15) !important;
-  filter: none !important;
+  transform: scale(0.90) !important;
+  color: #ffffff !important;
+  background: rgba(28, 35, 46, 0.92) !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  filter: brightness(0.90) !important;
 }
 
 #vplay-native-keyboard .touch-keycap-active {
+  color: #ffffff !important;
+  background: rgba(0, 120, 212, 0.40) !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Light mode support: Flat modern keys, no 3D, 80% opacity, shrink animation on press, zero border/outline */
+html.light-mode #vplay-native-keyboard .touch-keycap {
+  color: #1f2937 !important;
+  background: rgba(255, 255, 255, 0.80) !important; /* keys opacity 80% */
+  border: none !important;
+  outline: none !important;
+  border-radius: 3px !important;
+  transform: scale(1) !important;
+  box-shadow: none !important;
+  transition: transform 0.07s cubic-bezier(0.2, 0, 0, 1), background-color 0.07s ease, filter 0.07s ease !important;
+}
+
+html.light-mode #vplay-native-keyboard .touch-keycap:hover:not(.touch-keycap-pressed):not(.touch-keycap-active),
+html.light-mode #vplay-native-keyboard .touch-keycap:focus-visible:not(.touch-keycap-pressed):not(.touch-keycap-active) {
+  color: #111827 !important;
+  background: rgba(255, 255, 255, 0.92) !important;
+  border: none !important;
+  outline: none !important;
+  transform: scale(1) !important;
+  box-shadow: none !important;
+}
+
+html.light-mode #vplay-native-keyboard button:active,
+html.light-mode #vplay-native-keyboard button.touch-keycap-pressed,
+html.light-mode #vplay-native-keyboard .touch-keycap:active,
+html.light-mode #vplay-native-keyboard .touch-keycap.touch-keycap-pressed {
+  transform: scale(0.90) !important;
+  color: #111827 !important;
+  background: rgba(218, 224, 234, 0.92) !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  filter: brightness(0.92) !important;
+  transition: transform 0.05s cubic-bezier(0.2, 0, 0, 1), filter 0.05s ease !important;
+}
+
+html.light-mode #vplay-native-keyboard .touch-keycap-active {
   color: #005a9e !important;
-  background: rgba(0, 120, 212, 0.14) !important;
-  border-color: rgba(0, 120, 212, 0.38) !important;
-  box-shadow: inset 0 1px 2px rgba(0, 120, 212, 0.2) !important;
+  background: rgba(0, 120, 212, 0.16) !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+#vplay-native-keyboard .touch-keycap svg {
+  color: currentColor !important;
+  stroke: currentColor !important;
 }
 
 #vplay-native-keyboard .touch-keycap svg {
@@ -8326,6 +8395,19 @@ html.light-mode #topbar-search-box:hover {
   box-shadow: none !important;
 }
 
+.fluent-search-box {
+  transition: background-color 0.15s ease-in-out;
+}
+
+html.light-mode .fluent-search-box:not(:focus-within):not(.is-focused):hover {
+  background-color: rgba(0, 0, 0, 0.08) !important;
+}
+
+html:not(.light-mode) .fluent-search-box:not(:focus-within):not(.is-focused):hover,
+html.dark .fluent-search-box:not(:focus-within):not(.is-focused):hover {
+  background-color: #32383e !important;
+}
+
 #topbar-search-box:focus-within,
 #topbar-search-box.is-focused,
 #topbar-search-box.search-flyout-open {
@@ -8526,8 +8608,8 @@ html.dark #topbar-search-box.search-flyout-open,
 html.dark #topbar-search-box:focus-within,
 html.light-mode #topbar-search-box.is-focused,
 html.light-mode #topbar-search-box.search-flyout-open,
-html.light-mode #topbar-search-box:focus-within,
 .fluent-search-box,
+.fluent-search-box.is-focused,
 .fluent-search-box:focus-within,
 .fluent-input-box,
 .fluent-input-box:focus-within {
@@ -8572,6 +8654,7 @@ html.light-mode #topbar-search-box:focus-within,
 #topbar-search-box.is-focused::before,
 #topbar-search-box.search-flyout-open::before,
 #topbar-search-box:focus-within::before,
+.fluent-search-box.is-focused::before,
 .fluent-search-box:focus-within::before,
 .fluent-input-box:focus-within::before {
   width: 100%;
