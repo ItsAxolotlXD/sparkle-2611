@@ -29,8 +29,8 @@ const slideUpProps = (index: number) => ({
     opacity: 1,
     x: 0,
     transition: {
-      duration: 0.38,
-      delay: Math.min(index * 0.04, 0.8),
+      duration: 0.52,
+      delay: Math.min(index * 0.046, 1.1),
       ease: [0.16, 1, 0.3, 1] as const,
     },
   },
@@ -124,8 +124,8 @@ export const Article: React.FC<ArticleProps> = ({ slug, navigate, fontSize = 16 
   const relatedArticles = NEWS_DATA.filter((a) => a.id !== article.id).slice(0, 2);
   const buildMatch = article.title.match(/Build\s+([A-Za-z0-9.]+)/i) || article.id.match(/\b(26\d+)\b/);
   const isRtm = /RTM/i.test(article.title);
-  const versionMatch = article.title.match(/\b(26\.\d+)\b/);
-  const articleVersion = versionMatch ? versionMatch[1] : '26.12';
+  const versionMatch = article.title.match(/\b(26\.\d+|27M\d+)\b/);
+  const articleVersion = versionMatch ? versionMatch[1] : '27M1';
   const bigThumbnailTitle = buildMatch 
     ? `${articleVersion} ${isRtm ? 'RTM' : 'Insider Preview'} - Build ${buildMatch[1]}` 
     : article.title.replace(/^#\s*/, '');

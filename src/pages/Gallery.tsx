@@ -47,7 +47,7 @@ import {
 import { GalleryContextMenu, type GalleryContextAction } from '../components/gallery/GalleryContextMenu';
 import { PromptDialog, MoveToFolderDialog } from '../components/gallery/GalleryDialogs';
 import { useSettings } from '../hooks/useSettings';
-import { modalDialogVariants, modalBackdropVariants } from '../utils/animations';
+import { slideUpVariant, modalDialogVariants, modalBackdropVariants } from '../utils/animations';
 import { flyoutPanelClassName, flyoutPanelStyle } from '../components/FlyoutDropdown';
 import { 
   FluentNotesIcon,
@@ -842,7 +842,13 @@ export const Gallery: React.FC<GalleryProps> = ({ navigate, searchQuery = '', ro
     <div id="gallery-page" className="flex flex-col h-[calc(100vh-56px)] max-h-[calc(100vh-56px)] overflow-hidden bg-transparent text-[#111827] dark:text-[#F3F4F6] relative select-none font-['Segoe_UI',system-ui,sans-serif]">
 
       {/* Windows 11 Photos Fluent Command Bar - Fixed, does not scroll with page */}
-      <header className="gallery-toolbar shrink-0 z-30 px-3 sm:px-6 py-2 border-b border-black/10 dark:border-white/10 bg-[#f9f9f9]/80 dark:bg-[#202020]/80 backdrop-blur-2xl flex items-center justify-between gap-3 rounded-none md:rounded-tl-[10px]">
+      <motion.header
+        variants={slideUpVariant}
+        initial="hidden"
+        animate="visible"
+        custom={0}
+        className="gallery-toolbar shrink-0 z-30 px-3 sm:px-6 py-2 border-b border-black/10 dark:border-white/10 bg-[#f9f9f9]/80 dark:bg-[#202020]/80 backdrop-blur-2xl flex items-center justify-between gap-3 rounded-none md:rounded-tl-[10px]"
+      >
         {/* Left Section: Filter, Sort, Load Demo, New Folder (buttons with white icons) + item count badge */}
         <div className="flex items-center gap-1.5 overflow-visible py-0.5">
           {/* 1. Filter Dropdown (Icon phễu màu trắng) */}
@@ -1229,10 +1235,17 @@ export const Gallery: React.FC<GalleryProps> = ({ navigate, searchQuery = '', ro
             className="hidden"
           />
         </div>
-      </header>
+      </motion.header>
 
       {/* Main Content Area */}
-      <div className="flex-1 flex overflow-hidden relative" ref={galleryContainerRef}>
+      <motion.div
+        variants={slideUpVariant}
+        initial="hidden"
+        animate="visible"
+        custom={1}
+        className="flex-1 flex overflow-hidden relative"
+        ref={galleryContainerRef}
+      >
         {/* Gallery Content View */}
         <div className="flex-1 overflow-y-auto p-3 sm:p-6 no-scrollbar" ref={galleryScrollRef} data-gallery-scroll="true">
           {/* Folder breadcrumb navigation */}
@@ -1768,7 +1781,7 @@ export const Gallery: React.FC<GalleryProps> = ({ navigate, searchQuery = '', ro
             </div>
           )}
         </div>
-      </div>
+      </motion.div>
 
       {/* File context menu */}
       <AnimatePresence>

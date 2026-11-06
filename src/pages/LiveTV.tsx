@@ -2,7 +2,7 @@ import React, { useState, useMemo, useRef } from 'react';
 import { VideoPlayer } from '../components/VideoPlayer';
 import { CategoryIcon } from '../components/CategoryIcon';
 import { Channel } from '../types';
-import { Tv, Calendar, X } from 'lucide-react';
+import { Tv, Calendar, X, Plus } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { SequentialSection } from '../components/SequentialSection';
 import { useSettings } from '../hooks/useSettings';
@@ -10,6 +10,8 @@ import { EpgScheduleWidget } from '../components/EpgScheduleWidget';
 import { showAppToast } from '../utils/toast';
 import { WatchChannelContextMenu, ChannelContextAction } from '../components/WatchChannelContextMenu';
 import { EditChannelModal } from '../components/EditChannelModal';
+import { AddCustomChannelModal } from '../components/AddCustomChannelModal';
+import { slideUpVariant } from '../utils/animations';
 
 interface LiveTVProps {
   currentChannel: Channel;
@@ -21,6 +23,7 @@ interface LiveTVProps {
   navigate?: (route: string) => void;
   onUpdateChannel?: (channelId: string, updates: { name: string; streamUrl: string; logo?: string }) => void;
   onRemoveChannel?: (channelId: string) => void;
+  onAddChannel?: (newChannel: Channel) => void;
 }
 
 export const LiveTV: React.FC<LiveTVProps> = ({
@@ -33,6 +36,7 @@ export const LiveTV: React.FC<LiveTVProps> = ({
   navigate = () => {},
   onUpdateChannel,
   onRemoveChannel,
+  onAddChannel,
 }) => {
   const { settings } = useSettings();
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
@@ -42,6 +46,7 @@ export const LiveTV: React.FC<LiveTVProps> = ({
   // Context menu & Edit channel modal states
   const [contextMenu, setContextMenu] = useState<{ channel: Channel; x: number; y: number } | null>(null);
   const [editingChannel, setEditingChannel] = useState<Channel | null>(null);
+  const [isAddCustomModalOpen, setIsAddCustomModalOpen] = useState(false);
 
   const longPressTimer = useRef<number | null>(null);
   const longPressTriggered = useRef(false);
@@ -84,6 +89,15 @@ export const LiveTV: React.FC<LiveTVProps> = ({
       onUpdateChannel(channelId, updates);
     }
     showAppToast(`Updated channel info for "${updates.name}"`, { source: 'live-tv' });
+  };
+
+  const handleAddCustomChannel = (newChannel: Channel) => {
+    if (onAddChannel) {
+      onAddChannel(newChannel);
+    }
+    setSelectedCategory(newChannel.category);
+    onSelectChannel(newChannel);
+    showAppToast(`Added custom channel "${newChannel.name}"`, { source: 'live-tv' });
   };
 
   // Distinct category list maintaining natural broadcast order
@@ -149,10 +163,18 @@ export const LiveTV: React.FC<LiveTVProps> = ({
     }
   };
 
+  let animIdx = 0;
+
   return (
     <div className="space-y-4 sm:space-y-8 pb-16">
       {/* Video Player Section */}
-      <div className="w-full">
+      <motion.div
+        variants={slideUpVariant}
+        initial="hidden"
+        animate="visible"
+        custom={animIdx++}
+        className="w-full"
+      >
         <VideoPlayer
           channel={currentChannel}
           onOpenCustomStreamModal={onOpenCustomStreamModal}
@@ -163,17 +185,35 @@ export const LiveTV: React.FC<LiveTVProps> = ({
           onRandomChannel={handleRandomChannel}
           onOpenEpg={() => setIsEpgSidebarOpen((prev) => !prev)}
         />
-      </div>
+      </motion.div>
 
 
       {/* Channel List Section */}
-      <div className="space-y-6 pt-2">
+      <motion.div
+        variants={slideUpVariant}
+        initial="hidden"
+        animate="visible"
+        custom={animIdx++}
+        className="space-y-6 pt-2"
+      >
         {/* Category Underline Tabs Filter (matching Fluent underline tab style with #4cc2ff accent) */}
         <div className="flex flex-col gap-2">
           <div
             id="livetv-category-tabs"
             className="flex items-center gap-1 sm:gap-2 overflow-x-auto pb-0.5 no-scrollbar border-0"
           >
+            {/* "Add custom" WinUI 3 styled colored button placed to the left of "All" tab */}
+            <button
+              id="btn-livetv-add-custom-channel"
+              type="button"
+              onClick={() => setIsAddCustomModalOpen(true)}
+              className="fluent-btn-primary shrink-0 mr-1 sm:mr-1.5 px-3 py-1.5 sm:py-2 rounded-[5px] text-xs sm:text-[13px] font-semibold whitespace-nowrap cursor-pointer select-none flex items-center gap-1.5 bg-[#b4009e] dark:bg-[#ff82ff] hover:bg-[#9b0088] dark:hover:bg-[#ff9eff] active:bg-[#820072] dark:active:bg-[#e56fe5] text-white dark:text-black shadow-xs hover:shadow-sm active:scale-95 transition-all border border-black/15 dark:border-white/20"
+              title="Add custom channel"
+            >
+              <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
+              <span>Add custom</span>
+            </button>
+
             {/* All tab */}
             <button
               id="livetv-cat-btn-all"
@@ -374,7 +414,7 @@ export const LiveTV: React.FC<LiveTVProps> = ({
             )}
           </div>
         )}
-      </div>
+      </motion.div>
 
       {/* Right Sidebar Drawer for EPG Broadcast Schedule */}
       <AnimatePresence>
@@ -430,6 +470,15 @@ export const LiveTV: React.FC<LiveTVProps> = ({
         channel={editingChannel}
         onSave={handleSaveEdit}
         onClose={() => setEditingChannel(null)}
+      />
+
+      {/* Add Custom Channel Modal */}
+      <AddCustomChannelModal
+        isOpen={isAddCustomModalOpen}
+        existingCategories={distinctCategories}
+        initialCategory={selectedCategory !== 'All' ? selectedCategory : distinctCategories[0] || 'Kênh tùy chỉnh'}
+        onAdd={handleAddCustomChannel}
+        onClose={() => setIsAddCustomModalOpen(false)}
       />
     </div>
   );

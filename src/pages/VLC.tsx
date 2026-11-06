@@ -1115,7 +1115,11 @@ export const VLC: React.FC<VLCProps> = ({ navigate }) => {
       </AnimatePresence>
 
       {/* 1. VLC Fluent Menu Bar - Sparkle Design */}
-      <div 
+      <motion.div 
+        variants={slideUpVariant}
+        initial="hidden"
+        animate="visible"
+        custom={0}
         ref={menuContainerRef}
         className="vlc-menu-bar h-9 bg-white/90 dark:bg-[#202024]/90 backdrop-blur-md border-b border-black/10 dark:border-white/10 flex items-center justify-between px-2 text-xs font-normal relative z-40 shrink-0 text-neutral-800 dark:text-neutral-200"
       >
@@ -1730,10 +1734,16 @@ export const VLC: React.FC<VLCProps> = ({ navigate }) => {
             </span>
           )}
         </div>
-      </div>
+      </motion.div>
 
       {/* 2. Main Player Body (Video / Visualizer Stage + Optional Playlist Sidebar) */}
-      <div className="flex-1 flex overflow-hidden relative min-h-0 bg-black">
+      <motion.div
+        variants={slideUpVariant}
+        initial="hidden"
+        animate="visible"
+        custom={1}
+        className="flex-1 flex overflow-hidden relative min-h-0 bg-black"
+      >
         {/* Video / Visualizer Canvas Area */}
         <div 
           className="flex-1 flex flex-col items-center justify-center relative overflow-hidden bg-black select-none"
@@ -1993,10 +2003,16 @@ export const VLC: React.FC<VLCProps> = ({ navigate }) => {
             </motion.div>
           )}
         </AnimatePresence>
-      </div>
+      </motion.div>
 
       {/* 3. VLC Playback Controls Bar - Sparkle Fluent Design */}
-      <div className="vlc-controls-panel bg-white/95 dark:bg-[#202024]/95 backdrop-blur-xl border-t border-black/10 dark:border-white/10 px-3 py-2.5 flex flex-col gap-2 shrink-0 z-30 text-neutral-800 dark:text-neutral-200">
+      <motion.div
+        variants={slideUpVariant}
+        initial="hidden"
+        animate="visible"
+        custom={2}
+        className="vlc-controls-panel bg-white/95 dark:bg-[#202024]/95 backdrop-blur-xl border-t border-black/10 dark:border-white/10 px-3 py-2.5 flex flex-col gap-2 shrink-0 z-30 text-neutral-800 dark:text-neutral-200"
+      >
         {/* Scrubber Seek Track */}
         <div className="flex items-center gap-3 text-[11px] font-mono text-neutral-500 dark:text-neutral-400">
           <span className="w-12 text-right shrink-0">{formatTime(currentTime)}</span>
@@ -2200,7 +2216,7 @@ export const VLC: React.FC<VLCProps> = ({ navigate }) => {
             </button>
           </div>
         </div>
-      </div>
+      </motion.div>
 
       {/* Hidden File Inputs */}
       <input

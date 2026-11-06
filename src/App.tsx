@@ -657,6 +657,23 @@ export default function App() {
     navigate(`/live-tv?channel=${newChannel.slug}`);
   };
 
+  // Handle adding a custom channel from Add Custom channel modal
+  const handleAddCustomChannel = useCallback((newChannel: Channel) => {
+    setChannels((prev) => {
+      const exists = prev.some((c) => c.id === newChannel.id);
+      if (exists) return prev;
+      return [newChannel, ...prev];
+    });
+    try {
+      const saved = localStorage.getItem('waves_custom_channels');
+      const existing: Channel[] = saved ? JSON.parse(saved) : [];
+      const updated = [newChannel, ...existing.filter((c) => c.id !== newChannel.id)];
+      localStorage.setItem('waves_custom_channels', JSON.stringify(updated));
+    } catch {}
+    setCurrentChannel(newChannel);
+    navigate(`/live-tv?channel=${newChannel.slug}`);
+  }, [navigate]);
+
   // Handle importing a list of M3U channels
   const handleImportPlaylist = (importedList: Channel[]) => {
     setChannels((prev) => {
@@ -712,6 +729,7 @@ export default function App() {
             navigate={navigate}
             onUpdateChannel={handleUpdateChannel}
             onRemoveChannel={handleRemoveChannel}
+            onAddChannel={handleAddCustomChannel}
           />
         );
 
@@ -951,10 +969,10 @@ export default function App() {
           <AnimatePresence mode="wait" initial={false}>
             <motion.div
               key={currentRoute}
-              initial={{ opacity: 0, x: 80 }}
+              initial={{ opacity: 0, x: 40 }}
               animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -80 }}
-              transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+              exit={{ opacity: 0, x: -40 }}
+              transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
               className="tab-page-slide-wrapper w-full h-full rounded-tl-none md:rounded-tl-[10px] rounded-tr-none rounded-br-none rounded-bl-none overflow-hidden"
             >
               {renderContent()}

@@ -20,8 +20,8 @@ const slideUpProps = (index: number) => ({
     opacity: 1,
     x: 0,
     transition: {
-      duration: 0.38,
-      delay: Math.min(index * 0.04, 0.8),
+      duration: 0.52,
+      delay: Math.min(index * 0.046, 1.1),
       ease: [0.16, 1, 0.3, 1] as const,
     },
   },

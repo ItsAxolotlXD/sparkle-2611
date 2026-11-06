@@ -50,7 +50,7 @@ const cardSlideUpVariant = {
     opacity: 1,
     x: 0,
     transition: {
-      duration: 0.46,
+      duration: 0.52,
       ease: [0.16, 1, 0.3, 1],
       delay: 0,
     },

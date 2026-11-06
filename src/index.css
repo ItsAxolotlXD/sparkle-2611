@@ -757,11 +757,11 @@ html.light-mode [class*="FluentCraftmineIcon"] * {
   stroke: #000000 !important;
 }
 
-/* Tab Elements Slide Animation: Sau loading state tab khi load các content sẽ có hiệu ứng slide from right từng element một lần lượt như ở Settings page */
+/* Tab Elements Slide Animation: Sau loading state tab khi load các content sẽ có hiệu ứng slide from right từng element một lần lượt như ở Notes và Ink Canvas */
 @keyframes tabElementSlideUp {
   0% {
     opacity: 0;
-    transform: translateX(36px);
+    transform: translateX(40px);
   }
   100% {
     opacity: 1;
@@ -835,7 +835,7 @@ html.light-mode .app-tooltip {
 .tab-element-slide-up-container:not(:has(#settings-page)) > *:not(.no-tab-anim) > article,
 .tab-element-slide-up-container:not(:has(#settings-page)) .grid > *:not(style):not(script):not(.fixed),
 .tab-element-slide-up-container:not(:has(#settings-page)) [role="feed"] > *:not(style):not(script) {
-  animation: tabElementSlideUp 0.48s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: tabElementSlideUp 0.52s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 /* Staggered sequential entrance delays across elements */
@@ -1364,13 +1364,13 @@ html.light-mode #btn-mobile-menu-toggle svg {
   animation-delay: 0.25s;
 }
 
-/* Slide up animations for tab loading and refreshed elements */
+/* Slide animations for tab loading and refreshed elements */
 .tab-loading-slide-up {
-  animation: tabElementSlideUp 0.44s cubic-bezier(0.16, 1, 0.3, 1) both !important;
+  animation: tabElementSlideUp 0.52s cubic-bezier(0.16, 1, 0.3, 1) both !important;
 }
 
 .slide-up-refresh {
-  animation: tabElementSlideUp 0.44s cubic-bezier(0.16, 1, 0.3, 1) both !important;
+  animation: tabElementSlideUp 0.52s cubic-bezier(0.16, 1, 0.3, 1) both !important;
 }
 
 /* All Search Boxes: text & icon white in dark mode, matching Find and search Sparkle */
@@ -5809,7 +5809,7 @@ html.light-mode .settings-ios-group .text-white {
   -webkit-backdrop-filter: blur(32px) saturate(140%) !important;
   border: 0 !important;
   border-top: 1px solid rgba(255, 255, 255, 0.10) !important;
-  border-radius: 0 !important;
+  border-radius: 16px 16px 0 0 !important;
   box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.28) !important;
   color-scheme: dark;
   overscroll-behavior: contain;
@@ -6733,7 +6733,7 @@ html:not(.light-mode) #vplay-tools-dropdown-card svg.fill-current {
   background: rgba(43, 52, 66, 0.80) !important; /* keys opacity 80% */
   border: none !important;
   outline: none !important;
-  border-radius: 3px !important;
+  border-radius: 5px !important;
   transform: scale(1) !important;
   box-shadow: none !important;
   transition: transform 0.07s cubic-bezier(0.2, 0, 0, 1), background-color 0.07s ease, filter 0.07s ease !important;
@@ -6786,7 +6786,7 @@ html.light-mode #vplay-native-keyboard .touch-keycap {
   background: rgba(255, 255, 255, 0.80) !important; /* keys opacity 80% */
   border: none !important;
   outline: none !important;
-  border-radius: 3px !important;
+  border-radius: 5px !important;
   transform: scale(1) !important;
   box-shadow: none !important;
   transition: transform 0.07s cubic-bezier(0.2, 0, 0, 1), background-color 0.07s ease, filter 0.07s ease !important;
@@ -8898,24 +8898,24 @@ html.light-mode .gallery-toolbar button[title="Delete selected"] * {
   color: #ffffff !important;
 }
 
-/* Underline category tabs: strictly NO background on buttons, text, or pseudo-elements in any theme */
-#livetv-category-tabs button:not(#btn-livetv-open-epg-sidebar),
-#livetv-category-tabs button:not(#btn-livetv-open-epg-sidebar):hover,
-#livetv-category-tabs button:not(#btn-livetv-open-epg-sidebar):active,
-#livetv-category-tabs button:not(#btn-livetv-open-epg-sidebar):focus,
+/* Underline category tabs: strictly NO background on category tab buttons, text, or pseudo-elements in any theme */
+#livetv-category-tabs button:not(#btn-livetv-open-epg-sidebar):not(#btn-livetv-add-custom-channel),
+#livetv-category-tabs button:not(#btn-livetv-open-epg-sidebar):not(#btn-livetv-add-custom-channel):hover,
+#livetv-category-tabs button:not(#btn-livetv-open-epg-sidebar):not(#btn-livetv-add-custom-channel):active,
+#livetv-category-tabs button:not(#btn-livetv-open-epg-sidebar):not(#btn-livetv-add-custom-channel):focus,
 [id^="livetv-cat-btn-"],
 [id^="livetv-cat-btn-"]:hover,
 [id^="livetv-cat-btn-"]:active,
 [id^="livetv-cat-btn-"]:focus,
-html.light-mode #livetv-category-tabs button:not(#btn-livetv-open-epg-sidebar),
-html.light-mode #livetv-category-tabs button:not(#btn-livetv-open-epg-sidebar):hover,
-html.light-mode #livetv-category-tabs button:not(#btn-livetv-open-epg-sidebar):active,
+html.light-mode #livetv-category-tabs button:not(#btn-livetv-open-epg-sidebar):not(#btn-livetv-add-custom-channel),
+html.light-mode #livetv-category-tabs button:not(#btn-livetv-open-epg-sidebar):not(#btn-livetv-add-custom-channel):hover,
+html.light-mode #livetv-category-tabs button:not(#btn-livetv-open-epg-sidebar):not(#btn-livetv-add-custom-channel):active,
 html.light-mode [id^="livetv-cat-btn-"],
 html.light-mode [id^="livetv-cat-btn-"]:hover,
-html:not(.no-spatial-glass) #livetv-category-tabs button:not(#btn-livetv-open-epg-sidebar),
+html:not(.no-spatial-glass) #livetv-category-tabs button:not(#btn-livetv-open-epg-sidebar):not(#btn-livetv-add-custom-channel),
 html:not(.no-spatial-glass) [id^="livetv-cat-btn-"],
-html.no-spatial-glass #livetv-category-tabs button:not(#btn-livetv-open-epg-sidebar),
-html.no-shiny-outline #livetv-category-tabs button:not(#btn-livetv-open-epg-sidebar) {
+html.no-spatial-glass #livetv-category-tabs button:not(#btn-livetv-open-epg-sidebar):not(#btn-livetv-add-custom-channel),
+html.no-shiny-outline #livetv-category-tabs button:not(#btn-livetv-open-epg-sidebar):not(#btn-livetv-add-custom-channel) {
   background: transparent !important;
   background-color: transparent !important;
   background-image: none !important;
@@ -8924,12 +8924,103 @@ html.no-shiny-outline #livetv-category-tabs button:not(#btn-livetv-open-epg-side
   outline: none !important;
 }
 
-#livetv-category-tabs button:not(#btn-livetv-open-epg-sidebar)::before,
-#livetv-category-tabs button:not(#btn-livetv-open-epg-sidebar)::after,
+#livetv-category-tabs button:not(#btn-livetv-open-epg-sidebar):not(#btn-livetv-add-custom-channel)::before,
+#livetv-category-tabs button:not(#btn-livetv-open-epg-sidebar):not(#btn-livetv-add-custom-channel)::after,
 [id^="livetv-cat-btn-"]::before,
 [id^="livetv-cat-btn-"]::after {
   display: none !important;
   content: none !important;
+}
+
+/* WinUI 3 Magenta Colored Accent Button for Add Custom Channel in Watch tab */
+#btn-livetv-add-custom-channel {
+  background-color: #b4009e !important; /* WinUI 3 Magenta Light Mode */
+  color: #ffffff !important;
+  border: 1px solid rgba(0, 0, 0, 0.14) !important;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.28) !important;
+  border-radius: 5px !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.16) !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-weight: 500 !important;
+  transition: all 0.1s ease-in-out !important;
+}
+
+#btn-livetv-add-custom-channel svg,
+#btn-livetv-add-custom-channel span,
+#btn-livetv-add-custom-channel * {
+  color: #ffffff !important;
+  stroke: #ffffff !important;
+}
+
+#btn-livetv-add-custom-channel:hover {
+  background-color: #9b0088 !important;
+  color: #ffffff !important;
+}
+
+#btn-livetv-add-custom-channel:active {
+  background-color: #820072 !important;
+  color: #ffffff !important;
+  transform: scale(0.96) !important;
+}
+
+/* Light mode specific: WinUI 3 Magenta (#b4009e) */
+html.light-mode #btn-livetv-add-custom-channel {
+  background-color: #b4009e !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(0, 0, 0, 0.15) !important;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.3) !important;
+}
+
+html.light-mode #btn-livetv-add-custom-channel svg,
+html.light-mode #btn-livetv-add-custom-channel span,
+html.light-mode #btn-livetv-add-custom-channel * {
+  color: #ffffff !important;
+  stroke: #ffffff !important;
+}
+
+html.light-mode #btn-livetv-add-custom-channel:hover {
+  background-color: #9b0088 !important;
+  color: #ffffff !important;
+}
+
+html.light-mode #btn-livetv-add-custom-channel:active {
+  background-color: #820072 !important;
+  color: #ffffff !important;
+}
+
+/* Dark mode: WinUI 3 Fluent Magenta Accent (#ff82ff) */
+html:not(.light-mode) #btn-livetv-add-custom-channel,
+html.dark #btn-livetv-add-custom-channel {
+  background-color: #ff82ff !important;
+  color: #000000 !important;
+  border: 1px solid rgba(255, 255, 255, 0.20) !important;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.30) !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.35) !important;
+}
+
+html:not(.light-mode) #btn-livetv-add-custom-channel svg,
+html:not(.light-mode) #btn-livetv-add-custom-channel span,
+html:not(.light-mode) #btn-livetv-add-custom-channel *,
+html.dark #btn-livetv-add-custom-channel svg,
+html.dark #btn-livetv-add-custom-channel span,
+html.dark #btn-livetv-add-custom-channel * {
+  color: #000000 !important;
+  stroke: #000000 !important;
+}
+
+html:not(.light-mode) #btn-livetv-add-custom-channel:hover,
+html.dark #btn-livetv-add-custom-channel:hover {
+  background-color: #ff9eff !important;
+  color: #000000 !important;
+}
+
+html:not(.light-mode) #btn-livetv-add-custom-channel:active,
+html.dark #btn-livetv-add-custom-channel:active {
+  background-color: #e56fe5 !important;
+  color: #000000 !important;
+  transform: scale(0.96) !important;
 }
 
 /* All buttons in the app: strictly never zoom or scale up on hover */

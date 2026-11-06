@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
+import { Tv, Bookmark, Heart } from 'lucide-react';
 import { Channel } from '../types';
 import { ChannelCard } from '../components/ChannelCard';
 import { NewsCard } from '../components/NewsCard';
 import { CategoryIcon } from '../components/CategoryIcon';
 import { NEWS_DATA } from '../data/news';
 import { useFavorites } from '../hooks/useFavorites';
-import { Heart, Bookmark, Tv, Newspaper, ArrowRight } from 'lucide-react';
 import { FluentDeleteIcon } from '../components/FluentIcons';
+import { motion } from 'motion/react';
+import { slideUpVariant } from '../utils/animations';
 
 interface FavoritesProps {
   channels: Channel[];
@@ -44,10 +46,18 @@ export const Favorites: React.FC<FavoritesProps> = ({
     return isBookmarked && matchesSearch;
   });
 
+  let animIdx = 0;
+
   return (
     <div className="space-y-8 pb-16">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <motion.div
+        variants={slideUpVariant}
+        initial="hidden"
+        animate="visible"
+        custom={animIdx++}
+        className="flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+      >
         <div>
           <div className="flex items-center gap-2.5 text-xs text-[#E6005A] font-bold font-square uppercase tracking-wider mb-1">
             <CategoryIcon className="w-6 h-6 sm:w-6.5 sm:h-6.5 shrink-0" />
@@ -74,10 +84,16 @@ export const Favorites: React.FC<FavoritesProps> = ({
             <span>Clear All</span>
           </button>
         )}
-      </div>
+      </motion.div>
 
       {/* Tabs */}
-      <div className="flex p-1.5 rounded-full bg-[#E5E7EB] dark:bg-[#38383d] border border-[#D1D5DB] dark:border-[#2D2D35] max-w-sm">
+      <motion.div
+        variants={slideUpVariant}
+        initial="hidden"
+        animate="visible"
+        custom={animIdx++}
+        className="flex p-1.5 rounded-full bg-[#E5E7EB] dark:bg-[#38383d] border border-[#D1D5DB] dark:border-[#2D2D35] max-w-sm"
+      >
         <button
           onClick={() => setActiveTab('channels')}
           className={`flex-1 py-2 px-4 rounded-full text-xs font-bold flex items-center justify-center gap-2 transition-all cursor-pointer ${
@@ -101,7 +117,7 @@ export const Favorites: React.FC<FavoritesProps> = ({
           <Bookmark className="w-3.5 h-3.5" />
           <span>Saved Articles ({bookmarkedNews.length})</span>
         </button>
-      </div>
+      </motion.div>
 
       {/* Channels List */}
       {activeTab === 'channels' && (
@@ -109,18 +125,31 @@ export const Favorites: React.FC<FavoritesProps> = ({
           {favoriteChannels.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
               {favoriteChannels.map((channel) => (
-                <ChannelCard
+                <motion.div
                   key={channel.id}
-                  channel={channel}
-                  onSelect={(ch) => {
-                    onSelectChannel(ch);
-                    navigate(`/live-tv?channel=${ch.slug}`);
-                  }}
-                />
+                  variants={slideUpVariant}
+                  initial="hidden"
+                  animate="visible"
+                  custom={animIdx++}
+                >
+                  <ChannelCard
+                    channel={channel}
+                    onSelect={(ch) => {
+                      onSelectChannel(ch);
+                      navigate(`/live-tv?channel=${ch.slug}`);
+                    }}
+                  />
+                </motion.div>
               ))}
             </div>
           ) : (
-            <div className="text-center py-16 p-8 rounded-[30px] bg-white dark:bg-[#38383d] border border-[#e5e5e5] dark:border-[#2D2D35]">
+            <motion.div
+              variants={slideUpVariant}
+              initial="hidden"
+              animate="visible"
+              custom={animIdx++}
+              className="text-center py-16 p-8 rounded-[30px] bg-white dark:bg-[#38383d] border border-[#e5e5e5] dark:border-[#2D2D35]"
+            >
               <div className="w-16 h-16 rounded-full bg-black/5 dark:bg-[#28282d] flex items-center justify-center text-[#A1A1AA] mx-auto mb-4">
                 <Heart className="w-8 h-8" />
               </div>
@@ -134,7 +163,7 @@ export const Favorites: React.FC<FavoritesProps> = ({
               >
                 Explore Live TV
               </button>
-            </div>
+            </motion.div>
           )}
         </div>
       )}
@@ -145,15 +174,28 @@ export const Favorites: React.FC<FavoritesProps> = ({
           {bookmarkedNews.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {bookmarkedNews.map((article) => (
-                <NewsCard
+                <motion.div
                   key={article.id}
-                  article={article}
-                  onClick={(a) => navigate(`/news/${a.slug}`)}
-                />
+                  variants={slideUpVariant}
+                  initial="hidden"
+                  animate="visible"
+                  custom={animIdx++}
+                >
+                  <NewsCard
+                    article={article}
+                    onClick={(a) => navigate(`/news/${a.slug}`)}
+                  />
+                </motion.div>
               ))}
             </div>
           ) : (
-            <div className="text-center py-16 p-8 rounded-[30px] bg-white dark:bg-[#38383d] border border-[#e5e5e5] dark:border-[#2D2D35]">
+            <motion.div
+              variants={slideUpVariant}
+              initial="hidden"
+              animate="visible"
+              custom={animIdx++}
+              className="text-center py-16 p-8 rounded-[30px] bg-white dark:bg-[#38383d] border border-[#e5e5e5] dark:border-[#2D2D35]"
+            >
               <div className="w-16 h-16 rounded-full bg-black/5 dark:bg-[#28282d] flex items-center justify-center text-[#A1A1AA] mx-auto mb-4">
                 <Bookmark className="w-8 h-8" />
               </div>
@@ -167,7 +209,7 @@ export const Favorites: React.FC<FavoritesProps> = ({
               >
                 Explore News & Articles
               </button>
-            </div>
+            </motion.div>
           )}
         </div>
       )}

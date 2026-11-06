@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { flyoutPanelClassName, flyoutPanelStyle } from './FlyoutDropdown';
 import { useNativeKeyboard } from '../context/NativeKeyboardContext';
 import { useSettings } from '../hooks/useSettings';
+import { useIsMobile } from '../hooks/useIsMobile';
 import { keyboardSound } from '../utils/keyboardSound';
 import { VietnameseInputMethod } from '../utils/vietnameseIME';
 import {
@@ -75,6 +76,8 @@ export const NativeKeyboard: React.FC = () => {
     inputMethod,
     setInputMethod,
   } = useNativeKeyboard();
+
+  const isMobile = useIsMobile();
 
   const [layoutMode, setLayoutMode] = useState<KeyboardLayoutMode>('alpha');
   const [isShiftActive, setIsShiftActive] = useState(false);
@@ -427,7 +430,7 @@ export const NativeKeyboard: React.FC = () => {
     input.setSelectionRange(newPos, newPos);
   };
 
-  // Windows 11 Keyboard Rows definition
+  // Windows 11 Desktop Keyboard Rows definition
   const rowNumbers = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'];
   const row1Alpha = ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'];
   const row2Alpha = ['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ';'];
@@ -436,6 +439,21 @@ export const NativeKeyboard: React.FC = () => {
   const row1Num = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'];
   const row2Num = ['-', '/', ':', ';', '(', ')', '$', '&', '@', '"'];
   const row3Num = ['.', ',', '?', '!', "'", '[', ']', '{', '}'];
+
+  // Mobile Keyboard Rows definition (strictly matching iOS layout from reference image)
+  const mobileRow1Alpha = ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'];
+  const mobileRow2Alpha = ['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l']; // 9 keys, indented by half a key width
+  const mobileRow3Alpha = ['z', 'x', 'c', 'v', 'b', 'n', 'm']; // 7 keys flanked by Shift and Backspace
+
+  // Mobile Numeric Rows (123 mode)
+  const mobileRow1Num = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'];
+  const mobileRow2Num = ['-', '/', ':', ';', '(', ')', '$', '&', '@', '"'];
+  const mobileRow3Num = ['.', ',', '?', '!', "'"]; // 5 keys flanked by #+= and Backspace
+
+  // Mobile Symbols Rows (#+= mode)
+  const mobileRow1Sym = ['[', ']', '{', '}', '#', '%', '^', '*', '+', '='];
+  const mobileRow2Sym = ['_', '\\', '|', '~', '<', '>', '€', '£', '¥', '•'];
+  const mobileRow3Sym = ['.', ',', '?', '!', "'"]; // 5 keys flanked by 123 and Backspace
 
   const SECONDARY_LABELS: Record<string, string> = {
     q: '1',
@@ -454,15 +472,15 @@ export const NativeKeyboard: React.FC = () => {
     '?': '!',
   };
 
-  const keyHeightClass = 'h-[40px] sm:h-[44px] md:h-[48px]';
+  const keyHeightClass = isMobile ? 'h-[44px]' : 'h-[40px] sm:h-[44px] md:h-[48px]';
 
   // Render individual character key with tactile sink-down animation on press
-  const renderCharKey = (char: string, rowIndex: number, colIndex: number) => {
+  const renderCharKey = (char: string, rowIndex: number, colIndex: number, extraClass?: string) => {
     const keyId = `${layoutMode}-${rowIndex}-${char}-${colIndex}`;
     const isNumber = !isNaN(Number(char));
     const displayChar = (!isNumber && (isShiftActive || isCapsLock)) ? char.toUpperCase() : char;
     const isPressed = pressedKeyId === keyId;
-    const secondary = layoutMode === 'alpha' ? SECONDARY_LABELS[char] : undefined;
+    const secondary = (!isMobile && layoutMode === 'alpha') ? SECONDARY_LABELS[char] : undefined;
 
     return (
       <button
@@ -487,7 +505,7 @@ export const NativeKeyboard: React.FC = () => {
           setPressedKeyId(null);
         }}
         onClick={() => handleCharPress(char)}
-        className={`touch-keycap relative flex-1 min-w-0 ${keyHeightClass} rounded-[3px] font-medium flex items-center justify-center transition-colors cursor-default font-sans select-none ${
+        className={`touch-keycap relative ${extraClass || 'flex-1 min-w-0'} ${keyHeightClass} rounded-[5px] sm:rounded-[3px] font-medium flex items-center justify-center transition-colors cursor-default font-sans select-none ${
           isPressed ? 'touch-keycap-pressed z-20' : 'z-10'
         }`}
       >
@@ -499,7 +517,7 @@ export const NativeKeyboard: React.FC = () => {
             {secondary}
           </span>
         )}
-        <span className="relative z-10 text-[16px] sm:text-[18px] md:text-[20px] font-medium leading-none">
+        <span className={`relative z-10 ${isMobile ? 'text-[19px]' : 'text-[16px] sm:text-[18px] md:text-[20px]'} font-normal leading-none`}>
           {displayChar}
         </span>
       </button>
@@ -552,22 +570,46 @@ export const NativeKeyboard: React.FC = () => {
               <WindowsSettingsIcon className="w-4 h-4 text-current" />
             </button>
 
-            <button
-              type="button"
-              onMouseDown={(e) => e.preventDefault()}
-              onPointerDown={(e) => {
-                e.preventDefault();
-                playSound('action');
-              }}
-              onClick={() => {
-                setLayoutMode((prev) => (prev === 'alpha' ? 'numeric' : 'alpha'));
-              }}
-              className="flex h-6.5 w-6.5 items-center justify-center rounded-md hover:bg-black/10 dark:hover:bg-white/10 active:bg-black/15 dark:active:bg-white/15 transition-colors cursor-default"
-              title="Đổi kiểu ký tự"
-              aria-label="Đổi kiểu ký tự"
-            >
-              <WindowsLayoutIcon className="w-4 h-4 text-current" />
-            </button>
+            {isMobile ? (
+              <button
+                type="button"
+                id="btn-mobile-header-clipboard"
+                onMouseDown={(e) => e.preventDefault()}
+                onPointerDown={(e) => {
+                  e.preventDefault();
+                  playSound('action');
+                }}
+                onClick={() => {
+                  setShowEmojiPicker(false);
+                  setShowSettingsMenu(false);
+                  setShowClipboard((prev) => !prev);
+                }}
+                className={`flex h-6.5 w-6.5 items-center justify-center rounded-md hover:bg-black/10 dark:hover:bg-white/10 active:bg-black/15 dark:active:bg-white/15 transition-colors cursor-default ${
+                  showClipboard ? 'bg-black/10 dark:bg-white/15 text-[#0078d4] dark:text-[#4cc2ff]' : ''
+                }`}
+                title="Lịch sử sao chép (Clipboard)"
+                aria-label="Lịch sử sao chép"
+              >
+                <ClipboardList className="w-4 h-4 text-current" />
+              </button>
+            ) : (
+              <button
+                type="button"
+                onMouseDown={(e) => e.preventDefault()}
+                onPointerDown={(e) => {
+                  e.preventDefault();
+                  playSound('action');
+                }}
+                onClick={() => {
+                  setLayoutMode((prev) => (prev === 'alpha' ? 'numeric' : 'alpha'));
+                }}
+                className="flex h-6.5 w-6.5 items-center justify-center rounded-md hover:bg-black/10 dark:hover:bg-white/10 active:bg-black/15 dark:active:bg-white/15 transition-colors cursor-default"
+                title="Đổi kiểu ký tự"
+                aria-label="Đổi kiểu ký tự"
+              >
+                <WindowsLayoutIcon className="w-4 h-4 text-current" />
+              </button>
+            )}
           </div>
 
           {/* Search field for the emoji board - WinUI 3 Search Box style */}
@@ -869,7 +911,7 @@ export const NativeKeyboard: React.FC = () => {
             />
           </motion.div>
         ) : (
-          /* Windows 11 Touch Keyboard grid */
+          /* Touch Keyboard grid (Mobile layout if isMobile, otherwise Desktop layout) */
           <motion.div
             key="keyboard-view"
             initial={{ opacity: 0, x: 80 }}
@@ -878,355 +920,642 @@ export const NativeKeyboard: React.FC = () => {
             transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
             className="flex flex-col gap-1 sm:gap-1.5 md:gap-2 flex-1 justify-center py-0.5 w-full"
           >
-            {/* ROW 1: Esc, q..p with 1..0 superscripts, Backspace */}
-            <div className="flex items-center justify-between gap-1 sm:gap-1.5 md:gap-2 w-full">
-              {/* Esc key */}
-              <button
-                type="button"
-                onMouseDown={(e) => e.preventDefault()}
-                onPointerDown={(e) => {
-                  e.preventDefault();
-                  playSound('action');
-                  setPressedKeyId('esc-btn');
-                }}
-                onPointerUp={() => setPressedKeyId(null)}
-                onPointerLeave={() => setPressedKeyId(null)}
-                onPointerCancel={() => setPressedKeyId(null)}
-                onClick={handleEscPress}
-                className={`touch-keycap w-[8%] sm:w-[7.6%] min-w-[36px] sm:min-w-[42px] ${keyHeightClass} rounded-[3px] text-xs sm:text-[13px] font-medium flex items-center justify-center transition-colors cursor-default ${
-                  pressedKeyId === 'esc-btn' ? 'touch-keycap-pressed' : ''
-                }`}
-                title="Escape"
-                aria-label="Escape"
-              >
-                Esc
-              </button>
+            {isMobile ? (
+              /* Mobile Layout strictly matching user reference image */
+              <div className="flex flex-col gap-1.5 flex-1 justify-between py-1 w-full max-w-full px-1">
+                {/* ROW 1: q..p (10 keys) */}
+                <div className="flex items-center justify-between gap-1 w-full">
+                  {(layoutMode === 'alpha'
+                    ? mobileRow1Alpha
+                    : layoutMode === 'numeric'
+                    ? mobileRow1Num
+                    : mobileRow1Sym
+                  ).map((char, colIndex) => renderCharKey(char, 1, colIndex))}
+                </div>
 
-              {/* Characters q..p */}
-              {(layoutMode === 'alpha' ? row1Alpha : row1Num).map((char, colIndex) =>
-                renderCharKey(char, 1, colIndex)
-              )}
+                {/* ROW 2: a..l (9 keys centered with half-key indents on sides) */}
+                <div className="flex items-center justify-between gap-1 w-full">
+                  <div className="w-[4.8%] shrink-0" aria-hidden="true" />
+                  {(layoutMode === 'alpha'
+                    ? mobileRow2Alpha
+                    : layoutMode === 'numeric'
+                    ? mobileRow2Num
+                    : mobileRow2Sym
+                  ).map((char, colIndex) => renderCharKey(char, 2, colIndex))}
+                  <div className="w-[4.8%] shrink-0" aria-hidden="true" />
+                </div>
 
-              {/* Backspace key */}
-              <button
-                type="button"
-                onMouseDown={(e) => e.preventDefault()}
-                onPointerDown={(e) => {
-                  e.preventDefault();
-                  setPressedKeyId('backspace');
-                  handleDeleteDown();
-                }}
-                onPointerUp={() => {
-                  setPressedKeyId(null);
-                  handleDeleteUp();
-                }}
-                onPointerLeave={() => {
-                  setPressedKeyId(null);
-                  handleDeleteUp();
-                }}
-                onPointerCancel={() => {
-                  setPressedKeyId(null);
-                  handleDeleteUp();
-                }}
-                className={`touch-keycap w-[8.8%] sm:w-[8.4%] min-w-[40px] sm:min-w-[46px] ${keyHeightClass} rounded-[3px] flex items-center justify-center transition-colors cursor-default ${
-                  pressedKeyId === 'backspace' ? 'touch-keycap-pressed' : ''
-                }`}
-                title="Xóa lùi (Backspace)"
-                aria-label="Xóa lùi"
-              >
-                <WindowsBackspaceIcon className="w-5 h-5 text-current" />
-              </button>
-            </div>
+                {/* ROW 3: Shift / Symbol toggle, Letters / Symbols, Backspace */}
+                <div className="flex items-center justify-between gap-1 w-full">
+                  {/* Left: Shift (in alpha mode) or #+= / 123 (in numeric/symbols mode) */}
+                  {layoutMode === 'alpha' ? (
+                    <button
+                      type="button"
+                      onMouseDown={(e) => e.preventDefault()}
+                      onPointerDown={(e) => {
+                        e.preventDefault();
+                        playSound('modifier');
+                        setPressedKeyId('mobile-shift');
+                        if (navigator.vibrate) {
+                          try { navigator.vibrate(10); } catch {}
+                        }
+                      }}
+                      onPointerUp={() => setPressedKeyId(null)}
+                      onPointerLeave={() => setPressedKeyId(null)}
+                      onPointerCancel={() => setPressedKeyId(null)}
+                      onClick={handleShiftTap}
+                      className={`touch-keycap w-[14%] ${keyHeightClass} rounded-[5px] flex items-center justify-center transition-colors cursor-default ${
+                        isCapsLock || isShiftActive ? 'touch-keycap-active' : ''
+                      } ${pressedKeyId === 'mobile-shift' ? 'touch-keycap-pressed' : ''}`}
+                      title={isCapsLock ? 'Caps Lock BẬT' : isShiftActive ? 'Shift BẬT' : 'Shift'}
+                      aria-label="Shift"
+                    >
+                      <WindowsShiftIcon className="w-5 h-5 text-current" filled={isCapsLock || isShiftActive} />
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      onMouseDown={(e) => e.preventDefault()}
+                      onPointerDown={(e) => {
+                        e.preventDefault();
+                        playSound('modifier');
+                        setPressedKeyId('mobile-sym-toggle');
+                      }}
+                      onPointerUp={() => setPressedKeyId(null)}
+                      onPointerLeave={() => setPressedKeyId(null)}
+                      onPointerCancel={() => setPressedKeyId(null)}
+                      onClick={() => {
+                        setLayoutMode(layoutMode === 'numeric' ? 'symbols' : 'numeric');
+                      }}
+                      className={`touch-keycap w-[14%] ${keyHeightClass} rounded-[5px] flex items-center justify-center text-xs font-semibold transition-colors cursor-default ${
+                        pressedKeyId === 'mobile-sym-toggle' ? 'touch-keycap-pressed' : ''
+                      }`}
+                      title="Ký tự đặc biệt"
+                      aria-label="Ký tự đặc biệt"
+                    >
+                      {layoutMode === 'numeric' ? '#+=' : '123'}
+                    </button>
+                  )}
 
-            {/* ROW 2: Tab, a..l, ;, Enter */}
-            <div className="flex items-center justify-between gap-1 sm:gap-1.5 md:gap-2 w-full">
-              {/* Tab key */}
-              <button
-                type="button"
-                onMouseDown={(e) => e.preventDefault()}
-                onPointerDown={(e) => {
-                  e.preventDefault();
-                  playSound('char');
-                  setPressedKeyId('tab-btn');
-                }}
-                onPointerUp={() => setPressedKeyId(null)}
-                onPointerLeave={() => setPressedKeyId(null)}
-                onPointerCancel={() => setPressedKeyId(null)}
-                onClick={handleTabPress}
-                className={`touch-keycap w-[8.8%] sm:w-[8.4%] min-w-[40px] sm:min-w-[46px] ${keyHeightClass} rounded-[3px] text-xs sm:text-[13px] font-medium flex items-center justify-center transition-colors cursor-default ${
-                  pressedKeyId === 'tab-btn' ? 'touch-keycap-pressed' : ''
-                }`}
-                title="Tab"
-                aria-label="Tab"
-              >
-                Tab
-              </button>
+                  {/* Middle keys (7 letters in alpha mode, 5 symbols in numeric/symbols mode) */}
+                  {(layoutMode === 'alpha'
+                    ? mobileRow3Alpha
+                    : layoutMode === 'numeric'
+                    ? mobileRow3Num
+                    : mobileRow3Sym
+                  ).map((char, colIndex) => renderCharKey(char, 3, colIndex))}
 
-              {/* Characters a..l and ; */}
-              {(layoutMode === 'alpha' ? row2Alpha : row2Num).map((char, colIndex) =>
-                renderCharKey(char, 2, colIndex)
-              )}
+                  {/* Right: Backspace */}
+                  <button
+                    type="button"
+                    onMouseDown={(e) => e.preventDefault()}
+                    onPointerDown={(e) => {
+                      e.preventDefault();
+                      setPressedKeyId('mobile-backspace');
+                      handleDeleteDown();
+                    }}
+                    onPointerUp={() => {
+                      setPressedKeyId(null);
+                      handleDeleteUp();
+                    }}
+                    onPointerLeave={() => {
+                      setPressedKeyId(null);
+                      handleDeleteUp();
+                    }}
+                    onPointerCancel={() => {
+                      setPressedKeyId(null);
+                      handleDeleteUp();
+                    }}
+                    className={`touch-keycap w-[14%] ${keyHeightClass} rounded-[5px] flex items-center justify-center transition-colors cursor-default ${
+                      pressedKeyId === 'mobile-backspace' ? 'touch-keycap-pressed' : ''
+                    }`}
+                    title="Xóa lùi (Backspace)"
+                    aria-label="Xóa lùi"
+                  >
+                    <WindowsBackspaceIcon className="w-5 h-5 text-current" />
+                  </button>
+                </div>
 
-              {/* Enter key */}
-              <button
-                type="button"
-                onMouseDown={(e) => e.preventDefault()}
-                onPointerDown={(e) => {
-                  e.preventDefault();
-                  playSound('action');
-                  setPressedKeyId('enter-btn');
-                }}
-                onPointerUp={() => setPressedKeyId(null)}
-                onPointerLeave={() => setPressedKeyId(null)}
-                onPointerCancel={() => setPressedKeyId(null)}
-                onClick={handleEnterPress}
-                className={`touch-keycap w-[9.8%] sm:w-[9.4%] min-w-[44px] sm:min-w-[50px] ${keyHeightClass} rounded-[3px] flex items-center justify-center transition-colors cursor-default ${
-                  pressedKeyId === 'enter-btn' ? 'touch-keycap-pressed' : ''
-                }`}
-                title="Enter"
-                aria-label="Enter"
-              >
-                <WindowsEnterIcon className="w-5 h-5 text-current" />
-              </button>
-            </div>
+                {/* ROW 4: 123/ABC, Emoji, Space, Search / Enter */}
+                <div className="flex items-center justify-between gap-1 w-full">
+                  {/* 123 / ABC */}
+                  <button
+                    type="button"
+                    onMouseDown={(e) => e.preventDefault()}
+                    onPointerDown={(e) => {
+                      e.preventDefault();
+                      playSound('modifier');
+                      setPressedKeyId('mobile-mode-switch');
+                    }}
+                    onPointerUp={() => setPressedKeyId(null)}
+                    onPointerLeave={() => setPressedKeyId(null)}
+                    onPointerCancel={() => setPressedKeyId(null)}
+                    onClick={() => {
+                      setLayoutMode(layoutMode === 'alpha' ? 'numeric' : 'alpha');
+                    }}
+                    className={`touch-keycap w-[14%] ${keyHeightClass} rounded-[5px] flex items-center justify-center text-xs font-semibold transition-colors cursor-default ${
+                      pressedKeyId === 'mobile-mode-switch' ? 'touch-keycap-pressed' : ''
+                    }`}
+                    title={layoutMode === 'alpha' ? 'Số và ký tự' : 'Chữ cái'}
+                    aria-label="Đổi chế độ ký tự"
+                  >
+                    {layoutMode === 'alpha' ? '123' : 'ABC'}
+                  </button>
 
-            {/* ROW 3: Left Shift, z..m, ,, ., ?, Right Shift */}
-            <div className="flex items-center justify-between gap-1 sm:gap-1.5 md:gap-2 w-full">
-              {/* Left Shift key */}
-              <button
-                type="button"
-                onMouseDown={(e) => e.preventDefault()}
-                onPointerDown={(e) => {
-                  e.preventDefault();
-                  playSound('modifier');
-                  setPressedKeyId('shift-left');
-                  if (navigator.vibrate) {
-                    try { navigator.vibrate(10); } catch {}
-                  }
-                }}
-                onPointerUp={() => setPressedKeyId(null)}
-                onPointerLeave={() => setPressedKeyId(null)}
-                onPointerCancel={() => setPressedKeyId(null)}
-                onClick={handleShiftTap}
-                className={`touch-keycap w-[10.6%] sm:w-[10.2%] min-w-[44px] sm:min-w-[50px] ${keyHeightClass} rounded-[3px] flex items-center justify-center transition-colors cursor-default ${
-                  isCapsLock || isShiftActive ? 'touch-keycap-active' : ''
-                } ${pressedKeyId === 'shift-left' ? 'touch-keycap-pressed' : ''}`}
-                title={isCapsLock ? 'Caps Lock BẬT' : isShiftActive ? 'Shift BẬT' : 'Shift'}
-                aria-label="Shift trái"
-              >
-                <WindowsShiftIcon className="w-5 h-5 text-current" filled={isCapsLock || isShiftActive} />
-              </button>
+                  {/* Emoji */}
+                  <button
+                    type="button"
+                    id="btn-mobile-keyboard-emoji"
+                    onMouseDown={(e) => e.preventDefault()}
+                    onPointerDown={(e) => {
+                      e.preventDefault();
+                      playSound('action');
+                      setPressedKeyId('mobile-emoji-btn');
+                    }}
+                    onPointerUp={() => setPressedKeyId(null)}
+                    onPointerLeave={() => setPressedKeyId(null)}
+                    onPointerCancel={() => setPressedKeyId(null)}
+                    onClick={() => {
+                      setShowClipboard(false);
+                      setShowSettingsMenu(false);
+                      setShowEmojiPicker((prev) => !prev);
+                      setEmojiSearchQuery('');
+                    }}
+                    className={`touch-keycap w-[12%] ${keyHeightClass} rounded-[5px] flex items-center justify-center transition-colors cursor-default ${
+                      showEmojiPicker ? 'touch-keycap-active' : ''
+                    } ${pressedKeyId === 'mobile-emoji-btn' ? 'touch-keycap-pressed' : ''}`}
+                    title="Biểu tượng cảm xúc (Emoji)"
+                    aria-label="Biểu tượng cảm xúc"
+                  >
+                    <Smile className="w-5 h-5 text-current stroke-[1.8]" />
+                  </button>
 
-              {/* Characters z..m, ,, ., ? */}
-              {(layoutMode === 'alpha' ? row3Alpha : row3Num).map((char, colIndex) =>
-                renderCharKey(char, 3, colIndex)
-              )}
+                  {/* Spacebar */}
+                  <button
+                    type="button"
+                    onMouseDown={(e) => e.preventDefault()}
+                    onPointerDown={(e) => {
+                      e.preventDefault();
+                      playSound('space');
+                      setPressedKeyId('mobile-spacebar');
+                      if (navigator.vibrate) {
+                        try { navigator.vibrate(10); } catch {}
+                      }
+                    }}
+                    onPointerUp={() => setPressedKeyId(null)}
+                    onPointerLeave={() => setPressedKeyId(null)}
+                    onPointerCancel={() => setPressedKeyId(null)}
+                    onClick={handleSpacePress}
+                    className={`touch-keycap flex-1 min-w-0 ${keyHeightClass} rounded-[5px] flex items-center justify-center transition-colors cursor-default ${
+                      pressedKeyId === 'mobile-spacebar' ? 'touch-keycap-pressed' : ''
+                    }`}
+                    aria-label="Phím cách"
+                  >
+                    <span className="text-[11px] font-normal opacity-60 tracking-wider select-none pointer-events-none truncate px-1">
+                      {inputMethod === 'vi-telex'
+                        ? 'Tiếng Việt'
+                        : inputMethod === 'vi-vni'
+                        ? 'VNI'
+                        : 'space'}
+                    </span>
+                  </button>
 
-              {/* Right Shift key */}
-              <button
-                type="button"
-                onMouseDown={(e) => e.preventDefault()}
-                onPointerDown={(e) => {
-                  e.preventDefault();
-                  playSound('modifier');
-                  setPressedKeyId('shift-right');
-                  if (navigator.vibrate) {
-                    try { navigator.vibrate(10); } catch {}
-                  }
-                }}
-                onPointerUp={() => setPressedKeyId(null)}
-                onPointerLeave={() => setPressedKeyId(null)}
-                onPointerCancel={() => setPressedKeyId(null)}
-                onClick={handleShiftTap}
-                className={`touch-keycap w-[10.6%] sm:w-[10.2%] min-w-[44px] sm:min-w-[50px] ${keyHeightClass} rounded-[3px] flex items-center justify-center transition-colors cursor-default ${
-                  isCapsLock || isShiftActive ? 'touch-keycap-active' : ''
-                } ${pressedKeyId === 'shift-right' ? 'touch-keycap-pressed' : ''}`}
-                title={isCapsLock ? 'Caps Lock BẬT' : isShiftActive ? 'Shift BẬT' : 'Shift'}
-                aria-label="Shift phải"
-              >
-                <WindowsShiftIcon className="w-5 h-5 text-current" filled={isCapsLock || isShiftActive} />
-              </button>
-            </div>
+                  {/* Search / Action / Enter */}
+                  <button
+                    type="button"
+                    id="btn-mobile-keyboard-search"
+                    onMouseDown={(e) => e.preventDefault()}
+                    onPointerDown={(e) => {
+                      e.preventDefault();
+                      playSound('action');
+                      setPressedKeyId('mobile-search-btn');
+                    }}
+                    onPointerUp={() => setPressedKeyId(null)}
+                    onPointerLeave={() => setPressedKeyId(null)}
+                    onPointerCancel={() => setPressedKeyId(null)}
+                    onClick={handleEnterPress}
+                    className={`touch-keycap w-[22%] ${keyHeightClass} rounded-[5px] flex items-center justify-center transition-colors cursor-default ${
+                      pressedKeyId === 'mobile-search-btn' ? 'touch-keycap-pressed' : ''
+                    }`}
+                    title="Tìm kiếm / Enter"
+                    aria-label="Tìm kiếm hoặc hoàn tất"
+                  >
+                    <Search className="w-5 h-5 text-current stroke-[2.2]" />
+                  </button>
+                </div>
 
-            {/* ROW 4: &123, Emoji, Clipboard, Space, Mic, <, > */}
-            <div className="flex w-full items-center gap-1 sm:gap-1.5 md:gap-2">
-              {/* &123 / ABC layout mode switch */}
-              <button
-                type="button"
-                onMouseDown={(e) => e.preventDefault()}
-                onPointerDown={(e) => {
-                  e.preventDefault();
-                  playSound('modifier');
-                  setPressedKeyId('layout-mode');
-                }}
-                onPointerUp={() => setPressedKeyId(null)}
-                onPointerLeave={() => setPressedKeyId(null)}
-                onPointerCancel={() => setPressedKeyId(null)}
-                onClick={() => {
-                  setLayoutMode(layoutMode === 'alpha' ? 'numeric' : 'alpha');
-                }}
-                className={`touch-keycap h-[40px] sm:h-[44px] md:h-[48px] w-[7.4%] min-w-[38px] sm:min-w-[44px] shrink-0 rounded-[3px] flex items-center justify-center text-xs sm:text-[13px] font-medium transition-colors cursor-default ${
-                  pressedKeyId === 'layout-mode' ? 'touch-keycap-pressed' : ''
-                }`}
-                title="Chuyển sang ký tự số / chữ"
-                aria-label="Chuyển chế độ ký tự"
-              >
-                {layoutMode === 'alpha' ? '&123' : 'ABC'}
-              </button>
+                {/* ROW 5: Globe on left, Microphone on right, safe home bar in middle */}
+                <div className="flex items-center justify-between w-full px-4 pt-0.5 pb-0.5">
+                  <button
+                    type="button"
+                    id="btn-mobile-keyboard-globe"
+                    onMouseDown={(e) => e.preventDefault()}
+                    onPointerDown={(e) => {
+                      e.preventDefault();
+                      playSound('modifier');
+                      setPressedKeyId('mobile-globe');
+                    }}
+                    onPointerUp={() => setPressedKeyId(null)}
+                    onPointerLeave={() => setPressedKeyId(null)}
+                    onPointerCancel={() => setPressedKeyId(null)}
+                    onClick={() => {
+                      const methods: VietnameseInputMethod[] = ['vi-telex', 'vi-vni', 'en'];
+                      const currentIndex = methods.indexOf(inputMethod);
+                      const nextIndex = (currentIndex + 1) % methods.length;
+                      setInputMethod(methods[nextIndex]);
+                      playSound('action');
+                    }}
+                    className={`w-10 h-8 rounded-full flex items-center justify-center transition-colors cursor-default text-black/75 dark:text-white/75 hover:bg-black/10 dark:hover:bg-white/10 ${
+                      pressedKeyId === 'mobile-globe' ? 'scale-90 opacity-75' : ''
+                    }`}
+                    title={`Đổi kiểu gõ (${inputMethod === 'vi-telex' ? 'Telex' : inputMethod === 'vi-vni' ? 'VNI' : 'English'})`}
+                    aria-label="Chuyển ngôn ngữ / kiểu gõ"
+                  >
+                    <Globe className="w-5 h-5 text-current stroke-[1.8]" />
+                  </button>
 
-              {/* Emoji key (chuyển ra ngoài từ context menu phím dấu +, thay phím Windows) */}
-              <button
-                type="button"
-                id="btn-native-keyboard-emoji"
-                onMouseDown={(e) => e.preventDefault()}
-                onPointerDown={(e) => {
-                  e.preventDefault();
-                  playSound('action');
-                  setPressedKeyId('emoji-btn');
-                }}
-                onPointerUp={() => setPressedKeyId(null)}
-                onPointerLeave={() => setPressedKeyId(null)}
-                onPointerCancel={() => setPressedKeyId(null)}
-                onClick={() => {
-                  setShowClipboard(false);
-                  setShowSettingsMenu(false);
-                  setShowEmojiPicker((prev) => !prev);
-                  setEmojiSearchQuery('');
-                }}
-                className={`touch-keycap h-[40px] sm:h-[44px] md:h-[48px] w-[6.4%] min-w-[34px] sm:min-w-[40px] shrink-0 rounded-[3px] flex items-center justify-center transition-colors cursor-default ${
-                  showEmojiPicker ? 'touch-keycap-active' : ''
-                } ${pressedKeyId === 'emoji-btn' ? 'touch-keycap-pressed' : ''}`}
-                title="Biểu tượng cảm xúc (Emoji)"
-                aria-label="Biểu tượng cảm xúc"
-              >
-                <Smile className="w-5 h-5 text-current stroke-[1.8]" />
-              </button>
+                  {/* Spacer with home indicator bar */}
+                  <div className="flex-1 flex items-center justify-center pointer-events-none select-none opacity-20">
+                    <div className="w-24 h-1 rounded-full bg-current" />
+                  </div>
 
-              {/* Clipboard key (chuyển ra ngoài từ context menu phím dấu +, thay phím Alt) */}
-              <button
-                type="button"
-                id="btn-native-keyboard-clipboard"
-                onMouseDown={(e) => e.preventDefault()}
-                onPointerDown={(e) => {
-                  e.preventDefault();
-                  playSound('action');
-                  setPressedKeyId('clipboard-btn');
-                }}
-                onPointerUp={() => setPressedKeyId(null)}
-                onPointerLeave={() => setPressedKeyId(null)}
-                onPointerCancel={() => setPressedKeyId(null)}
-                onClick={() => {
-                  setShowEmojiPicker(false);
-                  setShowSettingsMenu(false);
-                  setShowClipboard((prev) => !prev);
-                }}
-                className={`touch-keycap h-[40px] sm:h-[44px] md:h-[48px] w-[6.4%] min-w-[34px] sm:min-w-[40px] shrink-0 rounded-[3px] flex items-center justify-center transition-colors cursor-default ${
-                  showClipboard ? 'touch-keycap-active' : ''
-                } ${pressedKeyId === 'clipboard-btn' ? 'touch-keycap-pressed' : ''}`}
-                title="Lịch sử sao chép (Clipboard)"
-                aria-label="Lịch sử sao chép"
-              >
-                <ClipboardList className="w-5 h-5 text-current stroke-[1.8]" />
-              </button>
+                  <button
+                    type="button"
+                    id="btn-mobile-keyboard-mic"
+                    onMouseDown={(e) => e.preventDefault()}
+                    onPointerDown={(e) => {
+                      e.preventDefault();
+                      playSound('action');
+                      setPressedKeyId('mobile-mic');
+                    }}
+                    onPointerUp={() => setPressedKeyId(null)}
+                    onPointerLeave={() => setPressedKeyId(null)}
+                    onPointerCancel={() => setPressedKeyId(null)}
+                    onClick={toggleMic}
+                    className={`w-10 h-8 rounded-full flex items-center justify-center transition-colors cursor-default text-black/75 dark:text-white/75 hover:bg-black/10 dark:hover:bg-white/10 ${
+                      isMicListening ? 'text-[#0078d4] dark:text-[#4cc2ff] bg-[#0078d4]/10 dark:bg-[#4cc2ff]/20 animate-pulse' : ''
+                    } ${pressedKeyId === 'mobile-mic' ? 'scale-90 opacity-75' : ''}`}
+                    title={isMicListening ? 'Đang nghe...' : 'Nhập bằng giọng nói'}
+                    aria-label="Nhập bằng giọng nói"
+                  >
+                    <Mic className="w-5 h-5 text-current stroke-[1.8]" />
+                  </button>
+                </div>
+              </div>
+            ) : (
+              /* Desktop Windows 11 Touch Keyboard grid */
+              <>
+                {/* ROW 1: Esc, q..p with 1..0 superscripts, Backspace */}
+                <div className="flex items-center justify-between gap-1 sm:gap-1.5 md:gap-2 w-full">
+                  {/* Esc key */}
+                  <button
+                    type="button"
+                    onMouseDown={(e) => e.preventDefault()}
+                    onPointerDown={(e) => {
+                      e.preventDefault();
+                      playSound('action');
+                      setPressedKeyId('esc-btn');
+                    }}
+                    onPointerUp={() => setPressedKeyId(null)}
+                    onPointerLeave={() => setPressedKeyId(null)}
+                    onPointerCancel={() => setPressedKeyId(null)}
+                    onClick={handleEscPress}
+                    className={`touch-keycap w-[8%] sm:w-[7.6%] min-w-[36px] sm:min-w-[42px] ${keyHeightClass} rounded-[3px] text-xs sm:text-[13px] font-medium flex items-center justify-center transition-colors cursor-default ${
+                      pressedKeyId === 'esc-btn' ? 'touch-keycap-pressed' : ''
+                    }`}
+                    title="Escape"
+                    aria-label="Escape"
+                  >
+                    Esc
+                  </button>
 
-              {/* Spacebar */}
-              <button
-                type="button"
-                onMouseDown={(e) => e.preventDefault()}
-                onPointerDown={(e) => {
-                  e.preventDefault();
-                  playSound('space');
-                  setPressedKeyId('spacebar');
-                  if (navigator.vibrate) {
-                    try { navigator.vibrate(10); } catch {}
-                  }
-                }}
-                onPointerUp={() => setPressedKeyId(null)}
-                onPointerLeave={() => setPressedKeyId(null)}
-                onPointerCancel={() => setPressedKeyId(null)}
-                onClick={handleSpacePress}
-                className={`touch-keycap flex-1 min-w-[90px] h-[40px] sm:h-[44px] md:h-[48px] rounded-[3px] font-semibold text-sm flex items-center justify-center transition-colors cursor-default ${
-                  pressedKeyId === 'spacebar' ? 'touch-keycap-pressed' : ''
-                }`}
-                aria-label="Phím cách"
-              >
-                <span className="text-[11px] sm:text-xs font-normal opacity-60 tracking-wider select-none pointer-events-none truncate px-2">
-                  {inputMethod === 'vi-telex'
-                    ? 'Tiếng Việt (Telex)'
-                    : inputMethod === 'vi-vni'
-                    ? 'Tiếng Việt (VNI)'
-                    : 'English'}
-                </span>
-              </button>
+                  {/* Characters q..p */}
+                  {(layoutMode === 'alpha' ? row1Alpha : row1Num).map((char, colIndex) =>
+                    renderCharKey(char, 1, colIndex)
+                  )}
 
-              {/* Microphone (Dictation) */}
-              <button
-                type="button"
-                id="btn-native-keyboard-mic"
-                onMouseDown={(e) => e.preventDefault()}
-                onPointerDown={(e) => {
-                  e.preventDefault();
-                  playSound('action');
-                  setPressedKeyId('mic-btn');
-                }}
-                onPointerUp={() => setPressedKeyId(null)}
-                onPointerLeave={() => setPressedKeyId(null)}
-                onPointerCancel={() => setPressedKeyId(null)}
-                onClick={toggleMic}
-                className={`touch-keycap h-[40px] sm:h-[44px] md:h-[48px] w-[5.8%] min-w-[32px] sm:min-w-[38px] shrink-0 rounded-[3px] flex items-center justify-center transition-colors cursor-default ${
-                  isMicListening ? 'touch-keycap-active' : ''
-                } ${pressedKeyId === 'mic-btn' ? 'touch-keycap-pressed' : ''}`}
-                title={isMicListening ? 'Đang nghe...' : 'Nhập bằng giọng nói'}
-                aria-label={isMicListening ? 'Đang nghe, dừng nhập bằng giọng nói' : 'Nhập bằng giọng nói'}
-                aria-pressed={isMicListening}
-              >
-                <Mic className="w-4.5 h-4.5 text-current" />
-              </button>
+                  {/* Backspace key */}
+                  <button
+                    type="button"
+                    onMouseDown={(e) => e.preventDefault()}
+                    onPointerDown={(e) => {
+                      e.preventDefault();
+                      setPressedKeyId('backspace');
+                      handleDeleteDown();
+                    }}
+                    onPointerUp={() => {
+                      setPressedKeyId(null);
+                      handleDeleteUp();
+                    }}
+                    onPointerLeave={() => {
+                      setPressedKeyId(null);
+                      handleDeleteUp();
+                    }}
+                    onPointerCancel={() => {
+                      setPressedKeyId(null);
+                      handleDeleteUp();
+                    }}
+                    className={`touch-keycap w-[8.8%] sm:w-[8.4%] min-w-[40px] sm:min-w-[46px] ${keyHeightClass} rounded-[3px] flex items-center justify-center transition-colors cursor-default ${
+                      pressedKeyId === 'backspace' ? 'touch-keycap-pressed' : ''
+                    }`}
+                    title="Xóa lùi (Backspace)"
+                    aria-label="Xóa lùi"
+                  >
+                    <WindowsBackspaceIcon className="w-5 h-5 text-current" />
+                  </button>
+                </div>
 
-              {/* Cursor Left < */}
-              <button
-                type="button"
-                onMouseDown={(e) => e.preventDefault()}
-                onPointerDown={(e) => {
-                  e.preventDefault();
-                  playSound('modifier');
-                  setPressedKeyId('arrow-left');
-                }}
-                onPointerUp={() => setPressedKeyId(null)}
-                onPointerLeave={() => setPressedKeyId(null)}
-                onPointerCancel={() => setPressedKeyId(null)}
-                onClick={handleArrowLeft}
-                className={`touch-keycap h-[40px] sm:h-[44px] md:h-[48px] w-[5.4%] min-w-[30px] sm:min-w-[36px] shrink-0 rounded-[3px] flex items-center justify-center text-sm font-semibold transition-colors cursor-default ${
-                  pressedKeyId === 'arrow-left' ? 'touch-keycap-pressed' : ''
-                }`}
-                title="Di chuyển sang trái"
-                aria-label="Sang trái"
-              >
-                &lt;
-              </button>
+                {/* ROW 2: Tab, a..l, ;, Enter */}
+                <div className="flex items-center justify-between gap-1 sm:gap-1.5 md:gap-2 w-full">
+                  {/* Tab key */}
+                  <button
+                    type="button"
+                    onMouseDown={(e) => e.preventDefault()}
+                    onPointerDown={(e) => {
+                      e.preventDefault();
+                      playSound('char');
+                      setPressedKeyId('tab-btn');
+                    }}
+                    onPointerUp={() => setPressedKeyId(null)}
+                    onPointerLeave={() => setPressedKeyId(null)}
+                    onPointerCancel={() => setPressedKeyId(null)}
+                    onClick={handleTabPress}
+                    className={`touch-keycap w-[8.8%] sm:w-[8.4%] min-w-[40px] sm:min-w-[46px] ${keyHeightClass} rounded-[3px] text-xs sm:text-[13px] font-medium flex items-center justify-center transition-colors cursor-default ${
+                      pressedKeyId === 'tab-btn' ? 'touch-keycap-pressed' : ''
+                    }`}
+                    title="Tab"
+                    aria-label="Tab"
+                  >
+                    Tab
+                  </button>
 
-              {/* Cursor Right > */}
-              <button
-                type="button"
-                onMouseDown={(e) => e.preventDefault()}
-                onPointerDown={(e) => {
-                  e.preventDefault();
-                  playSound('modifier');
-                  setPressedKeyId('arrow-right');
-                }}
-                onPointerUp={() => setPressedKeyId(null)}
-                onPointerLeave={() => setPressedKeyId(null)}
-                onPointerCancel={() => setPressedKeyId(null)}
-                onClick={handleArrowRight}
-                className={`touch-keycap h-[40px] sm:h-[44px] md:h-[48px] w-[5.6%] min-w-[32px] sm:min-w-[38px] shrink-0 rounded-[3px] flex items-center justify-center text-sm font-semibold transition-colors cursor-default ${
-                  pressedKeyId === 'arrow-right' ? 'touch-keycap-pressed' : ''
-                }`}
-                title="Di chuyển sang phải"
-                aria-label="Sang phải"
-              >
-                &gt;
-              </button>
-            </div>
+                  {/* Characters a..l and ; */}
+                  {(layoutMode === 'alpha' ? row2Alpha : row2Num).map((char, colIndex) =>
+                    renderCharKey(char, 2, colIndex)
+                  )}
+
+                  {/* Enter key */}
+                  <button
+                    type="button"
+                    onMouseDown={(e) => e.preventDefault()}
+                    onPointerDown={(e) => {
+                      e.preventDefault();
+                      playSound('action');
+                      setPressedKeyId('enter-btn');
+                    }}
+                    onPointerUp={() => setPressedKeyId(null)}
+                    onPointerLeave={() => setPressedKeyId(null)}
+                    onPointerCancel={() => setPressedKeyId(null)}
+                    onClick={handleEnterPress}
+                    className={`touch-keycap w-[9.8%] sm:w-[9.4%] min-w-[44px] sm:min-w-[50px] ${keyHeightClass} rounded-[3px] flex items-center justify-center transition-colors cursor-default ${
+                      pressedKeyId === 'enter-btn' ? 'touch-keycap-pressed' : ''
+                    }`}
+                    title="Enter"
+                    aria-label="Enter"
+                  >
+                    <WindowsEnterIcon className="w-5 h-5 text-current" />
+                  </button>
+                </div>
+
+                {/* ROW 3: Left Shift, z..m, ,, ., ?, Right Shift */}
+                <div className="flex items-center justify-between gap-1 sm:gap-1.5 md:gap-2 w-full">
+                  {/* Left Shift key */}
+                  <button
+                    type="button"
+                    onMouseDown={(e) => e.preventDefault()}
+                    onPointerDown={(e) => {
+                      e.preventDefault();
+                      playSound('modifier');
+                      setPressedKeyId('shift-left');
+                      if (navigator.vibrate) {
+                        try { navigator.vibrate(10); } catch {}
+                      }
+                    }}
+                    onPointerUp={() => setPressedKeyId(null)}
+                    onPointerLeave={() => setPressedKeyId(null)}
+                    onPointerCancel={() => setPressedKeyId(null)}
+                    onClick={handleShiftTap}
+                    className={`touch-keycap w-[10.6%] sm:w-[10.2%] min-w-[44px] sm:min-w-[50px] ${keyHeightClass} rounded-[3px] flex items-center justify-center transition-colors cursor-default ${
+                      isCapsLock || isShiftActive ? 'touch-keycap-active' : ''
+                    } ${pressedKeyId === 'shift-left' ? 'touch-keycap-pressed' : ''}`}
+                    title={isCapsLock ? 'Caps Lock BẬT' : isShiftActive ? 'Shift BẬT' : 'Shift'}
+                    aria-label="Shift trái"
+                  >
+                    <WindowsShiftIcon className="w-5 h-5 text-current" filled={isCapsLock || isShiftActive} />
+                  </button>
+
+                  {/* Characters z..m, ,, ., ? */}
+                  {(layoutMode === 'alpha' ? row3Alpha : row3Num).map((char, colIndex) =>
+                    renderCharKey(char, 3, colIndex)
+                  )}
+
+                  {/* Right Shift key */}
+                  <button
+                    type="button"
+                    onMouseDown={(e) => e.preventDefault()}
+                    onPointerDown={(e) => {
+                      e.preventDefault();
+                      playSound('modifier');
+                      setPressedKeyId('shift-right');
+                      if (navigator.vibrate) {
+                        try { navigator.vibrate(10); } catch {}
+                      }
+                    }}
+                    onPointerUp={() => setPressedKeyId(null)}
+                    onPointerLeave={() => setPressedKeyId(null)}
+                    onPointerCancel={() => setPressedKeyId(null)}
+                    onClick={handleShiftTap}
+                    className={`touch-keycap w-[10.6%] sm:w-[10.2%] min-w-[44px] sm:min-w-[50px] ${keyHeightClass} rounded-[3px] flex items-center justify-center transition-colors cursor-default ${
+                      isCapsLock || isShiftActive ? 'touch-keycap-active' : ''
+                    } ${pressedKeyId === 'shift-right' ? 'touch-keycap-pressed' : ''}`}
+                    title={isCapsLock ? 'Caps Lock BẬT' : isShiftActive ? 'Shift BẬT' : 'Shift'}
+                    aria-label="Shift phải"
+                  >
+                    <WindowsShiftIcon className="w-5 h-5 text-current" filled={isCapsLock || isShiftActive} />
+                  </button>
+                </div>
+
+                {/* ROW 4: &123, Emoji, Clipboard, Space, Mic, <, > */}
+                <div className="flex w-full items-center gap-1 sm:gap-1.5 md:gap-2">
+                  {/* &123 / ABC layout mode switch */}
+                  <button
+                    type="button"
+                    onMouseDown={(e) => e.preventDefault()}
+                    onPointerDown={(e) => {
+                      e.preventDefault();
+                      playSound('modifier');
+                      setPressedKeyId('layout-mode');
+                    }}
+                    onPointerUp={() => setPressedKeyId(null)}
+                    onPointerLeave={() => setPressedKeyId(null)}
+                    onPointerCancel={() => setPressedKeyId(null)}
+                    onClick={() => {
+                      setLayoutMode(layoutMode === 'alpha' ? 'numeric' : 'alpha');
+                    }}
+                    className={`touch-keycap h-[40px] sm:h-[44px] md:h-[48px] w-[7.4%] min-w-[38px] sm:min-w-[44px] shrink-0 rounded-[3px] flex items-center justify-center text-xs sm:text-[13px] font-medium transition-colors cursor-default ${
+                      pressedKeyId === 'layout-mode' ? 'touch-keycap-pressed' : ''
+                    }`}
+                    title="Chuyển sang ký tự số / chữ"
+                    aria-label="Chuyển chế độ ký tự"
+                  >
+                    {layoutMode === 'alpha' ? '&123' : 'ABC'}
+                  </button>
+
+                  {/* Emoji key */}
+                  <button
+                    type="button"
+                    id="btn-native-keyboard-emoji"
+                    onMouseDown={(e) => e.preventDefault()}
+                    onPointerDown={(e) => {
+                      e.preventDefault();
+                      playSound('action');
+                      setPressedKeyId('emoji-btn');
+                    }}
+                    onPointerUp={() => setPressedKeyId(null)}
+                    onPointerLeave={() => setPressedKeyId(null)}
+                    onPointerCancel={() => setPressedKeyId(null)}
+                    onClick={() => {
+                      setShowClipboard(false);
+                      setShowSettingsMenu(false);
+                      setShowEmojiPicker((prev) => !prev);
+                      setEmojiSearchQuery('');
+                    }}
+                    className={`touch-keycap h-[40px] sm:h-[44px] md:h-[48px] w-[6.4%] min-w-[34px] sm:min-w-[40px] shrink-0 rounded-[3px] flex items-center justify-center transition-colors cursor-default ${
+                      showEmojiPicker ? 'touch-keycap-active' : ''
+                    } ${pressedKeyId === 'emoji-btn' ? 'touch-keycap-pressed' : ''}`}
+                    title="Biểu tượng cảm xúc (Emoji)"
+                    aria-label="Biểu tượng cảm xúc"
+                  >
+                    <Smile className="w-5 h-5 text-current stroke-[1.8]" />
+                  </button>
+
+                  {/* Clipboard key */}
+                  <button
+                    type="button"
+                    id="btn-native-keyboard-clipboard"
+                    onMouseDown={(e) => e.preventDefault()}
+                    onPointerDown={(e) => {
+                      e.preventDefault();
+                      playSound('action');
+                      setPressedKeyId('clipboard-btn');
+                    }}
+                    onPointerUp={() => setPressedKeyId(null)}
+                    onPointerLeave={() => setPressedKeyId(null)}
+                    onPointerCancel={() => setPressedKeyId(null)}
+                    onClick={() => {
+                      setShowEmojiPicker(false);
+                      setShowSettingsMenu(false);
+                      setShowClipboard((prev) => !prev);
+                    }}
+                    className={`touch-keycap h-[40px] sm:h-[44px] md:h-[48px] w-[6.4%] min-w-[34px] sm:min-w-[40px] shrink-0 rounded-[3px] flex items-center justify-center transition-colors cursor-default ${
+                      showClipboard ? 'touch-keycap-active' : ''
+                    } ${pressedKeyId === 'clipboard-btn' ? 'touch-keycap-pressed' : ''}`}
+                    title="Lịch sử sao chép (Clipboard)"
+                    aria-label="Lịch sử sao chép"
+                  >
+                    <ClipboardList className="w-5 h-5 text-current stroke-[1.8]" />
+                  </button>
+
+                  {/* Spacebar */}
+                  <button
+                    type="button"
+                    onMouseDown={(e) => e.preventDefault()}
+                    onPointerDown={(e) => {
+                      e.preventDefault();
+                      playSound('space');
+                      setPressedKeyId('spacebar');
+                      if (navigator.vibrate) {
+                        try { navigator.vibrate(10); } catch {}
+                      }
+                    }}
+                    onPointerUp={() => setPressedKeyId(null)}
+                    onPointerLeave={() => setPressedKeyId(null)}
+                    onPointerCancel={() => setPressedKeyId(null)}
+                    onClick={handleSpacePress}
+                    className={`touch-keycap flex-1 min-w-[90px] h-[40px] sm:h-[44px] md:h-[48px] rounded-[3px] font-semibold text-sm flex items-center justify-center transition-colors cursor-default ${
+                      pressedKeyId === 'spacebar' ? 'touch-keycap-pressed' : ''
+                    }`}
+                    aria-label="Phím cách"
+                  >
+                    <span className="text-[11px] sm:text-xs font-normal opacity-60 tracking-wider select-none pointer-events-none truncate px-2">
+                      {inputMethod === 'vi-telex'
+                        ? 'Tiếng Việt (Telex)'
+                        : inputMethod === 'vi-vni'
+                        ? 'Tiếng Việt (VNI)'
+                        : 'English'}
+                    </span>
+                  </button>
+
+                  {/* Microphone (Dictation) */}
+                  <button
+                    type="button"
+                    id="btn-native-keyboard-mic"
+                    onMouseDown={(e) => e.preventDefault()}
+                    onPointerDown={(e) => {
+                      e.preventDefault();
+                      playSound('action');
+                      setPressedKeyId('mic-btn');
+                    }}
+                    onPointerUp={() => setPressedKeyId(null)}
+                    onPointerLeave={() => setPressedKeyId(null)}
+                    onPointerCancel={() => setPressedKeyId(null)}
+                    onClick={toggleMic}
+                    className={`touch-keycap h-[40px] sm:h-[44px] md:h-[48px] w-[5.8%] min-w-[32px] sm:min-w-[38px] shrink-0 rounded-[3px] flex items-center justify-center transition-colors cursor-default ${
+                      isMicListening ? 'touch-keycap-active' : ''
+                    } ${pressedKeyId === 'mic-btn' ? 'touch-keycap-pressed' : ''}`}
+                    title={isMicListening ? 'Đang nghe...' : 'Nhập bằng giọng nói'}
+                    aria-label={isMicListening ? 'Đang nghe, dừng nhập bằng giọng nói' : 'Nhập bằng giọng nói'}
+                    aria-pressed={isMicListening}
+                  >
+                    <Mic className="w-4.5 h-4.5 text-current" />
+                  </button>
+
+                  {/* Cursor Left < */}
+                  <button
+                    type="button"
+                    onMouseDown={(e) => e.preventDefault()}
+                    onPointerDown={(e) => {
+                      e.preventDefault();
+                      playSound('modifier');
+                      setPressedKeyId('arrow-left');
+                    }}
+                    onPointerUp={() => setPressedKeyId(null)}
+                    onPointerLeave={() => setPressedKeyId(null)}
+                    onPointerCancel={() => setPressedKeyId(null)}
+                    onClick={handleArrowLeft}
+                    className={`touch-keycap h-[40px] sm:h-[44px] md:h-[48px] w-[5.4%] min-w-[30px] sm:min-w-[36px] shrink-0 rounded-[3px] flex items-center justify-center text-sm font-semibold transition-colors cursor-default ${
+                      pressedKeyId === 'arrow-left' ? 'touch-keycap-pressed' : ''
+                    }`}
+                    title="Di chuyển sang trái"
+                    aria-label="Sang trái"
+                  >
+                    &lt;
+                  </button>
+
+                  {/* Cursor Right > */}
+                  <button
+                    type="button"
+                    onMouseDown={(e) => e.preventDefault()}
+                    onPointerDown={(e) => {
+                      e.preventDefault();
+                      playSound('modifier');
+                      setPressedKeyId('arrow-right');
+                    }}
+                    onPointerUp={() => setPressedKeyId(null)}
+                    onPointerLeave={() => setPressedKeyId(null)}
+                    onPointerCancel={() => setPressedKeyId(null)}
+                    onClick={handleArrowRight}
+                    className={`touch-keycap h-[40px] sm:h-[44px] md:h-[48px] w-[5.6%] min-w-[32px] sm:min-w-[38px] shrink-0 rounded-[3px] flex items-center justify-center text-sm font-semibold transition-colors cursor-default ${
+                      pressedKeyId === 'arrow-right' ? 'touch-keycap-pressed' : ''
+                    }`}
+                    title="Di chuyển sang phải"
+                    aria-label="Sang phải"
+                  >
+                    &gt;
+                  </button>
+                </div>
+              </>
+            )}
           </motion.div>
         )}
       </AnimatePresence>

@@ -728,7 +728,7 @@ export const Draws: React.FC<DrawsProps> = ({ navigate }) => {
   if (!selectedCanvasId) {
     let animIdx = 0;
     return (
-      <div className="min-h-screen bg-transparent text-[#111827] dark:text-white p-6 sm:p-10">
+      <div className="draws-page-root min-h-screen bg-transparent text-[#111827] dark:text-white p-6 sm:p-10">
         <div className="mx-auto max-w-6xl">
           <div className="flex items-end justify-between gap-4 mb-8">
             <motion.div
@@ -813,7 +813,7 @@ export const Draws: React.FC<DrawsProps> = ({ navigate }) => {
   }
 
   return (
-    <div className="flex flex-col h-full min-h-screen bg-transparent text-[#111827] dark:text-[#F3F4F6] relative select-none">
+    <div className="draws-page-root flex flex-col h-full min-h-screen bg-transparent text-[#111827] dark:text-[#F3F4F6] relative select-none">
       {/* Toast notification - Adaptive light mode, bottom position, button radius, no sparkle icon */}
       <AnimatePresence>
         {toastMessage && (

@@ -140,9 +140,13 @@ const EditChannelModalBody: React.FC<{
             <div className="flex items-center gap-3 p-2.5 rounded-[8px] bg-black/[0.03] dark:bg-white/[0.05] border border-black/[0.06] dark:border-white/[0.06]">
               <div className="w-14 h-9 rounded-[5px] bg-white dark:bg-[#2d2d32] border border-black/[0.08] dark:border-white/[0.08] flex items-center justify-center p-1 shrink-0 overflow-hidden">
                 <img
+                  key={logo}
                   src={logo || defaultLogo}
                   alt={trimmedName || channel.name}
                   className="max-h-full max-w-full object-contain"
+                  onLoad={(e) => {
+                    (e.target as HTMLElement).style.display = 'block';
+                  }}
                   onError={(e) => {
                     (e.target as HTMLElement).style.display = 'none';
                   }}

@@ -7,6 +7,8 @@ import { Tag, Radio, Filter, Tv, CheckCircle2, Sparkles, Satellite, X } from 'lu
 import { FluentSearchIcon } from '../components/FluentIcons';
 import { SequentialSection } from '../components/SequentialSection';
 import { useSettings } from '../hooks/useSettings';
+import { motion } from 'motion/react';
+import { slideUpVariant } from '../utils/animations';
 
 interface ChannelsProps {
   channels: Channel[];
@@ -44,13 +46,21 @@ export const Channels: React.FC<ChannelsProps> = ({
     return matchesGroup && matchesSearch;
   });
 
+  let animIdx = 0;
+
   return (
     <div className="space-y-6 sm:space-y-8 pb-16">
       {/* Support Ceased Banner */}
       <DiscontinuedBanner navigate={navigate} />
 
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <motion.div
+        variants={slideUpVariant}
+        initial="hidden"
+        animate="visible"
+        custom={animIdx++}
+        className="flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+      >
         <div>
           <div className="flex items-center gap-2.5 text-xs text-[#E6005A] font-bold font-square uppercase tracking-wider mb-1">
             <CategoryIcon className="w-6 h-6 sm:w-6.5 sm:h-6.5 shrink-0" />
@@ -71,10 +81,16 @@ export const Channels: React.FC<ChannelsProps> = ({
           <Sparkles className="w-4 h-4" />
           <span>Import M3U8 Stream</span>
         </button>
-      </div>
+      </motion.div>
 
       {/* Filter and Search Bar */}
-      <div className="p-3.5 sm:p-4 rounded-[8px] bg-white dark:bg-[#38383d] border border-black/10 dark:border-white/10 flex flex-col md:flex-row items-center justify-between gap-3 sm:gap-4 shadow-xs">
+      <motion.div
+        variants={slideUpVariant}
+        initial="hidden"
+        animate="visible"
+        custom={animIdx++}
+        className="p-3.5 sm:p-4 rounded-[8px] bg-white dark:bg-[#38383d] border border-black/10 dark:border-white/10 flex flex-col md:flex-row items-center justify-between gap-3 sm:gap-4 shadow-xs"
+      >
         {/* Groups */}
         <div className="flex items-center gap-1.5 overflow-x-auto w-full md:w-auto pb-1 md:pb-0 no-scrollbar">
           {groups.map((grp) => (
@@ -116,20 +132,27 @@ export const Channels: React.FC<ChannelsProps> = ({
             </button>
           )}
         </div>
-      </div>
+      </motion.div>
 
       {/* Grid of channels */}
       {filteredChannels.length <= 16 || !settings.loadPagesSequentially ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {filteredChannels.map((channel) => (
-            <ChannelCard
+            <motion.div
               key={channel.id}
-              channel={channel}
-              onSelect={(ch) => {
-                onSelectChannel(ch);
-                navigate(`/live-tv?channel=${ch.slug}`);
-              }}
-            />
+              variants={slideUpVariant}
+              initial="hidden"
+              animate="visible"
+              custom={animIdx++}
+            >
+              <ChannelCard
+                channel={channel}
+                onSelect={(ch) => {
+                  onSelectChannel(ch);
+                  navigate(`/live-tv?channel=${ch.slug}`);
+                }}
+              />
+            </motion.div>
           ))}
         </div>
       ) : (
@@ -138,14 +161,21 @@ export const Channels: React.FC<ChannelsProps> = ({
           <SequentialSection order={0} enabled={settings.loadPagesSequentially}>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
               {filteredChannels.slice(0, 16).map((channel) => (
-                <ChannelCard
+                <motion.div
                   key={channel.id}
-                  channel={channel}
-                  onSelect={(ch) => {
-                    onSelectChannel(ch);
-                    navigate(`/live-tv?channel=${ch.slug}`);
-                  }}
-                />
+                  variants={slideUpVariant}
+                  initial="hidden"
+                  animate="visible"
+                  custom={animIdx++}
+                >
+                  <ChannelCard
+                    channel={channel}
+                    onSelect={(ch) => {
+                      onSelectChannel(ch);
+                      navigate(`/live-tv?channel=${ch.slug}`);
+                    }}
+                  />
+                </motion.div>
               ))}
             </div>
           </SequentialSection>
@@ -155,14 +185,21 @@ export const Channels: React.FC<ChannelsProps> = ({
             <SequentialSection order={1} enabled={settings.loadPagesSequentially}>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                 {filteredChannels.slice(16, 32).map((channel) => (
-                  <ChannelCard
+                  <motion.div
                     key={channel.id}
-                    channel={channel}
-                    onSelect={(ch) => {
-                      onSelectChannel(ch);
-                      navigate(`/live-tv?channel=${ch.slug}`);
-                    }}
-                  />
+                    variants={slideUpVariant}
+                    initial="hidden"
+                    animate="visible"
+                    custom={animIdx++}
+                  >
+                    <ChannelCard
+                      channel={channel}
+                      onSelect={(ch) => {
+                        onSelectChannel(ch);
+                        navigate(`/live-tv?channel=${ch.slug}`);
+                      }}
+                    />
+                  </motion.div>
                 ))}
               </div>
             </SequentialSection>
@@ -173,14 +210,21 @@ export const Channels: React.FC<ChannelsProps> = ({
             <SequentialSection order={2} enabled={settings.loadPagesSequentially}>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                 {filteredChannels.slice(32).map((channel) => (
-                  <ChannelCard
+                  <motion.div
                     key={channel.id}
-                    channel={channel}
-                    onSelect={(ch) => {
-                      onSelectChannel(ch);
-                      navigate(`/live-tv?channel=${ch.slug}`);
-                    }}
-                  />
+                    variants={slideUpVariant}
+                    initial="hidden"
+                    animate="visible"
+                    custom={animIdx++}
+                  >
+                    <ChannelCard
+                      channel={channel}
+                      onSelect={(ch) => {
+                        onSelectChannel(ch);
+                        navigate(`/live-tv?channel=${ch.slug}`);
+                      }}
+                    />
+                  </motion.div>
                 ))}
               </div>
             </SequentialSection>

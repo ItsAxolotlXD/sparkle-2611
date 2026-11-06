@@ -1,11 +1,21 @@
 import React from 'react';
 import { Sparkles, Shield, ExternalLink } from 'lucide-react';
+import { motion } from 'motion/react';
+import { slideUpVariant } from '../utils/animations';
 
 export const About: React.FC = () => {
+  let animIdx = 0;
+
   return (
     <div className="max-w-4xl mx-auto space-y-10 pb-20">
       {/* Hero Intro */}
-      <div className="text-center space-y-4 pt-4">
+      <motion.div
+        variants={slideUpVariant}
+        initial="hidden"
+        animate="visible"
+        custom={animIdx++}
+        className="text-center space-y-4 pt-4"
+      >
         <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#E6005A]/15 border border-[#E6005A]/30 text-[#E6005A] text-xs font-bold uppercase tracking-wider">
           <Sparkles className="w-3.5 h-3.5" />
           <span>About Sparkle</span>
@@ -32,11 +42,15 @@ export const About: React.FC = () => {
             </span>
           </p>
         </div>
-      </div>
+      </motion.div>
 
       {/* Disclaimer and Ethics Card */}
-      <div
+      <motion.div
         id="about-disclaimer-card"
+        variants={slideUpVariant}
+        initial="hidden"
+        animate="visible"
+        custom={animIdx++}
         className="p-8 rounded-[30px] bg-white dark:bg-[#38383d] border border-[#E5E7EB] dark:border-[#34343E] shadow-sm dark:shadow-xl space-y-4 transition-all"
       >
         <div className="flex items-center gap-3">
@@ -48,11 +62,15 @@ export const About: React.FC = () => {
         <p id="about-disclaimer-text" className="text-xs sm:text-sm text-[#4B5563] dark:text-[#A1A1AA] leading-relaxed">
           All television logos, trademarks, studio images, and broadcast feeds are the intellectual property of their respective broadcasters (Vietnam Television VTV, Ho Chi Minh City Television HTV, VTC Digital Television, and local radio-television stations). Sparkle serves non-commercial, academic research, and technical archive purposes only.
         </p>
-      </div>
+      </motion.div>
 
       {/* Community Connect */}
-      <div
+      <motion.div
         id="about-community-card"
+        variants={slideUpVariant}
+        initial="hidden"
+        animate="visible"
+        custom={animIdx++}
         className="text-center p-8 rounded-[30px] bg-white dark:bg-[#38383d] border border-[#E5E7EB] dark:border-[#2D2D35] shadow-sm dark:shadow-none space-y-4 transition-all"
       >
         <h3 className="text-xl font-bold text-[#111827] dark:text-white">Join the Waves Community</h3>
@@ -79,7 +97,7 @@ export const About: React.FC = () => {
             <ExternalLink className="w-3.5 h-3.5" />
           </a>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 };

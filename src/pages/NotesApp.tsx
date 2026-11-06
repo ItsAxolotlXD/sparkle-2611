@@ -521,7 +521,7 @@ export const NotesApp: React.FC<NotesAppProps> = ({
   if (!selectedNoteId) {
     let animIdx = 0;
     return (
-      <div className="min-h-screen bg-transparent text-[#111827] dark:text-white p-6 sm:p-10 select-none">
+      <div className="notes-page-root min-h-screen bg-transparent text-[#111827] dark:text-white p-6 sm:p-10 select-none">
         <div className="mx-auto max-w-6xl">
           {/* Header */}
           <div className="flex items-end justify-between gap-4 mb-8">
@@ -712,7 +712,7 @@ export const NotesApp: React.FC<NotesAppProps> = ({
 
   // 2. FULL-PAGE WINUI 3 NOTE EDITOR VIEW (pinned Gallery-like toolbar, full page canvas, no go back/export/pin/delete, Save button)
   return (
-    <div className="flex flex-col w-full min-h-screen bg-transparent text-[#111827] dark:text-[#F3F4F6] relative select-none">
+    <div className="notes-page-root flex flex-col w-full min-h-screen bg-transparent text-[#111827] dark:text-[#F3F4F6] relative select-none">
       {/* Toast Notification */}
       {notice && (
         <div className="fixed top-16 left-1/2 -translate-x-1/2 z-50 px-4 py-2 rounded-[6px] bg-[#0078d4] dark:bg-[#4cc2ff] text-white dark:text-black text-xs font-semibold shadow-xl flex items-center gap-2 animate-fade-in">

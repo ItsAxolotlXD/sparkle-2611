@@ -74,9 +74,9 @@ const slideUpVariant = {
     opacity: 1,
     x: 0,
     transition: {
-      duration: 0.38,
+      duration: 0.52,
       ease: [0.16, 1, 0.3, 1],
-      delay: Math.min(i * 0.04, 0.8),
+      delay: Math.min(i * 0.046, 1.1),
     },
   }),
 };
@@ -1527,11 +1527,11 @@ export const Settings: React.FC<SettingsProps> = ({
             >
               <div className="space-y-2.5 bg-transparent pt-0.5">
                 {/* 1. Version information */}
-                {matchesSearch(['Update version', 'Build number', 'Branch', 'Channel', 'Insider Preview', 'co_release', '26105.11', '26.12']) && (
+                {matchesSearch(['Update version', 'Build number', 'Branch', 'Channel', 'Insider Preview', 'Moment 1 (2027)', '26106.11', '27M1']) && (
                   <motion.div variants={slideUpVariant} initial="hidden" animate="visible" custom={elementIndex++} className="settings-block-card rounded-[6px] bg-white dark:bg-[#2c3037] shadow-xs p-4 sm:p-5 space-y-3 select-text hover:bg-black/[0.02] dark:hover:bg-[#363b43] transition-colors border-none">
-                    <div className="flex items-center justify-between text-xs sm:text-sm"><span className="text-[#111827] dark:text-white">Update version</span><span className="font-semibold text-[#9CA3AF]">26.12</span></div>
-                    <div className="flex items-center justify-between text-xs sm:text-sm"><span className="text-[#111827] dark:text-white">Build number</span><span className="font-semibold text-[#9CA3AF]">26105.11</span></div>
-                    <div className="flex items-center justify-between text-xs sm:text-sm"><span className="text-[#111827] dark:text-white">Branch</span><span className="font-semibold text-[#9CA3AF]">co_release</span></div>
+                    <div className="flex items-center justify-between text-xs sm:text-sm"><span className="text-[#111827] dark:text-white">Update version</span><span className="font-semibold text-[#9CA3AF]">27M1</span></div>
+                    <div className="flex items-center justify-between text-xs sm:text-sm"><span className="text-[#111827] dark:text-white">Build number</span><span className="font-semibold text-[#9CA3AF]">26106.11</span></div>
+                    <div className="flex items-center justify-between text-xs sm:text-sm"><span className="text-[#111827] dark:text-white">Branch</span><span className="font-semibold text-[#9CA3AF]">Moment 1 (2027)</span></div>
                     <div className="flex items-center justify-between text-xs sm:text-sm"><span className="text-[#111827] dark:text-white">Channel</span><span className="font-semibold text-[#4cc2ff]">Insider Preview</span></div>
                   </motion.div>
                 )}

@@ -133,9 +133,9 @@ export const Feedback: React.FC<FeedbackProps> = () => {
   return (
     <motion.div
       id="feedback-page"
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+      initial={{ opacity: 0, x: 40 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ duration: 0.52, ease: [0.16, 1, 0.3, 1] }}
       className="feedback-page-wrapper w-full max-w-5xl mx-auto pb-28 pt-2 px-4 sm:px-6 select-none space-y-6"
     >
       {/* Header */}
