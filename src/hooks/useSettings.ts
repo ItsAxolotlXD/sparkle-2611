@@ -54,6 +54,7 @@ export interface SystemSettings {
   pageLoading: boolean;
   pageLoadingVersion?: number;
   loadPagesSequentially: boolean;
+  openSettingsInNewTab: boolean;
   customKeybinds: CustomKeybinds;
 }
 
@@ -112,6 +113,7 @@ export const DEFAULT_SETTINGS: SystemSettings = {
   pageLoading: false,
   pageLoadingVersion: 2,
   loadPagesSequentially: false,
+  openSettingsInNewTab: false,
   customKeybinds: DEFAULT_KEYBINDS,
 };
 
@@ -129,6 +131,7 @@ export const getStoredSettings = (): SystemSettings => {
     
     if (saved) {
       const parsed = JSON.parse(saved);
+      const isTabbedSparkle = typeof parsed.tabbedSparkle === 'boolean' ? parsed.tabbedSparkle : false;
       let fontScale = typeof parsed.fontScale === 'number' ? parsed.fontScale : DEFAULT_SETTINGS.fontScale;
       // Auto-migrate from old 4-item scheme if needed
       if (parsed.fontScaleVersion !== 2) {
@@ -200,7 +203,7 @@ export const getStoredSettings = (): SystemSettings => {
           ? (typeof parsed.triangleExperiment === 'boolean' ? parsed.triangleExperiment : true)
           : true,
         triangleExperimentVersion: 1,
-        tabbedSparkle: typeof parsed.tabbedSparkle === 'boolean' ? parsed.tabbedSparkle : false,
+        tabbedSparkle: isTabbedSparkle,
         newWatchTab: typeof parsed.newWatchTab === 'boolean' ? parsed.newWatchTab : DEFAULT_SETTINGS.newWatchTab,
         fluentIcons: typeof parsed.fluentIcons === 'boolean' ? parsed.fluentIcons : DEFAULT_SETTINGS.fluentIcons,
         dynamicSidebarIcons: typeof parsed.dynamicSidebarIcons === 'boolean' ? parsed.dynamicSidebarIcons : true,
@@ -210,6 +213,9 @@ export const getStoredSettings = (): SystemSettings => {
           : false,
         pageLoadingVersion: 2,
         loadPagesSequentially: typeof parsed.loadPagesSequentially === 'boolean' ? parsed.loadPagesSequentially : false,
+        openSettingsInNewTab: typeof parsed.openSettingsInNewTab === 'boolean'
+          ? (isTabbedSparkle ? parsed.openSettingsInNewTab : false)
+          : isTabbedSparkle,
         hoverToExpand: parsed.hoverToExpandVersion === 1
           ? (typeof parsed.hoverToExpand === 'boolean' ? parsed.hoverToExpand : true)
           : true,
@@ -366,6 +372,9 @@ export const updateGlobalSetting = <K extends keyof SystemSettings>(key: K, valu
   let extraUpdates: Partial<SystemSettings> = {};
   if (key === 'theme' && value === 'light') {
     extraUpdates.spatialGlassOpacity = 43;
+  }
+  if (key === 'tabbedSparkle') {
+    extraUpdates.openSettingsInNewTab = Boolean(value);
   }
   settingsStore = { ...settingsStore, [key]: value, ...extraUpdates, fontScaleVersion: 2, spatialGlassVersion: 3, nativeKeyboardVersion: 3, pageLoadingVersion: 2 };
   draftSettingsStore = { ...settingsStore };

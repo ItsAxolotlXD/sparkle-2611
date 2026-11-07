@@ -114,13 +114,11 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({
       {showWatermark && (
         <div
           id="splash-watermark"
-          className={`absolute bottom-4 right-5 sm:bottom-6 sm:right-7 z-10 text-right select-none pointer-events-none ${
-            isLightMode ? 'text-black/60' : 'text-white/60'
-          } text-[11px] sm:text-[12px] leading-[1.35] font-normal`}
-          style={{ fontFamily: "'Segoe UI Variable Text', 'Segoe UI', system-ui, sans-serif" }}
+          className="absolute bottom-4 right-5 sm:bottom-6 sm:right-7 z-10 text-right select-none pointer-events-none text-white [text-shadow:0_1px_3px_rgba(0,0,0,0.85)] text-[11px] sm:text-[12px] leading-[1.35] font-normal"
+          style={{ fontFamily: "'Segoe UI Variable Text', 'Segoe UI', system-ui, sans-serif", color: '#ffffff' }}
         >
-          <div>Sparkle 27M1 Insider Preview</div>
-          <div>Evaluation copy. Build 26106.11.Moment 1 (2027)</div>
+          <div style={{ color: '#ffffff' }}>Sparkle 27M1 Insider Preview</div>
+          <div style={{ color: '#ffffff' }}>Evaluation copy. Build 26106.11.Moment 1 (2027)</div>
         </div>
       )}
     </div>

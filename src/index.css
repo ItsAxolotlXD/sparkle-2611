@@ -9099,3 +9099,48 @@ html.dark .app-toast-tick {
   opacity: 0.9 !important;
 }
 
+/* Sidebar Search Box - Full Width Underline with refined thickness */
+#sidebar-search-box {
+  border-bottom: none !important;
+}
+#sidebar-search-box:focus-within {
+  border-bottom: none !important;
+}
+html.light-mode #sidebar-search-box,
+html.light-mode #sidebar-search-box:focus-within {
+  border-bottom: none !important;
+}
+
+#sidebar-search-box::after {
+  left: 0 !important;
+  width: 100% !important;
+  border-radius: 0 0 6px 6px !important;
+  height: 2px !important;
+  background-color: rgba(255, 255, 255, 0.45) !important;
+}
+
+#sidebar-search-box::before {
+  left: 0 !important;
+  width: 100% !important;
+  border-radius: 0 0 6px 6px !important;
+  height: 2.8px !important;
+  transform: none !important;
+  background-color: var(--ui-accent, #4cc2ff) !important;
+  opacity: 0;
+  transition: opacity 200ms ease, background-color 200ms ease !important;
+}
+
+#sidebar-search-box:focus-within::before,
+#sidebar-search-box.is-focused::before,
+#sidebar-search-box.search-flyout-open::before {
+  opacity: 1 !important;
+}
+
+html.light-mode #sidebar-search-box::after {
+  background-color: rgba(0, 0, 0, 0.32) !important;
+}
+
+html.light-mode #sidebar-search-box::before {
+  background-color: var(--ui-accent, #0078d4) !important;
+}
+

@@ -87,7 +87,7 @@ export function getRouteTitle(route: string, channel?: Channel): string {
 }
 
 export default function App() {
-  const { settings, draftSettings, hasChanges, applyDraftSettings, discardDraftSettings } = useSettings();
+  const { settings, draftSettings, hasChanges, applyDraftSettings, discardDraftSettings, updateSetting } = useSettings();
 
   // Tooltip & navigation block for unsaved settings
   const [showUnsavedTooltip, setShowUnsavedTooltip] = useState(false);
@@ -667,6 +667,25 @@ export default function App() {
 
   // Navigation handler
   const navigate = useCallback((path: string, state?: any) => {
+    // If "Open Settings in new tab" is enabled, navigate to settings creates/switches to settings in another tab
+    const isSettingsTarget = path === '/settings' || path.startsWith('/settings?') || path.startsWith('/settings#') || path.startsWith('/settings/');
+    if (settings.openSettingsInNewTab && isSettingsTarget) {
+      if (currentRoute === '/settings' || currentRoute.startsWith('/settings')) {
+        // Already active on settings
+        return;
+      }
+      if (!settings.tabbedSparkle) {
+        updateSetting('tabbedSparkle', true);
+      }
+      const existingSettingsTab = tabs.find((t) => t.route === '/settings' || t.route.startsWith('/settings'));
+      if (existingSettingsTab) {
+        handleSelectTab(existingSettingsTab.id);
+      } else {
+        handleCreateTab(path);
+      }
+      return;
+    }
+
     // If currently on settings and there are unsaved changes, prompt before leaving
     if (currentRoute === '/settings' && hasChanges) {
       const isStillSettings = path === '/settings' || path.startsWith('/settings?') || path.startsWith('/settings#');
@@ -685,7 +704,7 @@ export default function App() {
     }
 
     executeNavigation(path, state);
-  }, [currentRoute, hasChanges, unsavedNoteState, executeNavigation]);
+  }, [currentRoute, hasChanges, unsavedNoteState, executeNavigation, settings.openSettingsInNewTab, settings.tabbedSparkle, tabs, handleSelectTab, handleCreateTab, updateSetting]);
 
   const handleSaveAndNavigate = () => {
     applyDraftSettings();
@@ -737,8 +756,9 @@ export default function App() {
     setPendingNavigation(null);
   };
 
-  // Open search handler - opens new search box on TopBar
+  // Open search handler - opens search UI menu (Spotlight search modal / TopBar search)
   const handleOpenSearch = useCallback(() => {
+    setIsSpotlightOpen(true);
     window.dispatchEvent(new CustomEvent('vplay:focus-topbar-search'));
   }, []);
 

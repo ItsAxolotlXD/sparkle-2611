@@ -39,15 +39,11 @@ export const EvaluationWatermark: React.FC<EvaluationWatermarkProps> = ({ classN
       aria-hidden="true"
       className={`fixed bottom-3 right-4 sm:bottom-4 sm:right-6 z-[9990] pointer-events-none select-none text-right transition-opacity duration-1000 ease-in-out ${
         isVisible ? 'opacity-100' : 'opacity-0'
-      } ${
-        isLightMode
-          ? 'text-black/55 [text-shadow:0_1px_2px_rgba(255,255,255,0.7)]'
-          : 'text-white/55 [text-shadow:0_1px_2px_rgba(0,0,0,0.8)]'
-      } text-[11px] sm:text-[12px] leading-[1.35] font-normal tracking-normal ${className}`}
-      style={{ fontFamily: "'Segoe UI Variable Text', 'Segoe UI', system-ui, sans-serif" }}
+      } text-white [text-shadow:0_1px_3px_rgba(0,0,0,0.85),0_0_2px_rgba(0,0,0,0.85)] text-[11px] sm:text-[12px] leading-[1.35] font-normal tracking-normal ${className}`}
+      style={{ fontFamily: "'Segoe UI Variable Text', 'Segoe UI', system-ui, sans-serif", color: '#ffffff' }}
     >
-      <div>Sparkle 27M1 Insider Preview</div>
-      <div>Evaluation copy. Build 26106.11.Moment 1 (2027)</div>
+      <div style={{ color: '#ffffff' }}>Sparkle 27M1 Insider Preview</div>
+      <div style={{ color: '#ffffff' }}>Evaluation copy. Build 26106.11.Moment 1 (2027)</div>
     </div>
   );
 };

@@ -166,6 +166,9 @@ export const Settings: React.FC<SettingsProps> = ({
         showAppToast(`Changed ${label} to ${String(value)}`, { source: 'settings' });
       }
     }
+    if (key === 'tabbedSparkle') {
+      updateDraftSetting('openSettingsInNewTab', Boolean(value));
+    }
     if (key === 'superDarkMode') {
       if (value) {
         document.documentElement.classList.add('super-dark');
@@ -207,7 +210,7 @@ export const Settings: React.FC<SettingsProps> = ({
   const matchesExperimental =
     matchesSearch(['Velocity Features', 'Velocity', 'vivetool', 'tabbed sparkle', 'tabbed', 'Insider experiments', 'Insider Flags', 'thử nghiệm', 'touch keyboard', 'native keyboard', 'bàn phím cảm ứng', 'bàn phím ảo', 'immersive search', 'fluent icons', 'flumojs', 'fluent emojis', 'emoji', '3d icons', 'animated boot screen', 'boot screen', 'khởi động', 'video khởi động']);
   const matchesInterface = 
-    matchesSearch(['Appearance', 'Interface', 'giao diện', 'chế độ ứng dụng', 'ban ngày', 'ban đêm', 'light', 'dark', 'thanh điều hướng', 'navigation', 'side view', 'top view', 'tab view', 'thu phóng giao diện', 'font', 'vị trí thanh bên', 'siêu chế độ tối', 'super dark']);
+    matchesSearch(['Appearance', 'Interface', 'giao diện', 'chế độ ứng dụng', 'ban ngày', 'ban đêm', 'light', 'dark', 'thanh điều hướng', 'navigation', 'side view', 'top view', 'tab view', 'thu phóng giao diện', 'font', 'vị trí thanh bên', 'siêu chế độ tối', 'super dark', 'Open Settings in new tab', 'open settings', 'tab mới', 'new tab']);
   const matchesAccessibility = matchesSearch(['Accessibility', 'trợ năng', 'hover to expand']);
   const matchesKeyboard = matchesSearch(['Keyboard and Mouse', 'Native keyboard', 'bàn phím số', 'clipboard', 'âm bàn phím', 'keyboard sound', 'keybinds', 'phím tắt']);
   const matchesTools = false;
@@ -966,6 +969,36 @@ export const Settings: React.FC<SettingsProps> = ({
                   <motion.div variants={slideUpVariant} initial="hidden" animate="visible" custom={elementIndex++} className="settings-block-card rounded-[6px] bg-white dark:bg-[#2c3037] shadow-xs px-4 py-3 sm:py-3.5 flex items-center justify-between gap-4 transition-colors hover:bg-black/[0.02] dark:hover:bg-[#363b43] border-none">
                     <div className="min-w-0 flex-1 pr-2"><div className="font-normal text-sm text-[#111827] dark:text-white">Tự động ẩn Side View</div><div className="text-xs text-[#6B7280] dark:text-[#9CA3AF] mt-0.5 leading-normal">Tự động thu gọn thanh menu khi không di chuột vào.</div></div>
                     <button id="toggle-autohide-sidebar-appearance" type="button" role="switch" aria-checked={draftSettings.autoHideSidebar} onClick={() => updateDraft('autoHideSidebar', !draftSettings.autoHideSidebar)} className="toggle-switch-btn focus:outline-none shrink-0 border-none"><span className="toggle-switch-thumb" /></button>
+                  </motion.div>
+                )}
+
+                {matchesSearch(['Open Settings in new tab', 'Appearance', 'tab mới', 'cài đặt', 'settings in new tab', 'new tab']) && (
+                  <motion.div
+                    variants={slideUpVariant}
+                    initial="hidden"
+                    animate="visible"
+                    custom={elementIndex++}
+                    id="setting-open-settings-new-tab"
+                    className="settings-block-card rounded-[6px] bg-white dark:bg-[#2c3037] shadow-xs px-4 py-3 sm:py-3.5 flex items-center justify-between gap-4 transition-colors hover:bg-black/[0.02] dark:hover:bg-[#363b43] border-none"
+                  >
+                    <div className="min-w-0 flex-1 pr-2">
+                      <div className="font-normal text-sm text-[#111827] dark:text-white">
+                        Open Settings in new tab
+                      </div>
+                      <div className="text-xs text-[#6B7280] dark:text-[#9CA3AF] mt-0.5 leading-normal">
+                        Mở cài đặt ở tab khác thay vì mở trực tiếp, tránh gián đoạn trải nghiệm sử dụng.
+                      </div>
+                    </div>
+                    <button
+                      id="toggle-open-settings-new-tab"
+                      type="button"
+                      role="switch"
+                      aria-checked={draftSettings.openSettingsInNewTab}
+                      onClick={() => updateDraft('openSettingsInNewTab', !draftSettings.openSettingsInNewTab)}
+                      className="toggle-switch-btn focus:outline-none shrink-0 border-none"
+                    >
+                      <span className="toggle-switch-thumb" />
+                    </button>
                   </motion.div>
                 )}
                   </div>

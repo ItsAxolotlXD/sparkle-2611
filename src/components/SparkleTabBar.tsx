@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect, useCallback } from 'react';
+import React, { useRef, useState, useEffect, useLayoutEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
@@ -66,6 +66,152 @@ interface TabContextMenuState {
   y: number;
   tabId: string;
 }
+
+interface TabContextMenuProps {
+  x: number;
+  y: number;
+  tabId: string;
+  onClose: () => void;
+  onCreateTab: () => void;
+  onDuplicateTab: (tabId: string) => void;
+  onCloseTab: (tabId: string) => void;
+  onCloseOtherTabs: (tabId: string) => void;
+}
+
+const TabContextMenu: React.FC<TabContextMenuProps> = ({
+  x,
+  y,
+  tabId,
+  onClose,
+  onCreateTab,
+  onDuplicateTab,
+  onCloseTab,
+  onCloseOtherTabs,
+}) => {
+  const menuRef = useRef<HTMLDivElement>(null);
+  const [position, setPosition] = useState({ left: x, top: y });
+
+  useLayoutEffect(() => {
+    const el = menuRef.current;
+    if (!el) return;
+    const { width, height } = el.getBoundingClientRect();
+    const maxLeft = (typeof window !== 'undefined' ? window.innerWidth : 800) - width - 8;
+    const maxTop = (typeof window !== 'undefined' ? window.innerHeight : 600) - height - 8;
+    setPosition({
+      left: Math.max(8, Math.min(x, maxLeft)),
+      top: Math.max(8, Math.min(y, maxTop)),
+    });
+  }, [x, y]);
+
+  useEffect(() => {
+    const handlePointerDown = (e: MouseEvent | PointerEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        onClose();
+      }
+    };
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+
+    const timer = setTimeout(() => {
+      window.addEventListener('pointerdown', handlePointerDown);
+    }, 50);
+
+    window.addEventListener('keydown', handleKey);
+    window.addEventListener('resize', onClose);
+
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener('pointerdown', handlePointerDown);
+      window.removeEventListener('keydown', handleKey);
+      window.removeEventListener('resize', onClose);
+    };
+  }, [onClose]);
+
+  if (typeof document === 'undefined') return null;
+
+  return createPortal(
+    <motion.div
+      ref={menuRef}
+      role="menu"
+      aria-label="Tab actions"
+      initial={{ opacity: 0, y: -10, scaleY: 0.92 }}
+      animate={{ opacity: 1, y: 0, scaleY: 1 }}
+      exit={{ opacity: 0, y: -8, scaleY: 0.95 }}
+      transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
+      style={{
+        ...flyoutPanelStyle,
+        position: 'fixed',
+        left: position.left,
+        top: position.top,
+        zIndex: 2147483647,
+        transformOrigin: 'top left',
+      }}
+      className={`w-[190px] p-1 ${flyoutPanelClassName} fluent-context-menu`}
+      onContextMenu={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+      }}
+      onMouseDown={(e) => e.stopPropagation()}
+      onClick={(e) => e.stopPropagation()}
+    >
+      <button
+        type="button"
+        role="menuitem"
+        onClick={() => {
+          onCreateTab();
+          onClose();
+        }}
+        className="w-full h-8 px-2.5 rounded-[4px] flex items-center gap-2.5 text-[12px] text-[#111827] dark:text-white hover:bg-black/5 dark:hover:bg-white/10 cursor-pointer text-left border-none"
+      >
+        <Plus className="w-3.5 h-3.5 text-neutral-400" />
+        <span>New tab</span>
+      </button>
+      {tabId && (
+        <>
+          <button
+            type="button"
+            role="menuitem"
+            onClick={() => {
+              onDuplicateTab(tabId);
+              onClose();
+            }}
+            className="w-full h-8 px-2.5 rounded-[4px] flex items-center gap-2.5 text-[12px] text-[#111827] dark:text-white hover:bg-black/5 dark:hover:bg-white/10 cursor-pointer text-left border-none"
+          >
+            <Copy className="w-3.5 h-3.5 text-neutral-400" />
+            <span>Duplicate tab</span>
+          </button>
+          <div className="h-[1px] my-1 bg-black/10 dark:bg-white/10" />
+          <button
+            type="button"
+            role="menuitem"
+            onClick={() => {
+              onCloseTab(tabId);
+              onClose();
+            }}
+            className="w-full h-8 px-2.5 rounded-[4px] flex items-center gap-2.5 text-[12px] text-[#111827] dark:text-white hover:bg-black/5 dark:hover:bg-white/10 cursor-pointer text-left border-none"
+          >
+            <X className="w-3.5 h-3.5 text-neutral-400" />
+            <span>Close tab</span>
+          </button>
+          <button
+            type="button"
+            role="menuitem"
+            onClick={() => {
+              onCloseOtherTabs(tabId);
+              onClose();
+            }}
+            className="w-full h-8 px-2.5 rounded-[4px] flex items-center gap-2.5 text-[12px] text-[#111827] dark:text-white hover:bg-black/5 dark:hover:bg-white/10 cursor-pointer text-left border-none"
+          >
+            <Trash2 className="w-3.5 h-3.5 text-neutral-400" />
+            <span>Close other tabs</span>
+          </button>
+        </>
+      )}
+    </motion.div>,
+    document.body
+  );
+};
 
 // Renders the exact same icons as on the sidebar
 const TabIcon: React.FC<{ route: string; active: boolean; dynamicIcons: boolean }> = ({
@@ -210,23 +356,11 @@ export const SparkleTabBar: React.FC<SparkleTabBarProps> = ({
     tabsContainerRef.current?.scrollBy({ left: 150, behavior: 'smooth' });
   };
 
-  // Close context menu on outside click or escape
-  useEffect(() => {
-    if (!contextMenu) return;
-    const handleClose = () => setContextMenu(null);
-    const handleKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setContextMenu(null);
-    };
-    window.addEventListener('click', handleClose);
-    window.addEventListener('keydown', handleKey);
-    return () => {
-      window.removeEventListener('click', handleClose);
-      window.removeEventListener('keydown', handleKey);
-    };
-  }, [contextMenu]);
+  // Tab Context menu state
+  // Outside clicks are handled inside the dedicated TabContextMenu component
 
   return (
-    <div className="flex-1 flex items-end min-w-0 h-full relative select-none pl-1 pr-1">
+    <div className="flex-1 flex items-end min-w-0 h-full relative select-none -ml-1.5 sm:-ml-3 pl-0 pr-1">
       {/* 1. Left Pole Arrow (<) for horizontal scrolling when tabs overflow */}
       {canScrollLeft && (
         <button
@@ -249,6 +383,17 @@ export const SparkleTabBar: React.FC<SparkleTabBarProps> = ({
             updateScrollStatus();
           }
         }}
+        onContextMenu={(e) => {
+          if (e.target === e.currentTarget) {
+            e.preventDefault();
+            e.stopPropagation();
+            setContextMenu({
+              x: e.clientX,
+              y: e.clientY + 2,
+              tabId: '',
+            });
+          }
+        }}
         className="flex-1 flex items-end overflow-x-auto no-scrollbar scroll-smooth h-full space-x-1"
       >
         <AnimatePresence initial={false}>
@@ -261,10 +406,10 @@ export const SparkleTabBar: React.FC<SparkleTabBarProps> = ({
                 data-tab-id={tab.id}
                 role="tab"
                 aria-selected={isActive}
-                initial={{ opacity: 0, y: 5, scale: 0.94 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.9 }}
-                transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+                initial={{ opacity: 0, y: 22 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 22 }}
+                transition={{ duration: 0.24, ease: [0.16, 1, 0.3, 1] }}
                 layout
                 onClick={() => onSelectTab(tab.id)}
                 onAuxClick={(e) => {
@@ -276,9 +421,10 @@ export const SparkleTabBar: React.FC<SparkleTabBarProps> = ({
                 }}
                 onContextMenu={(e) => {
                   e.preventDefault();
+                  e.stopPropagation();
                   setContextMenu({
-                    x: Math.min(e.clientX, window.innerWidth - 200),
-                    y: e.clientY,
+                    x: e.clientX,
+                    y: e.clientY + 2,
                     tabId: tab.id,
                   });
                 }}
@@ -356,73 +502,22 @@ export const SparkleTabBar: React.FC<SparkleTabBarProps> = ({
         <Plus className="w-3.5 h-3.5 stroke-[2.2]" />
       </button>
 
-      {/* 5. Tab Right-Click Context Menu */}
-      {contextMenu &&
-        createPortal(
-          <div
-            role="menu"
-            style={{
-              ...flyoutPanelStyle,
-              position: 'fixed',
-              left: contextMenu.x,
-              top: contextMenu.y,
-              zIndex: 2147483647,
-            }}
-            className={`w-[190px] p-1 ${flyoutPanelClassName} fluent-context-menu`}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <button
-              type="button"
-              role="menuitem"
-              onClick={() => {
-                onCreateTab();
-                setContextMenu(null);
-              }}
-              className="w-full h-8 px-2.5 rounded-[4px] flex items-center gap-2.5 text-[12px] text-[#111827] dark:text-white hover:bg-black/5 dark:hover:bg-white/10 cursor-pointer text-left border-none"
-            >
-              <Plus className="w-3.5 h-3.5 text-neutral-400" />
-              <span>New tab</span>
-            </button>
-            <button
-              type="button"
-              role="menuitem"
-              onClick={() => {
-                onDuplicateTab(contextMenu.tabId);
-                setContextMenu(null);
-              }}
-              className="w-full h-8 px-2.5 rounded-[4px] flex items-center gap-2.5 text-[12px] text-[#111827] dark:text-white hover:bg-black/5 dark:hover:bg-white/10 cursor-pointer text-left border-none"
-            >
-              <Copy className="w-3.5 h-3.5 text-neutral-400" />
-              <span>Duplicate tab</span>
-            </button>
-            <div className="h-[1px] my-1 bg-black/10 dark:bg-white/10" />
-            <button
-              type="button"
-              role="menuitem"
-              onClick={() => {
-                onCloseTab(contextMenu.tabId);
-                setContextMenu(null);
-              }}
-              className="w-full h-8 px-2.5 rounded-[4px] flex items-center gap-2.5 text-[12px] text-[#111827] dark:text-white hover:bg-black/5 dark:hover:bg-white/10 cursor-pointer text-left border-none"
-            >
-              <X className="w-3.5 h-3.5 text-neutral-400" />
-              <span>Close tab</span>
-            </button>
-            <button
-              type="button"
-              role="menuitem"
-              onClick={() => {
-                onCloseOtherTabs(contextMenu.tabId);
-                setContextMenu(null);
-              }}
-              className="w-full h-8 px-2.5 rounded-[4px] flex items-center gap-2.5 text-[12px] text-[#111827] dark:text-white hover:bg-black/5 dark:hover:bg-white/10 cursor-pointer text-left border-none"
-            >
-              <Trash2 className="w-3.5 h-3.5 text-neutral-400" />
-              <span>Close other tabs</span>
-            </button>
-          </div>,
-          document.body
+      {/* 5. Tab Right-Click Context Menu with Slide-Down Animation from top edge */}
+      <AnimatePresence>
+        {contextMenu && (
+          <TabContextMenu
+            key={`tab-context-menu-${contextMenu.tabId || 'strip'}-${contextMenu.x}-${contextMenu.y}`}
+            x={contextMenu.x}
+            y={contextMenu.y}
+            tabId={contextMenu.tabId}
+            onClose={() => setContextMenu(null)}
+            onCreateTab={onCreateTab}
+            onDuplicateTab={onDuplicateTab}
+            onCloseTab={onCloseTab}
+            onCloseOtherTabs={onCloseOtherTabs}
+          />
         )}
+      </AnimatePresence>
     </div>
   );
 };
