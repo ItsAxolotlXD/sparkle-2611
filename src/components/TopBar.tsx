@@ -172,6 +172,7 @@ export const TopBar: React.FC<TopBarProps> = ({
   const [isSearchFlyoutOpen, setIsSearchFlyoutOpen] = useState(false);
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [showAllResults, setShowAllResults] = useState(false);
+  const [isTabSearchExpanded, setIsTabSearchExpanded] = useState(false);
   const [galleryItems, setGalleryItems] = useState<GalleryMediaItem[]>([]);
   const searchContainerRef = useRef<HTMLDivElement>(null);
   const [resultTitleTooltip, setResultTitleTooltip] = useState<{
@@ -313,20 +314,38 @@ export const TopBar: React.FC<TopBarProps> = ({
     setSearchQuery(tabSearchQuery || '');
   }, [tabSearchQuery, currentRoute]);
 
-  // Listen for vplay:focus-topbar-search event to open search flyout and focus input
-  useEffect(() => {
-    const handleFocusTopBarSearch = () => {
-      setIsSearchFlyoutOpen(true);
-      setIsSearchFocused(true);
+  const handleOpenTabBarSearch = useCallback(() => {
+    setIsTabSearchExpanded(true);
+    setIsSearchFlyoutOpen(true);
+    setIsSearchFocused(true);
+    setTimeout(() => {
       const input = searchContainerRef.current?.querySelector('input');
       if (input) {
         input.focus();
         input.select();
       }
+    }, 60);
+  }, []);
+
+  // Listen for vplay:focus-topbar-search event to open search flyout and focus input
+  useEffect(() => {
+    const handleFocusTopBarSearch = () => {
+      if (settings.tabbedSparkle) {
+        setIsTabSearchExpanded(true);
+      }
+      setIsSearchFlyoutOpen(true);
+      setIsSearchFocused(true);
+      setTimeout(() => {
+        const input = searchContainerRef.current?.querySelector('input');
+        if (input) {
+          input.focus();
+          input.select();
+        }
+      }, 60);
     };
     window.addEventListener('vplay:focus-topbar-search', handleFocusTopBarSearch);
     return () => window.removeEventListener('vplay:focus-topbar-search', handleFocusTopBarSearch);
-  }, []);
+  }, [settings.tabbedSparkle]);
 
   // Load gallery items so TopBar search can find gallery media/documents
   useEffect(() => {
@@ -447,12 +466,20 @@ export const TopBar: React.FC<TopBarProps> = ({
       if (searchContainerRef.current && !searchContainerRef.current.contains(e.target as Node)) {
         setIsSearchFlyoutOpen(false);
         setShowAllResults(false);
+        if (settings.tabbedSparkle) {
+          setIsTabSearchExpanded(false);
+          setIsSearchFocused(false);
+        }
       }
     };
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         setIsSearchFlyoutOpen(false);
         setShowAllResults(false);
+        if (settings.tabbedSparkle) {
+          setIsTabSearchExpanded(false);
+          setIsSearchFocused(false);
+        }
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -463,7 +490,7 @@ export const TopBar: React.FC<TopBarProps> = ({
       document.removeEventListener('touchstart', handleClickOutside);
       document.removeEventListener('keydown', handleKeyDown);
     };
-  }, []);
+  }, [settings.tabbedSparkle]);
 
   const isTopBarMode = settings.navigationMode === 'topbar';
 
@@ -1197,6 +1224,10 @@ export const TopBar: React.FC<TopBarProps> = ({
     item.onSelect();
     setIsSearchFlyoutOpen(false);
     setShowAllResults(false);
+    setIsSearchFocused(false);
+    if (settings.tabbedSparkle) {
+      setIsTabSearchExpanded(false);
+    }
   };
 
   // Get 3D Fluent icon or real logo based on the recent search item/query
@@ -1600,6 +1631,10 @@ export const TopBar: React.FC<TopBarProps> = ({
     // Stay on current tab page - do not jump to /search or open spotlight modal
     setIsSearchFlyoutOpen(false);
     setShowAllResults(false);
+    setIsSearchFocused(false);
+    if (settings.tabbedSparkle) {
+      setIsTabSearchExpanded(false);
+    }
   };
 
   const isWebSearch = Boolean(searchQuery.trim() && searchResults.length > 0 && searchResults[0].type === 'web-search');
@@ -1710,7 +1745,7 @@ export const TopBar: React.FC<TopBarProps> = ({
       </div>
 
       {/* 2. Center Search Box OR Tab Bar (Tabbed Sparkle) */}
-      {settings.tabbedSparkle && tabs && tabs.length > 0 ? (
+      {settings.tabbedSparkle && !isTabSearchExpanded && tabs && tabs.length > 0 ? (
         <SparkleTabBar
           tabs={tabs}
           activeTabId={activeTabId || tabs[0]?.id || ''}
@@ -1720,6 +1755,7 @@ export const TopBar: React.FC<TopBarProps> = ({
           onDuplicateTab={onDuplicateTab}
           onCloseOtherTabs={onCloseOtherTabs}
           isLightMode={isLightMode}
+          onOpenSearch={handleOpenTabBarSearch}
         />
       ) : (
         <div 
@@ -1731,20 +1767,7 @@ export const TopBar: React.FC<TopBarProps> = ({
               : 'px-1 sm:px-4 z-40 md:absolute md:left-1/2 md:-translate-x-1/2 md:w-full md:max-w-[460px]'
           }`}
         >
-        <div className="relative w-full max-w-full md:max-w-[460px] min-w-0 mx-auto flex items-center gap-2">
-          {(isSearchFlyoutOpen || isSearchFocused) && (
-            <button
-              type="button"
-              onClick={() => {
-                setIsSearchFlyoutOpen(false);
-                setIsSearchFocused(false);
-              }}
-              className="md:hidden w-8 h-8 rounded-full flex items-center justify-center text-black dark:text-white hover:bg-black/10 dark:hover:bg-white/10 shrink-0 cursor-pointer"
-              aria-label="Back"
-            >
-              <ArrowLeft className="w-4 h-4" />
-            </button>
-          )}
+        <div className="relative w-full max-w-full md:max-w-[460px] min-w-0 mx-auto flex items-center">
           <form 
             onSubmit={(e) => {
               e.preventDefault();
@@ -1754,16 +1777,37 @@ export const TopBar: React.FC<TopBarProps> = ({
               }
               handleSearchSubmit(e);
             }} 
-            className="flex-1 w-full min-w-0"
+            className="w-full min-w-0"
           >
-            <div
+            <motion.div
+              layoutId="sparkle-search-box-pill"
               id="topbar-search-box"
-              className={`group relative w-full h-9 sm:h-9 rounded-[100px] flex items-center px-3.5 gap-2 transition-all ${
+              transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
+              className={`group relative w-full h-9 sm:h-9 rounded-[100px] flex items-center px-3.5 gap-2 transition-colors ${
                 isSearchFlyoutOpen || isSearchFocused
                   ? 'search-flyout-open is-focused bg-white dark:bg-[#282c31]'
                   : 'bg-[#fbfbfb] dark:bg-[#282c31]'
               } ${isFindWordsMode ? 'ring-2 ring-[#0078d4] dark:ring-[#4cc2ff]' : ''} ${currentRoute === '/search' || currentRoute.startsWith('/search') ? 'topbar-search-box-spotlight-glow' : ''}`}
             >
+              {((isSearchFlyoutOpen || isSearchFocused) || (settings.tabbedSparkle && isTabSearchExpanded)) && (
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setIsSearchFlyoutOpen(false);
+                    setIsSearchFocused(false);
+                    if (settings.tabbedSparkle) {
+                      setIsTabSearchExpanded(false);
+                    }
+                  }}
+                  className={`${settings.tabbedSparkle && isTabSearchExpanded ? 'flex' : 'md:hidden flex'} w-6 h-6 -ml-1 rounded-full items-center justify-center text-black dark:text-white hover:bg-black/10 dark:hover:bg-white/10 shrink-0 cursor-pointer transition-colors border-none`}
+                  aria-label="Back"
+                  title="Return to tabs"
+                >
+                  <ArrowLeft className="w-4 h-4" />
+                </button>
+              )}
+
               <FluentSearchIcon className="w-[16px] h-[16px] text-black dark:text-white shrink-0 pointer-events-none select-none" />
 
               {isFindWordsMode ? (
@@ -1964,7 +2008,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                   </>
                 )}
               </div>
-            </div>
+            </motion.div>
           </form>
 
             {/* Flyout Result Dropdown: Displays up to 4 items initially with slide-up animation and layout morph */}

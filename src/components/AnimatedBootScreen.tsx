@@ -128,7 +128,7 @@ export const AnimatedBootScreen: React.FC<AnimatedBootScreenProps> = ({
         style={{ fontFamily: "'Segoe UI Variable Text', 'Segoe UI', system-ui, sans-serif" }}
       >
         <div>Sparkle 27M1 Insider Preview</div>
-        <div>Evaluation copy. Build 26106.11.Moment 1 (2027)</div>
+        <div>Evaluation copy. Build 26164.Moment 1 (2027)</div>
       </div>
     </div>
   );

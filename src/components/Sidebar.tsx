@@ -283,11 +283,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
 }) => {
   const { settings, updateSetting } = useSettings();
   const { favoriteChannelIds } = useFavorites();
-  const [sidebarSearch, setSidebarSearch] = useState(tabSearchQuery);
-
-  useEffect(() => {
-    setSidebarSearch(tabSearchQuery);
-  }, [tabSearchQuery]);
 
   const handleGoBack = () => {
     if (window.history.length > 1) {
@@ -301,220 +296,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const mobileNavRef = useRef<HTMLDivElement>(null);
   const collapsedNavRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const sidebarSearchBoxRef = useRef<HTMLDivElement>(null);
-
-  const [isSidebarSearchFlyoutOpen, setIsSidebarSearchFlyoutOpen] = useState(false);
-  const [sidebarSearchBoxCoords, setSidebarSearchBoxCoords] = useState<{ left: number; top: number; width: number } | null>(null);
-
-  const openSidebarSearchFlyout = () => {
-    if (sidebarSearchBoxRef.current) {
-      const rect = sidebarSearchBoxRef.current.getBoundingClientRect();
-      setSidebarSearchBoxCoords({
-        left: Math.max(8, rect.left),
-        top: rect.bottom + 6,
-        width: Math.max(200, rect.width),
-      });
-      setIsSidebarSearchFlyoutOpen(true);
-    }
-  };
-
-  useEffect(() => {
-    if (!isSidebarSearchFlyoutOpen) return;
-    const handlePointerDown = (e: MouseEvent | PointerEvent) => {
-      const flyoutEl = document.getElementById('sidebar-search-flyout');
-      const boxEl = sidebarSearchBoxRef.current;
-      if (
-        flyoutEl && !flyoutEl.contains(e.target as Node) &&
-        boxEl && !boxEl.contains(e.target as Node)
-      ) {
-        setIsSidebarSearchFlyoutOpen(false);
-      }
-    };
-    const handleKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        setIsSidebarSearchFlyoutOpen(false);
-      }
-    };
-    const handleScrollOrResize = () => {
-      if (sidebarSearchBoxRef.current) {
-        const rect = sidebarSearchBoxRef.current.getBoundingClientRect();
-        setSidebarSearchBoxCoords({
-          left: Math.max(8, rect.left),
-          top: rect.bottom + 6,
-          width: Math.max(200, rect.width),
-        });
-      }
-    };
-
-    const timer = setTimeout(() => {
-      window.addEventListener('pointerdown', handlePointerDown);
-    }, 50);
-
-    window.addEventListener('keydown', handleKey);
-    window.addEventListener('resize', handleScrollOrResize);
-    window.addEventListener('scroll', handleScrollOrResize, true);
-
-    return () => {
-      clearTimeout(timer);
-      window.removeEventListener('pointerdown', handlePointerDown);
-      window.removeEventListener('keydown', handleKey);
-      window.removeEventListener('resize', handleScrollOrResize);
-      window.removeEventListener('scroll', handleScrollOrResize, true);
-    };
-  }, [isSidebarSearchFlyoutOpen]);
-
-  const vtv1Logo = useMemo(() => {
-    return (
-      channels.find((c) => c.slug.includes('vtv1') || c.name.toLowerCase().includes('vtv1'))?.logo ||
-      'https://img.vtvprime.vn/CK-rS1WbUz0mcRIodGxvvpqXiQB6XhphIkl2z7F_S_4/rs:fit:836:468/czM6Ly9wcmQtc24taW1hZ2VzL2NoYW5uZWwvM2ZlMDdhZmQtYzIyZS00M2QwLTgyZTgtOWNkMGUyYTc3ZTRkLnBuZw==.png'
-    );
-  }, [channels]);
-
-  const trendingSidebarItems = useMemo(() => {
-    return [
-      {
-        id: 'sidebar-trending-vtv1-hd',
-        title: 'VTV1 HD',
-        subtitle: 'Watch',
-        icon: (
-          <div className="w-7 h-7 flex items-center justify-center shrink-0">
-            <img src={vtv1Logo} alt="VTV1 HD" className="w-6 h-6 object-contain rounded-[4px]" />
-          </div>
-        ),
-        onSelect: () => {
-          const matched = channels.find(
-            (c) =>
-              c.slug.toLowerCase().includes('vtv1') ||
-              c.name.toLowerCase().includes('vtv1') ||
-              (c.shortName && c.shortName.toLowerCase().includes('vtv1'))
-          );
-          if (matched && onSelectChannel) {
-            onSelectChannel(matched);
-          }
-          navigate(`/live-tv?channel=${matched?.slug || 'vtv1-hd'}`);
-        },
-      },
-      {
-        id: 'sidebar-trending-craftmine',
-        title: 'The Craftmine',
-        subtitle: 'Play',
-        icon: (
-          <div className="w-7 h-7 flex items-center justify-center shrink-0">
-            <Fluent3DCraftmineIcon className="w-6 h-6 drop-shadow-sm" />
-          </div>
-        ),
-        onSelect: () => {
-          navigate('/craftmine');
-        },
-      },
-      {
-        id: 'sidebar-trending-memories',
-        title: 'View memories',
-        subtitle: 'Gallery',
-        icon: (
-          <div className="w-7 h-7 flex items-center justify-center shrink-0">
-            <Fluent3DGalleryIcon className="w-6 h-6 drop-shadow-sm" />
-          </div>
-        ),
-        onSelect: () => {
-          navigate('/gallery');
-        },
-      },
-      {
-        id: 'sidebar-trending-settings',
-        title: 'Flag experimental',
-        subtitle: 'Settings',
-        icon: (
-          <div className="w-7 h-7 flex items-center justify-center shrink-0">
-            <Fluent3DSettingsIcon className="w-6 h-6 drop-shadow-sm" />
-          </div>
-        ),
-        onSelect: () => {
-          navigate('/test');
-        },
-      },
-    ];
-  }, [channels, vtv1Logo, navigate, onSelectChannel]);
-
-  const sidebarFilteredItems = useMemo(() => {
-    const q = sidebarSearch.trim().toLowerCase();
-    if (!q) return trendingSidebarItems;
-
-    const results: { id: string; title: string; subtitle: string; icon: React.ReactNode; onSelect: () => void }[] = [];
-
-    // Filter matching channels
-    const matchingChannels = channels.filter(
-      (c) =>
-        c.name.toLowerCase().includes(q) ||
-        c.slug.toLowerCase().includes(q) ||
-        (c.shortName && c.shortName.toLowerCase().includes(q))
-    );
-    matchingChannels.slice(0, 4).forEach((ch) => {
-      results.push({
-        id: `channel-${ch.id || ch.slug}`,
-        title: ch.name,
-        subtitle: ch.category || 'Live TV',
-        icon: (
-          <div className="w-7 h-7 flex items-center justify-center shrink-0">
-            <img src={ch.logo} alt={ch.name} className="w-6 h-6 object-contain rounded-[4px]" />
-          </div>
-        ),
-        onSelect: () => {
-          if (onSelectChannel) onSelectChannel(ch);
-          navigate(`/live-tv?channel=${ch.slug}`);
-        },
-      });
-    });
-
-    // Matching built-in features
-    const allFeatures: { title: string; subtitle: string; icon: React.ReactNode; route: string }[] = [
-      { title: 'The Craftmine', subtitle: 'Play', icon: <Fluent3DCraftmineIcon className="w-6 h-6 drop-shadow-sm" />, route: '/craftmine' },
-      { title: 'View memories', subtitle: 'Gallery', icon: <Fluent3DGalleryIcon className="w-6 h-6 drop-shadow-sm" />, route: '/gallery' },
-      { title: 'Flag experimental', subtitle: 'Settings', icon: <Fluent3DSettingsIcon className="w-6 h-6 drop-shadow-sm" />, route: '/test' },
-      { title: 'Update blogs', subtitle: 'News', icon: <Fluent3DArticlesIcon className="w-6 h-6 drop-shadow-sm" />, route: '/news' },
-      { title: 'Notes', subtitle: 'Tools', icon: <Fluent3DNotesIcon className="w-6 h-6 drop-shadow-sm" />, route: '/notes' },
-      { title: 'Draw', subtitle: 'Canvas', icon: <Fluent3DDrawsIcon className="w-6 h-6 drop-shadow-sm" />, route: '/draws' },
-      { title: 'Camera', subtitle: 'Media', icon: <Fluent3DCameraIcon className="w-6 h-6 drop-shadow-sm" />, route: '/camera' },
-      { title: 'VLC Media Player', subtitle: 'Tools', icon: <Fluent3DVlcIcon className="w-6 h-6 drop-shadow-sm" />, route: '/vlc' },
-      { title: 'Photopea', subtitle: 'Tools', icon: <Fluent3DPhotopeaIcon className="w-6 h-6 drop-shadow-sm" />, route: '/photopea' },
-      { title: 'Settings', subtitle: 'Appearance', icon: <Fluent3DSettingsIcon className="w-6 h-6 drop-shadow-sm" />, route: '/settings' },
-    ];
-
-    allFeatures
-      .filter((f) => f.title.toLowerCase().includes(q) || f.subtitle.toLowerCase().includes(q))
-      .slice(0, 4)
-      .forEach((f) => {
-        results.push({
-          id: `feat-${f.route}`,
-          title: f.title,
-          subtitle: f.subtitle,
-          icon: f.icon,
-          onSelect: () => navigate(f.route),
-        });
-      });
-
-    // Web Search option
-    results.push({
-      id: 'sidebar-web-google',
-      title: `Search Google for "${sidebarSearch.trim()}"`,
-      subtitle: 'Web search',
-      icon: (
-        <div className="w-7 h-7 rounded-full bg-[#4285F4]/10 dark:bg-[#4285F4]/20 flex items-center justify-center shrink-0">
-          <svg className="w-4 h-4" viewBox="0 0 24 24">
-            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
-            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
-            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" />
-            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" />
-          </svg>
-        </div>
-      ),
-      onSelect: () => {
-        window.open(`https://www.google.com/search?q=${encodeURIComponent(sidebarSearch.trim())}`, '_blank');
-      },
-    });
-
-    return results;
-  }, [sidebarSearch, trendingSidebarItems, channels, onSelectChannel, navigate]);
 
   const [isLiveTvExpanded, setIsLiveTvExpanded] = useState(false);
   const [isFavoritesExpanded, setIsFavoritesExpanded] = useState(false);
@@ -1193,7 +974,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
     onClose,
   }) => {
     const menuRef = useRef<HTMLDivElement>(null);
-    const [position, setPosition] = useState({ left: x, top: y });
+    const isUpward = y > (typeof window !== 'undefined' ? window.innerHeight - 340 : 500);
+    const [position, setPosition] = useState(() => {
+      const maxLeft = (typeof window !== 'undefined' ? window.innerWidth : 800) - 240;
+      return {
+        left: Math.max(SIDEBAR_MENU_MARGIN, Math.min(x, maxLeft)),
+        top: Math.max(SIDEBAR_MENU_MARGIN, isUpward ? y - 320 : y),
+      };
+    });
 
     useLayoutEffect(() => {
       const el = menuRef.current;
@@ -1242,170 +1030,134 @@ export const Sidebar: React.FC<SidebarProps> = ({
     return createPortal(
       <motion.div
         ref={menuRef}
-        role="menu"
-        aria-label="Sidebar actions"
-        initial={{ opacity: 0, y: 22 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: 14 }}
-        transition={{ duration: 0.38, ease: [0.16, 1, 0.3, 1] }}
+        exit={{ opacity: 1 }}
+        transition={{ duration: 0.13 }}
+        style={{
+          position: 'fixed',
+          left: position.left,
+          top: position.top,
+          zIndex: 2147483647,
+          clipPath: isUpward ? 'inset(-60px -60px 0% -60px)' : 'inset(0% -60px -60px -60px)',
+        }}
+        className="fluent-context-menu-wrapper pointer-events-auto"
         onContextMenu={(e) => e.preventDefault()}
-        className={`fixed z-[2147483647] w-[232px] ${flyoutPanelClassName} fluent-context-menu`}
-        style={{ ...flyoutPanelStyle, left: position.left, top: position.top }}
       >
-        <motion.button
-          type="button"
-          role="menuitem"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{
-            opacity: 1,
-            y: 0,
-            transition: { duration: 0.38, delay: 0, ease: [0.16, 1, 0.3, 1] },
-          }}
-          onClick={() => {
-            onClose();
-            window.location.reload();
-          }}
-          className="w-full h-[36px] px-3 rounded-[6px] flex items-center gap-3 text-[13px] font-medium text-left outline-none transition-colors cursor-pointer hover:bg-black/[0.05] dark:hover:bg-white/[0.08] focus-visible:bg-black/[0.05] dark:focus-visible:bg-white/[0.08] active:bg-black/[0.08] dark:active:bg-white/[0.12]"
-        >
-          <RefreshCw className="w-4 h-4 shrink-0 text-black dark:text-neutral-300" />
-          <span className="truncate">Refresh</span>
-        </motion.button>
-
-        <motion.button
-          type="button"
-          role="menuitem"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{
-            opacity: 1,
-            y: 0,
-            transition: { duration: 0.38, delay: 0.04, ease: [0.16, 1, 0.3, 1] },
-          }}
-          onClick={() => {
-            onClose();
-            onGoBack();
-          }}
-          className="w-full h-[36px] px-3 rounded-[6px] flex items-center gap-3 text-[13px] font-medium text-left outline-none transition-colors cursor-pointer hover:bg-black/[0.05] dark:hover:bg-white/[0.08] focus-visible:bg-black/[0.05] dark:focus-visible:bg-white/[0.08] active:bg-black/[0.08] dark:active:bg-white/[0.12]"
-        >
-          <ArrowLeft className="w-4 h-4 shrink-0 text-black dark:text-neutral-300" />
-          <span className="truncate">Go back</span>
-        </motion.button>
-
-        <motion.button
-          type="button"
-          role="menuitem"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{
-            opacity: 1,
-            y: 0,
-            transition: { duration: 0.38, delay: 0.08, ease: [0.16, 1, 0.3, 1] },
-          }}
-          onClick={() => {
-            onClose();
-            onToggleCollapse?.();
-          }}
-          className="w-full h-[36px] px-3 rounded-[6px] flex items-center gap-3 text-[13px] font-medium text-left outline-none transition-colors cursor-pointer hover:bg-black/[0.05] dark:hover:bg-white/[0.08] focus-visible:bg-black/[0.05] dark:focus-visible:bg-white/[0.08] active:bg-black/[0.08] dark:active:bg-white/[0.12]"
-        >
-          <PanelLeft className="w-4 h-4 shrink-0 text-black dark:text-neutral-300" />
-          <span className="truncate">{isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}</span>
-        </motion.button>
-
-        <motion.button
-          type="button"
-          role="menuitem"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{
-            opacity: 1,
-            y: 0,
-            transition: { duration: 0.38, delay: 0.12, ease: [0.16, 1, 0.3, 1] },
-          }}
-          onClick={() => {
-            onToggleHoverToExpand();
-            onClose();
-          }}
-          className="w-full h-[36px] px-3 rounded-[6px] flex items-center gap-3 text-[13px] font-medium text-left outline-none transition-colors cursor-pointer hover:bg-black/[0.05] dark:hover:bg-white/[0.08] focus-visible:bg-black/[0.05] dark:focus-visible:bg-white/[0.08] active:bg-black/[0.08] dark:active:bg-white/[0.12]"
-        >
-          <PanelsTopLeft className="w-4 h-4 shrink-0 text-black dark:text-neutral-300" />
-          <span className="truncate flex-1">Hover to expand</span>
-          {hoverToExpand && (
-            <Check className="w-4 h-4 shrink-0 text-black dark:text-[#4cc2ff]" />
-          )}
-        </motion.button>
-
         <motion.div
-          role="separator"
-          initial={{ opacity: 0, scaleX: 0.8 }}
-          animate={{
-            opacity: 1,
-            scaleX: 1,
-            transition: { duration: 0.38, delay: 0.15, ease: [0.16, 1, 0.3, 1] },
-          }}
-          className="h-px bg-black/10 dark:bg-white/10 my-1 mx-1 origin-left"
-        />
-
-        <motion.button
-          type="button"
-          role="menuitem"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{
-            opacity: 1,
-            y: 0,
-            transition: { duration: 0.38, delay: 0.18, ease: [0.16, 1, 0.3, 1] },
-          }}
-          aria-label="Bật/tắt nhanh Fluent icons (Insider flag)"
-          onClick={() => {
-            onToggleFluentIcons();
-            onClose();
-          }}
-          className="w-full h-[36px] px-3 rounded-[6px] flex items-center gap-3 text-[13px] font-medium text-left outline-none transition-colors cursor-pointer hover:bg-black/[0.05] dark:hover:bg-white/[0.08] focus-visible:bg-black/[0.05] dark:focus-visible:bg-white/[0.08] active:bg-black/[0.08] dark:active:bg-white/[0.12]"
+          role="menu"
+          aria-label="Sidebar actions"
+          initial={{ y: isUpward ? '100%' : '-100%' }}
+          animate={{ y: '0%' }}
+          exit={{ y: isUpward ? '100%' : '-100%' }}
+          transition={{ duration: 0.13, ease: 'easeOut' }}
+          style={flyoutPanelStyle}
+          className={`w-[232px] p-1.5 ${flyoutPanelClassName} fluent-context-menu`}
         >
-          <Palette className="w-4 h-4 shrink-0 text-black dark:text-neutral-300" />
-          <span className="truncate flex-1">Fluent design icons</span>
-          {fluentIcons && (
-            <Check className="w-4 h-4 shrink-0 text-black dark:text-[#4cc2ff]" />
-          )}
-        </motion.button>
+          <div className="w-full flex flex-col space-y-0.5">
+            <button
+              type="button"
+              role="menuitem"
+              onClick={() => {
+                onClose();
+                window.location.reload();
+              }}
+              className="w-full h-[36px] px-3 rounded-[6px] flex items-center gap-3 text-[13px] font-medium text-left outline-none transition-colors cursor-pointer hover:bg-black/[0.05] dark:hover:bg-white/[0.08] focus-visible:bg-black/[0.05] dark:focus-visible:bg-white/[0.08] active:bg-black/[0.08] dark:active:bg-white/[0.12]"
+            >
+              <RefreshCw className="w-4 h-4 shrink-0 text-black dark:text-neutral-300" />
+              <span className="truncate">Refresh</span>
+            </button>
 
-        <motion.button
-          type="button"
-          role="menuitem"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{
-            opacity: 1,
-            y: 0,
-            transition: { duration: 0.38, delay: 0.20, ease: [0.16, 1, 0.3, 1] },
-          }}
-          aria-label="Dynamic sidebar icons: icon thường cho Sign In, Settings, WinUI 3; icon Fluent 3D màu cho Home, Update blogs, Watch, Gallery, Notes, Ink Canvas..."
-          onClick={() => {
-            onToggleDynamicSidebarIcons();
-            onClose();
-          }}
-          className="w-full h-[36px] px-3 rounded-[6px] flex items-center gap-3 text-[13px] font-medium text-left outline-none transition-colors cursor-pointer hover:bg-black/[0.05] dark:hover:bg-white/[0.08] focus-visible:bg-black/[0.05] dark:focus-visible:bg-white/[0.08] active:bg-black/[0.08] dark:active:bg-white/[0.12]"
-        >
-          <Sparkles className="w-4 h-4 shrink-0 text-black dark:text-neutral-300" />
-          <span className="truncate flex-1">Dynamic sidebar icons</span>
-          {dynamicSidebarIcons && (
-            <Check className="w-4 h-4 shrink-0 text-black dark:text-[#4cc2ff]" />
-          )}
-        </motion.button>
+            <button
+              type="button"
+              role="menuitem"
+              onClick={() => {
+                onClose();
+                onGoBack();
+              }}
+              className="w-full h-[36px] px-3 rounded-[6px] flex items-center gap-3 text-[13px] font-medium text-left outline-none transition-colors cursor-pointer hover:bg-black/[0.05] dark:hover:bg-white/[0.08] focus-visible:bg-black/[0.05] dark:focus-visible:bg-white/[0.08] active:bg-black/[0.08] dark:active:bg-white/[0.12]"
+            >
+              <ArrowLeft className="w-4 h-4 shrink-0 text-black dark:text-neutral-300" />
+              <span className="truncate">Go back</span>
+            </button>
 
-        <motion.button
-          type="button"
-          role="menuitem"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{
-            opacity: 1,
-            y: 0,
-            transition: { duration: 0.38, delay: 0.22, ease: [0.16, 1, 0.3, 1] },
-          }}
-          onClick={() => {
-            onClose();
-            onNavigateSettings();
-          }}
-          className="w-full h-[36px] px-3 rounded-[6px] flex items-center gap-3 text-[13px] font-medium text-left outline-none transition-colors cursor-pointer hover:bg-black/[0.05] dark:hover:bg-white/[0.08] focus-visible:bg-black/[0.05] dark:focus-visible:bg-white/[0.08] active:bg-black/[0.08] dark:active:bg-white/[0.12]"
-        >
-          <Settings2 className="w-4 h-4 shrink-0 text-black dark:text-neutral-300" />
-          <span className="truncate">Interface settings</span>
-        </motion.button>
+            <button
+              type="button"
+              role="menuitem"
+              onClick={() => {
+                onClose();
+                onToggleCollapse?.();
+              }}
+              className="w-full h-[36px] px-3 rounded-[6px] flex items-center gap-3 text-[13px] font-medium text-left outline-none transition-colors cursor-pointer hover:bg-black/[0.05] dark:hover:bg-white/[0.08] focus-visible:bg-black/[0.05] dark:focus-visible:bg-white/[0.08] active:bg-black/[0.08] dark:active:bg-white/[0.12]"
+            >
+              <PanelLeft className="w-4 h-4 shrink-0 text-black dark:text-neutral-300" />
+              <span className="truncate">{isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}</span>
+            </button>
+
+            <button
+              type="button"
+              role="menuitem"
+              onClick={() => {
+                onToggleHoverToExpand();
+                onClose();
+              }}
+              className="w-full h-[36px] px-3 rounded-[6px] flex items-center gap-3 text-[13px] font-medium text-left outline-none transition-colors cursor-pointer hover:bg-black/[0.05] dark:hover:bg-white/[0.08] focus-visible:bg-black/[0.05] dark:focus-visible:bg-white/[0.08] active:bg-black/[0.08] dark:active:bg-white/[0.12]"
+            >
+              <PanelsTopLeft className="w-4 h-4 shrink-0 text-black dark:text-neutral-300" />
+              <span className="truncate flex-1">Hover to expand</span>
+              {hoverToExpand && (
+                <Check className="w-4 h-4 shrink-0 text-black dark:text-[#4cc2ff]" />
+              )}
+            </button>
+
+            <div className="h-px bg-black/10 dark:bg-white/10 my-1 mx-1" />
+
+            <button
+              type="button"
+              role="menuitem"
+              aria-label="Bật/tắt nhanh Fluent icons (Insider flag)"
+              onClick={() => {
+                onToggleFluentIcons();
+                onClose();
+              }}
+              className="w-full h-[36px] px-3 rounded-[6px] flex items-center gap-3 text-[13px] font-medium text-left outline-none transition-colors cursor-pointer hover:bg-black/[0.05] dark:hover:bg-white/[0.08] focus-visible:bg-black/[0.05] dark:focus-visible:bg-white/[0.08] active:bg-black/[0.08] dark:active:bg-white/[0.12]"
+            >
+              <Palette className="w-4 h-4 shrink-0 text-black dark:text-neutral-300" />
+              <span className="truncate flex-1">Fluent design icons</span>
+              {fluentIcons && (
+                <Check className="w-4 h-4 shrink-0 text-black dark:text-[#4cc2ff]" />
+              )}
+            </button>
+
+            <button
+              type="button"
+              role="menuitem"
+              aria-label="Dynamic sidebar icons: icon thường cho Sign In, Settings, WinUI 3; icon Fluent 3D màu cho Home, Update blogs, Watch, Gallery, Notes, Ink Canvas..."
+              onClick={() => {
+                onToggleDynamicSidebarIcons();
+                onClose();
+              }}
+              className="w-full h-[36px] px-3 rounded-[6px] flex items-center gap-3 text-[13px] font-medium text-left outline-none transition-colors cursor-pointer hover:bg-black/[0.05] dark:hover:bg-white/[0.08] focus-visible:bg-black/[0.05] dark:focus-visible:bg-white/[0.08] active:bg-black/[0.08] dark:active:bg-white/[0.12]"
+            >
+              <Sparkles className="w-4 h-4 shrink-0 text-black dark:text-neutral-300" />
+              <span className="truncate flex-1">Dynamic sidebar icons</span>
+              {dynamicSidebarIcons && (
+                <Check className="w-4 h-4 shrink-0 text-black dark:text-[#4cc2ff]" />
+              )}
+            </button>
+
+            <button
+              type="button"
+              role="menuitem"
+              onClick={() => {
+                onClose();
+                onNavigateSettings();
+              }}
+              className="w-full h-[36px] px-3 rounded-[6px] flex items-center gap-3 text-[13px] font-medium text-left outline-none transition-colors cursor-pointer hover:bg-black/[0.05] dark:hover:bg-white/[0.08] focus-visible:bg-black/[0.05] dark:focus-visible:bg-white/[0.08] active:bg-black/[0.08] dark:active:bg-white/[0.12]"
+            >
+              <Settings2 className="w-4 h-4 shrink-0 text-black dark:text-neutral-300" />
+              <span className="truncate">Interface settings</span>
+            </button>
+          </div>
+        </motion.div>
       </motion.div>,
       document.body
     );
@@ -1522,66 +1274,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
             currentRoute={currentRoute}
             dependencyKey={`${navItems.length}-${isLiveTvExpanded}-${currentRoute}`}
           />
-
-          {/* Sidebar Search Box (WinUI 3 AutoSuggestBox style) */}
-          <div className="shrink-0 mb-2 px-0.5">
-            <div
-              ref={sidebarSearchBoxRef}
-              id="sidebar-search-box"
-              onClick={() => {
-                openSidebarSearchFlyout();
-              }}
-              className={`fluent-search-box winui-search-input group relative w-full h-8 sm:h-[32px] rounded-[6px] bg-[#fbfbfb] dark:bg-[#282c31] hover:bg-black/[0.04] dark:hover:bg-[#32383e] focus-within:bg-white dark:focus-within:bg-[#202020] flex items-center px-2.5 gap-2 transition-colors cursor-pointer border border-black/10 dark:border-white/10 shadow-xs ${
-                isSidebarSearchFlyoutOpen ? 'is-focused search-flyout-open' : ''
-              }`}
-            >
-              <FluentSearchIcon className="w-4 h-4 text-black dark:text-white shrink-0 pointer-events-none select-none" />
-              <input
-                type="text"
-                value={sidebarSearch}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  openSidebarSearchFlyout();
-                }}
-                onFocus={() => {
-                  openSidebarSearchFlyout();
-                }}
-                onChange={(e) => {
-                  const val = e.target.value;
-                  setSidebarSearch(val);
-                  if (onTabSearchChange) onTabSearchChange(val);
-                  if (!isSidebarSearchFlyoutOpen) openSidebarSearchFlyout();
-                }}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault();
-                    if (sidebarSearch.trim()) {
-                      setIsSidebarSearchFlyoutOpen(false);
-                      navigate(`/search?q=${encodeURIComponent(sidebarSearch.trim())}`);
-                    }
-                  } else if (e.key === 'Escape') {
-                    setIsSidebarSearchFlyoutOpen(false);
-                  }
-                }}
-                placeholder={settings.tabbedSparkle ? "Search Home" : "Search"}
-                className="flex-1 min-w-0 bg-transparent text-[13px] text-black dark:text-white placeholder-black/50 dark:placeholder-white/50 outline-none border-none py-1 pr-1 font-normal select-text cursor-pointer"
-              />
-              {sidebarSearch && (
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setSidebarSearch('');
-                    if (onTabSearchChange) onTabSearchChange('');
-                  }}
-                  className="w-4 h-4 rounded-[4px] flex items-center justify-center text-neutral-400 hover:text-black dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/10 cursor-pointer transition-colors"
-                  aria-label="Clear search"
-                >
-                  <X className="w-3 h-3" />
-                </button>
-              )}
-            </div>
-          </div>
 
           {/* 1. Home */}
           <div className="shrink-0">
@@ -2256,21 +1948,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   dependencyKey={`${navItems.length}-${currentRoute}`}
                 />
 
-                {/* Search Icon in Collapsed Sidebar (Active when Tabbed Sparkle is enabled) */}
-                {settings.tabbedSparkle && (
-                  <button
-                    type="button"
-                    id="sidebar-collapsed-search"
-                    onClick={() => onOpenSearch ? onOpenSearch() : navigate('/search')}
-                    onMouseEnter={(e) => showTooltip('Search', e)}
-                    onMouseLeave={hideTooltip}
-                    aria-label="Search"
-                    className="sidebar-nav-item w-10 h-[38px] rounded-[6px] shrink-0 flex items-center justify-center relative transition-colors cursor-pointer text-black dark:text-[#cccccc] hover:bg-black/5 dark:hover:bg-white/[0.05] hover:text-black dark:hover:text-white"
-                  >
-                    <Search className="w-5 h-5 text-black dark:text-white" />
-                  </button>
-                )}
-
                 {/* 1. Home Icon */}
                 <button
                   type="button"
@@ -2716,66 +2393,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
               className="z-[99999] px-3 py-1.5 min-h-[30px] flex items-center rounded-[6px] text-[#111827] dark:text-white text-xs font-medium shadow-[0_4px_20px_rgba(0,0,0,0.18)] border-0 outline-none pointer-events-none whitespace-nowrap select-none"
             >
               {collapsedTooltip.label}
-            </motion.div>
-          )}
-        </AnimatePresence>,
-        document.body
-      )}
-
-      {/* Sidebar Trending Searches Flyout Dropdown (WinUI 3 style) */}
-      {typeof document !== 'undefined' && createPortal(
-        <AnimatePresence>
-          {isSidebarSearchFlyoutOpen && sidebarSearchBoxCoords && (
-            <motion.div
-              id="sidebar-search-flyout"
-              role="listbox"
-              aria-label="Trending searches"
-              initial={{ opacity: 0, y: -8, scaleY: 0.94 }}
-              animate={{ opacity: 1, y: 0, scaleY: 1 }}
-              exit={{ opacity: 0, y: -6, scaleY: 0.96 }}
-              transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
-              style={{
-                ...flyoutPanelStyle,
-                position: 'fixed',
-                left: sidebarSearchBoxCoords.left,
-                top: sidebarSearchBoxCoords.top,
-                width: sidebarSearchBoxCoords.width,
-                zIndex: 2147483647,
-                transformOrigin: 'top center',
-                maxHeight: 'calc(100vh - 120px)',
-              }}
-              className={`p-1.5 space-y-0.5 overflow-y-auto no-scrollbar ${flyoutPanelClassName} fluent-context-menu`}
-              onMouseDown={(e) => e.stopPropagation()}
-            >
-              {/* Header */}
-              <div className="px-2.5 pt-1 pb-1 text-[11px] font-semibold text-[#6b7280] dark:text-[#9ca3af] select-none border-b border-black/5 dark:border-white/5 mb-1 flex items-center justify-between">
-                <span>{sidebarSearch.trim() ? 'Search results' : 'Trending searches'}</span>
-              </div>
-
-              {/* Items */}
-              {sidebarFilteredItems.map((item) => (
-                <button
-                  key={item.id}
-                  type="button"
-                  onClick={() => {
-                    item.onSelect();
-                    setIsSidebarSearchFlyoutOpen(false);
-                  }}
-                  className="w-full min-h-[44px] px-2 py-1.5 rounded-[6px] flex items-center gap-2.5 text-left text-[#111827] dark:text-white hover:bg-black/[0.06] dark:hover:bg-white/[0.08] active:bg-black/[0.1] dark:active:bg-white/[0.12] transition-colors cursor-pointer border-none"
-                >
-                  {item.icon}
-                  <div className="min-w-0 flex-1">
-                    <div className="text-[13px] font-medium text-[#111827] dark:text-white/95 truncate leading-tight">
-                      {item.title}
-                    </div>
-                    {item.subtitle && (
-                      <div className="text-[11px] font-normal text-[#6b7280] dark:text-[#9ca3af] truncate leading-tight mt-0.5">
-                        {item.subtitle}
-                      </div>
-                    )}
-                  </div>
-                </button>
-              ))}
             </motion.div>
           )}
         </AnimatePresence>,

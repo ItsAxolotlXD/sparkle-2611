@@ -7,7 +7,8 @@ import {
   Plus, 
   X, 
   Copy, 
-  Trash2 
+  Trash2,
+  Search
 } from 'lucide-react';
 import { flyoutPanelClassName, flyoutPanelStyle } from './FlyoutDropdown';
 import {
@@ -59,6 +60,7 @@ interface SparkleTabBarProps {
   onDuplicateTab: (tabId: string) => void;
   onCloseOtherTabs: (tabId: string) => void;
   isLightMode: boolean;
+  onOpenSearch?: () => void;
 }
 
 interface TabContextMenuState {
@@ -89,7 +91,14 @@ const TabContextMenu: React.FC<TabContextMenuProps> = ({
   onCloseOtherTabs,
 }) => {
   const menuRef = useRef<HTMLDivElement>(null);
-  const [position, setPosition] = useState({ left: x, top: y });
+  const [position, setPosition] = useState(() => {
+    const maxLeft = (typeof window !== 'undefined' ? window.innerWidth : 800) - 198;
+    const maxTop = (typeof window !== 'undefined' ? window.innerHeight : 600) - 160;
+    return {
+      left: Math.max(8, Math.min(x, maxLeft)),
+      top: Math.max(8, Math.min(y, maxTop)),
+    };
+  });
 
   useLayoutEffect(() => {
     const el = menuRef.current;
@@ -133,21 +142,16 @@ const TabContextMenu: React.FC<TabContextMenuProps> = ({
   return createPortal(
     <motion.div
       ref={menuRef}
-      role="menu"
-      aria-label="Tab actions"
-      initial={{ opacity: 0, y: -10, scaleY: 0.92 }}
-      animate={{ opacity: 1, y: 0, scaleY: 1 }}
-      exit={{ opacity: 0, y: -8, scaleY: 0.95 }}
-      transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
+      exit={{ opacity: 1 }}
+      transition={{ duration: 0.13 }}
       style={{
-        ...flyoutPanelStyle,
         position: 'fixed',
         left: position.left,
         top: position.top,
         zIndex: 2147483647,
-        transformOrigin: 'top left',
+        clipPath: 'inset(0% -60px -60px -60px)',
       }}
-      className={`w-[190px] p-1 ${flyoutPanelClassName} fluent-context-menu`}
+      className="fluent-context-menu-wrapper pointer-events-auto"
       onContextMenu={(e) => {
         e.preventDefault();
         e.stopPropagation();
@@ -155,59 +159,72 @@ const TabContextMenu: React.FC<TabContextMenuProps> = ({
       onMouseDown={(e) => e.stopPropagation()}
       onClick={(e) => e.stopPropagation()}
     >
-      <button
-        type="button"
-        role="menuitem"
-        onClick={() => {
-          onCreateTab();
-          onClose();
-        }}
-        className="w-full h-8 px-2.5 rounded-[4px] flex items-center gap-2.5 text-[12px] text-[#111827] dark:text-white hover:bg-black/5 dark:hover:bg-white/10 cursor-pointer text-left border-none"
+      <motion.div
+        role="menu"
+        aria-label="Tab actions"
+        initial={{ y: '-100%' }}
+        animate={{ y: '0%' }}
+        exit={{ y: '-100%' }}
+        transition={{ duration: 0.13, ease: 'easeOut' }}
+        style={flyoutPanelStyle}
+        className={`w-[190px] p-1 ${flyoutPanelClassName} fluent-context-menu`}
       >
-        <Plus className="w-3.5 h-3.5 text-neutral-400" />
-        <span>New tab</span>
-      </button>
-      {tabId && (
-        <>
+        <div className="w-full flex flex-col">
           <button
             type="button"
             role="menuitem"
             onClick={() => {
-              onDuplicateTab(tabId);
+              onCreateTab();
               onClose();
             }}
             className="w-full h-8 px-2.5 rounded-[4px] flex items-center gap-2.5 text-[12px] text-[#111827] dark:text-white hover:bg-black/5 dark:hover:bg-white/10 cursor-pointer text-left border-none"
           >
-            <Copy className="w-3.5 h-3.5 text-neutral-400" />
-            <span>Duplicate tab</span>
+            <Plus className="w-3.5 h-3.5 text-neutral-400" />
+            <span>New tab</span>
           </button>
-          <div className="h-[1px] my-1 bg-black/10 dark:bg-white/10" />
-          <button
-            type="button"
-            role="menuitem"
-            onClick={() => {
-              onCloseTab(tabId);
-              onClose();
-            }}
-            className="w-full h-8 px-2.5 rounded-[4px] flex items-center gap-2.5 text-[12px] text-[#111827] dark:text-white hover:bg-black/5 dark:hover:bg-white/10 cursor-pointer text-left border-none"
-          >
-            <X className="w-3.5 h-3.5 text-neutral-400" />
-            <span>Close tab</span>
-          </button>
-          <button
-            type="button"
-            role="menuitem"
-            onClick={() => {
-              onCloseOtherTabs(tabId);
-              onClose();
-            }}
-            className="w-full h-8 px-2.5 rounded-[4px] flex items-center gap-2.5 text-[12px] text-[#111827] dark:text-white hover:bg-black/5 dark:hover:bg-white/10 cursor-pointer text-left border-none"
-          >
-            <Trash2 className="w-3.5 h-3.5 text-neutral-400" />
-            <span>Close other tabs</span>
-          </button>
-        </>
-      )}
+          {tabId && (
+            <>
+              <button
+                type="button"
+                role="menuitem"
+                onClick={() => {
+                  onDuplicateTab(tabId);
+                  onClose();
+                }}
+                className="w-full h-8 px-2.5 rounded-[4px] flex items-center gap-2.5 text-[12px] text-[#111827] dark:text-white hover:bg-black/5 dark:hover:bg-white/10 cursor-pointer text-left border-none"
+              >
+                <Copy className="w-3.5 h-3.5 text-neutral-400" />
+                <span>Duplicate tab</span>
+              </button>
+              <div className="h-[1px] my-1 bg-black/10 dark:bg-white/10" />
+              <button
+                type="button"
+                role="menuitem"
+                onClick={() => {
+                  onCloseTab(tabId);
+                  onClose();
+                }}
+                className="w-full h-8 px-2.5 rounded-[4px] flex items-center gap-2.5 text-[12px] text-[#111827] dark:text-white hover:bg-black/5 dark:hover:bg-white/10 cursor-pointer text-left border-none"
+              >
+                <X className="w-3.5 h-3.5 text-neutral-400" />
+                <span>Close tab</span>
+              </button>
+              <button
+                type="button"
+                role="menuitem"
+                onClick={() => {
+                  onCloseOtherTabs(tabId);
+                  onClose();
+                }}
+                className="w-full h-8 px-2.5 rounded-[4px] flex items-center gap-2.5 text-[12px] text-[#111827] dark:text-white hover:bg-black/5 dark:hover:bg-white/10 cursor-pointer text-left border-none"
+              >
+                <Trash2 className="w-3.5 h-3.5 text-neutral-400" />
+                <span>Close other tabs</span>
+              </button>
+            </>
+          )}
+        </div>
+      </motion.div>
     </motion.div>,
     document.body
   );
@@ -308,6 +325,7 @@ export const SparkleTabBar: React.FC<SparkleTabBarProps> = ({
   onDuplicateTab,
   onCloseOtherTabs,
   isLightMode,
+  onOpenSearch,
 }) => {
   const { settings } = useSettings();
   const dynamicIcons = settings.dynamicSidebarIcons !== false;
@@ -315,6 +333,23 @@ export const SparkleTabBar: React.FC<SparkleTabBarProps> = ({
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
   const [contextMenu, setContextMenu] = useState<TabContextMenuState | null>(null);
+  const [addTabTooltip, setAddTabTooltip] = useState<{ top: number; left: number } | null>(null);
+
+  const showAddTabTooltip = (e: React.MouseEvent<HTMLElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    setAddTabTooltip({
+      top: rect.bottom + 6,
+      left: rect.left + rect.width / 2,
+    });
+  };
+
+  const hideAddTabTooltip = () => {
+    setAddTabTooltip(null);
+  };
+
+  useEffect(() => {
+    setAddTabTooltip(null);
+  }, [tabs.length, activeTabId]);
 
   // Check overflow and scroll bounds for the two pole navigation arrows
   const updateScrollStatus = useCallback(() => {
@@ -361,6 +396,25 @@ export const SparkleTabBar: React.FC<SparkleTabBarProps> = ({
 
   return (
     <div className="flex-1 flex items-end min-w-0 h-full relative select-none -ml-1.5 sm:-ml-3 pl-0 pr-1">
+      {/* 0. Search Icon at the start of Tab Bar (Tabbed Sparkle) */}
+      {onOpenSearch && (
+        <motion.button
+          layoutId="sparkle-search-box-pill"
+          type="button"
+          id="btn-sparkle-tabbar-search"
+          onClick={(e) => {
+            e.stopPropagation();
+            onOpenSearch();
+          }}
+          transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
+          title="Search (Ctrl+E)"
+          aria-label="Search"
+          className="w-[30px] h-[30px] mb-0.5 mr-1.5 rounded-[100px] flex items-center justify-center bg-transparent hover:bg-black/10 dark:hover:bg-white/10 active:bg-black/15 dark:active:bg-white/15 transition-colors cursor-pointer shrink-0 z-10 border-none shadow-none"
+        >
+          <FluentSearchIcon className="w-[15px] h-[15px] text-black dark:text-white shrink-0 pointer-events-none select-none" />
+        </motion.button>
+      )}
+
       {/* 1. Left Pole Arrow (<) for horizontal scrolling when tabs overflow */}
       {canScrollLeft && (
         <button
@@ -436,8 +490,10 @@ export const SparkleTabBar: React.FC<SparkleTabBarProps> = ({
                 className={`group relative flex-1 shrink h-[30px] flex items-center justify-between px-2.5 cursor-pointer rounded-t-[6px] transition-colors duration-150 border-none outline-none ${
                   isActive
                     ? isLightMode
-                      ? 'bg-white text-[#111827] shadow-xs z-10'
-                      : 'bg-[#202020] text-white shadow-xs z-10'
+                      ? 'bg-[#f9f9f9] text-[#111827] shadow-xs z-10'
+                      : settings.superDarkMode
+                      ? 'bg-black text-white shadow-xs z-10'
+                      : 'bg-[#282c31] text-white shadow-xs z-10'
                     : isLightMode
                     ? 'bg-transparent text-[#4b5563] hover:bg-black/[0.04] hover:text-[#111827]'
                     : 'bg-transparent text-[#9ca3af] hover:bg-white/[0.05] hover:text-[#e5e7eb]'
@@ -490,17 +546,49 @@ export const SparkleTabBar: React.FC<SparkleTabBarProps> = ({
         </button>
       )}
 
-      {/* 4. Add Tab Button (+) */}
+      {/* 4. Add Tab Button (+) with Sidebar-style Floating Tooltip */}
       <button
         type="button"
         id="btn-sparkle-add-tab"
-        onClick={onCreateTab}
-        title="New tab (Ctrl+T)"
+        onClick={() => {
+          hideAddTabTooltip();
+          onCreateTab();
+        }}
+        onMouseEnter={showAddTabTooltip}
+        onMouseLeave={hideAddTabTooltip}
         aria-label="New tab"
         className="w-[28px] h-[28px] mb-0.5 ml-1 rounded-[5px] flex items-center justify-center text-neutral-500 hover:text-black dark:text-neutral-400 dark:hover:text-white hover:bg-black/10 dark:hover:bg-white/10 active:bg-black/15 dark:active:bg-white/15 transition-colors cursor-pointer shrink-0 z-10 border-none"
       >
         <Plus className="w-3.5 h-3.5 stroke-[2.2]" />
       </button>
+
+      {/* Floating Tooltip for New tab button (+) matching Sidebar tooltip styling */}
+      {typeof document !== 'undefined' && createPortal(
+        <AnimatePresence>
+          {addTabTooltip && (
+            <motion.div
+              key="sparkle-add-tab-tooltip"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.18, ease: 'easeOut' }}
+              style={{
+                position: 'fixed',
+                top: `${addTabTooltip.top}px`,
+                left: `${addTabTooltip.left}px`,
+                transform: 'translateX(-50%)',
+                backgroundColor: isLightMode ? 'rgba(255, 255, 255, 0.50)' : 'rgba(24, 24, 28, 0.50)',
+                backdropFilter: 'blur(16px) saturate(140%)',
+                WebkitBackdropFilter: 'blur(16px) saturate(140%)',
+              }}
+              className="z-[99999] px-3 py-1.5 min-h-[30px] flex items-center rounded-[6px] text-[#111827] dark:text-white text-xs font-medium shadow-[0_4px_20px_rgba(0,0,0,0.18)] border-0 outline-none pointer-events-none whitespace-nowrap select-none"
+            >
+              New tab
+            </motion.div>
+          )}
+        </AnimatePresence>,
+        document.body
+      )}
 
       {/* 5. Tab Right-Click Context Menu with Slide-Down Animation from top edge */}
       <AnimatePresence>

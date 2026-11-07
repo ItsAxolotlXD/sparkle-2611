@@ -26,7 +26,14 @@ const VIEWPORT_MARGIN = 8;
 
 export const GalleryContextMenu: React.FC<GalleryContextMenuProps> = ({ x, y, isFavorite, onAction, onClose }) => {
   const menuRef = useRef<HTMLDivElement>(null);
-  const [position, setPosition] = useState({ left: x, top: y });
+  const isUpward = y > (typeof window !== 'undefined' ? window.innerHeight - 340 : 500);
+  const [position, setPosition] = useState(() => {
+    const maxLeft = (typeof window !== 'undefined' ? window.innerWidth : 800) - 240;
+    return {
+      left: Math.max(VIEWPORT_MARGIN, Math.min(x, maxLeft)),
+      top: Math.max(VIEWPORT_MARGIN, isUpward ? y - 320 : y),
+    };
+  });
 
   const primary: MenuEntry[] = [
     { action: 'open', label: 'Open', icon: MousePointer2 },
@@ -85,23 +92,13 @@ export const GalleryContextMenu: React.FC<GalleryContextMenuProps> = ({ x, y, is
     };
   }, [onClose]);
 
-  const renderEntry = (entry: MenuEntry, delay: number) => {
+  const renderEntry = (entry: MenuEntry) => {
     const Icon = entry.icon;
     return (
-      <motion.button
+      <button
         key={entry.action}
         type="button"
         role="menuitem"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{
-          opacity: 1,
-          y: 0,
-          transition: {
-            duration: 0.38,
-            delay,
-            ease: [0.16, 1, 0.3, 1],
-          },
-        }}
         onClick={() => onAction(entry.action)}
         className={`w-full h-[36px] px-3 rounded-[6px] flex items-center gap-3 text-[13px] font-medium text-left outline-none transition-colors cursor-pointer hover:bg-black/[0.05] dark:hover:bg-white/[0.08] focus-visible:bg-black/[0.05] dark:focus-visible:bg-white/[0.08] active:bg-black/[0.08] dark:active:bg-white/[0.12] ${
           entry.danger ? 'text-[#c42b1c] dark:text-[#ff99a4]' : 'text-[#111827] dark:text-white'
@@ -113,35 +110,41 @@ export const GalleryContextMenu: React.FC<GalleryContextMenuProps> = ({ x, y, is
           }`}
         />
         <span className="truncate">{entry.label}</span>
-      </motion.button>
+      </button>
     );
   };
 
   return createPortal(
     <motion.div
       ref={menuRef}
-      role="menu"
-      aria-label="File actions"
-      initial={{ opacity: 0, y: 22 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: 14 }}
-      transition={{ duration: 0.38, ease: [0.16, 1, 0.3, 1] }}
+      exit={{ opacity: 1 }}
+      transition={{ duration: 0.13 }}
+      style={{
+        position: 'fixed',
+        left: position.left,
+        top: position.top,
+        zIndex: 2147483647,
+        clipPath: isUpward ? 'inset(-60px -60px 0% -60px)' : 'inset(0% -60px -60px -60px)',
+      }}
+      className="fluent-context-menu-wrapper pointer-events-auto"
       onContextMenu={(e) => e.preventDefault()}
-      className={`fixed z-[2147483647] w-[232px] ${flyoutPanelClassName} fluent-context-menu`}
-      style={{ ...flyoutPanelStyle, left: position.left, top: position.top }}
     >
-      {primary.map((entry, idx) => renderEntry(entry, idx * 0.04))}
       <motion.div
-        role="separator"
-        initial={{ opacity: 0, scaleX: 0.8 }}
-        animate={{
-          opacity: 1,
-          scaleX: 1,
-          transition: { duration: 0.38, delay: 0.23, ease: [0.16, 1, 0.3, 1] },
-        }}
-        className="h-px bg-black/10 dark:bg-white/10 my-1 mx-1 origin-left"
-      />
-      {secondary.map((entry, idx) => renderEntry(entry, 0.26 + idx * 0.04))}
+        role="menu"
+        aria-label="File actions"
+        initial={{ y: isUpward ? '100%' : '-100%' }}
+        animate={{ y: '0%' }}
+        exit={{ y: isUpward ? '100%' : '-100%' }}
+        transition={{ duration: 0.13, ease: 'easeOut' }}
+        style={flyoutPanelStyle}
+        className={`w-[232px] p-1.5 ${flyoutPanelClassName} fluent-context-menu`}
+      >
+        <div className="w-full flex flex-col space-y-0.5">
+          {primary.map((entry) => renderEntry(entry))}
+          <div className="h-px bg-black/10 dark:bg-white/10 my-1 mx-1" />
+          {secondary.map((entry) => renderEntry(entry))}
+        </div>
+      </motion.div>
     </motion.div>,
     document.body
   );

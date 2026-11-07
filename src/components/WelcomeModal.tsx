@@ -78,7 +78,7 @@ export const WelcomeModal: React.FC<WelcomeModalProps> = ({
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-[#666666] dark:text-[#AAAAAA]">Release Build</span>
-                  <span className="font-semibold text-[#111827] dark:text-[#FFFFFF]">26106.11</span>
+                  <span className="font-semibold text-[#111827] dark:text-[#FFFFFF]">26164</span>
                 </div>
                 <div className="pt-2 mt-1 border-t border-black/[0.06] dark:border-white/[0.08] flex items-center justify-between">
                   <span className="text-[#666666] dark:text-[#AAAAAA]">Design System</span>
