@@ -20,6 +20,7 @@ import {
   RefreshCw,
   PanelsTopLeft,
   PanelLeft,
+  Search,
   Palette,
   Settings2,
   Check,
@@ -248,6 +249,8 @@ interface SidebarProps {
   onOpenOfficeTool?: (tool: string) => void;
   isSplashFinished?: boolean;
   mobileDragOffset?: number | null;
+  tabSearchQuery?: string;
+  onTabSearchChange?: (query: string) => void;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -274,10 +277,17 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onOpenUpdate = () => {},
   onOpenOfficeTool = (_tool: string) => {},
   isSplashFinished = false,
-  mobileDragOffset = null
+  mobileDragOffset = null,
+  tabSearchQuery = '',
+  onTabSearchChange,
 }) => {
   const { settings, updateSetting } = useSettings();
   const { favoriteChannelIds } = useFavorites();
+  const [sidebarSearch, setSidebarSearch] = useState(tabSearchQuery);
+
+  useEffect(() => {
+    setSidebarSearch(tabSearchQuery);
+  }, [tabSearchQuery]);
 
   const handleGoBack = () => {
     if (window.history.length > 1) {
@@ -1299,6 +1309,50 @@ export const Sidebar: React.FC<SidebarProps> = ({
             dependencyKey={`${navItems.length}-${isLiveTvExpanded}-${currentRoute}`}
           />
 
+          {/* Sidebar Search Box (Active when Tabbed Sparkle is enabled, placed on top of Home tab) */}
+          {settings.tabbedSparkle && (
+            <div className="shrink-0 mb-2 px-0.5">
+              <div
+                id="sidebar-search-box"
+                className="group relative w-full h-8.5 sm:h-8.5 rounded-[100px] bg-[#fbfbfb] dark:bg-[#282c31] focus-within:bg-white dark:focus-within:bg-[#282c31] border border-black/5 dark:border-white/5 focus-within:ring-1 focus-within:ring-[#0078d4] dark:focus-within:ring-[#4cc2ff] flex items-center px-3.5 gap-2 transition-all shadow-xs"
+              >
+                <FluentSearchIcon className="w-[16px] h-[16px] text-black dark:text-white shrink-0 pointer-events-none select-none" />
+                <input
+                  type="text"
+                  value={sidebarSearch}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    setSidebarSearch(val);
+                    if (onTabSearchChange) onTabSearchChange(val);
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      if (sidebarSearch.trim()) {
+                        navigate(`/search?q=${encodeURIComponent(sidebarSearch.trim())}`);
+                      }
+                    }
+                  }}
+                  placeholder="Search Home"
+                  className="flex-1 min-w-0 bg-transparent text-xs sm:text-[13px] text-black dark:text-white placeholder-black/75 dark:placeholder-white outline-none border-none py-0.5 pr-1"
+                />
+                {sidebarSearch && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSidebarSearch('');
+                      if (onTabSearchChange) onTabSearchChange('');
+                    }}
+                    className="w-4 h-4 rounded-full flex items-center justify-center text-neutral-400 hover:text-black dark:hover:text-white cursor-pointer"
+                    aria-label="Clear search"
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
+                )}
+              </div>
+            </div>
+          )}
+
           {/* 1. Home */}
           <div className="shrink-0">
             <button
@@ -1971,6 +2025,21 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   currentRoute={currentRoute}
                   dependencyKey={`${navItems.length}-${currentRoute}`}
                 />
+
+                {/* Search Icon in Collapsed Sidebar (Active when Tabbed Sparkle is enabled) */}
+                {settings.tabbedSparkle && (
+                  <button
+                    type="button"
+                    id="sidebar-collapsed-search"
+                    onClick={() => onOpenSearch ? onOpenSearch() : navigate('/search')}
+                    onMouseEnter={(e) => showTooltip('Search', e)}
+                    onMouseLeave={hideTooltip}
+                    aria-label="Search"
+                    className="sidebar-nav-item w-10 h-[38px] rounded-[6px] shrink-0 flex items-center justify-center relative transition-colors cursor-pointer text-black dark:text-[#cccccc] hover:bg-black/5 dark:hover:bg-white/[0.05] hover:text-black dark:hover:text-white"
+                  >
+                    <Search className="w-5 h-5 text-black dark:text-white" />
+                  </button>
+                )}
 
                 {/* 1. Home Icon */}
                 <button

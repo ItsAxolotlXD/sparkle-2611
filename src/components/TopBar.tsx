@@ -30,6 +30,7 @@ import {
   FluentSettingsIcon,
   FLUENT_ICON_URLS 
 } from './FluentIcons';
+import { SparkleTabBar, type AppTab } from './SparkleTabBar';
 import { 
   Fluent3DSearchIcon,
   Fluent3DFolderSearchIcon,
@@ -123,6 +124,13 @@ interface TopBarProps {
   onDismissUnsavedTooltip?: () => void;
   tabSearchQuery?: string;
   onTabSearchChange?: (query: string) => void;
+  tabs?: AppTab[];
+  activeTabId?: string;
+  onSelectTab?: (tabId: string) => void;
+  onCreateTab?: () => void;
+  onCloseTab?: (tabId: string) => void;
+  onDuplicateTab?: (tabId: string) => void;
+  onCloseOtherTabs?: (tabId: string) => void;
 }
 
 export const TopBar: React.FC<TopBarProps> = ({
@@ -145,7 +153,14 @@ export const TopBar: React.FC<TopBarProps> = ({
   showUnsavedTooltip = false,
   onDismissUnsavedTooltip = () => {},
   tabSearchQuery = '',
-  onTabSearchChange
+  onTabSearchChange,
+  tabs = [],
+  activeTabId = '',
+  onSelectTab = () => {},
+  onCreateTab = () => {},
+  onCloseTab = () => {},
+  onDuplicateTab = () => {},
+  onCloseOtherTabs = () => {},
 }) => {
   const { settings, hasChanges, applyDraftSettings, updateSetting } = useSettings();
   const { notes, setActiveNoteId, createNote, isStickyVisible, toggleSticky } = useNotes();
@@ -1590,9 +1605,11 @@ export const TopBar: React.FC<TopBarProps> = ({
   const isWebSearch = Boolean(searchQuery.trim() && searchResults.length > 0 && searchResults[0].type === 'web-search');
 
   return (
-    <header className={`w-full h-14 relative bg-[#f3f3f3] dark:bg-[#1b1f24] px-3 sm:px-6 md:px-8 flex items-center justify-between gap-3 sticky top-0 ${
+    <header className={`w-full ${
+      settings.tabbedSparkle ? 'h-[38px] sm:h-[40px] pt-1' : 'h-14'
+    } relative bg-[#f3f3f3] dark:bg-[#1b1f24] px-2 sm:px-4 md:px-6 flex items-end justify-between gap-2 sm:gap-3 sticky top-0 ${
       isSearchFlyoutOpen || isSearchFocused ? 'z-[2147483647]' : '!z-[200]'
-    } select-none`}>
+    } select-none border-b border-black/5 dark:border-white/5`}>
       {/* Sticky top-left tab corner rounded mask: keeps top-left of tab page rounded (bo cong 10px) when scrolling, hidden on mobile UI */}
       <div
         aria-hidden="true"
@@ -1614,7 +1631,7 @@ export const TopBar: React.FC<TopBarProps> = ({
       </div>
 
       {/* 1. Left Section */}
-      <div className="flex items-center gap-2 sm:gap-3 shrink-0 z-10">
+      <div className={`flex items-center gap-2 sm:gap-3 shrink-0 z-10 ${settings.tabbedSparkle ? 'mb-1' : ''}`}>
         {settings.navigationMode !== 'floaty' && (
           <motion.button
             id="btn-mobile-menu-toggle"
@@ -1692,16 +1709,28 @@ export const TopBar: React.FC<TopBarProps> = ({
         )}
       </div>
 
-      {/* 2. Center Search Box with Flyout matching Microsoft Fluent Design and reference image */}
-      <div 
-        ref={searchContainerRef}
-        id="topbar-search-container"
-        className={`flex-1 flex items-center justify-center min-w-0 transition-all ${
-          isSearchFlyoutOpen || isSearchFocused
-            ? 'fixed md:absolute inset-x-0 top-0 h-14 md:h-auto md:top-auto px-2.5 sm:px-4 z-[2147483647] bg-[#f3f3f3] dark:bg-[#1b1f24] md:bg-transparent md:left-1/2 md:-translate-x-1/2 md:w-full md:max-w-[460px]'
-            : 'px-1 sm:px-4 z-40 md:absolute md:left-1/2 md:-translate-x-1/2 md:w-full md:max-w-[460px]'
-        }`}
-      >
+      {/* 2. Center Search Box OR Tab Bar (Tabbed Sparkle) */}
+      {settings.tabbedSparkle && tabs && tabs.length > 0 ? (
+        <SparkleTabBar
+          tabs={tabs}
+          activeTabId={activeTabId || tabs[0]?.id || ''}
+          onSelectTab={onSelectTab}
+          onCreateTab={onCreateTab}
+          onCloseTab={onCloseTab}
+          onDuplicateTab={onDuplicateTab}
+          onCloseOtherTabs={onCloseOtherTabs}
+          isLightMode={isLightMode}
+        />
+      ) : (
+        <div 
+          ref={searchContainerRef}
+          id="topbar-search-container"
+          className={`flex-1 flex items-center justify-center min-w-0 transition-all ${
+            isSearchFlyoutOpen || isSearchFocused
+              ? 'fixed md:absolute inset-x-0 top-0 h-14 md:h-auto md:top-auto px-2.5 sm:px-4 z-[2147483647] bg-[#f3f3f3] dark:bg-[#1b1f24] md:bg-transparent md:left-1/2 md:-translate-x-1/2 md:w-full md:max-w-[460px]'
+              : 'px-1 sm:px-4 z-40 md:absolute md:left-1/2 md:-translate-x-1/2 md:w-full md:max-w-[460px]'
+          }`}
+        >
         <div className="relative w-full max-w-full md:max-w-[460px] min-w-0 mx-auto flex items-center gap-2">
           {(isSearchFlyoutOpen || isSearchFocused) && (
             <button
@@ -2240,9 +2269,10 @@ export const TopBar: React.FC<TopBarProps> = ({
           </AnimatePresence>
         </div>
       </div>
+      )}
 
       {/* 3. Right Action Icons: Settings */}
-      <div className="flex items-center gap-1.5 sm:gap-2 shrink-0 z-10">
+      <div className={`flex items-center gap-1.5 sm:gap-2 shrink-0 z-10 ${settings.tabbedSparkle ? 'mb-1' : ''}`}>
 
 
         {/* TopBar Mode: Settings Gear Icon */}

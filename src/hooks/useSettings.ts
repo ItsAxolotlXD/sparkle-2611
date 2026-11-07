@@ -45,6 +45,7 @@ export interface SystemSettings {
   animatedBootScreen: boolean;
   triangleExperiment: boolean;
   triangleExperimentVersion?: number;
+  tabbedSparkle: boolean;
   newWatchTab: boolean;
   fluentIcons: boolean;
   dynamicSidebarIcons: boolean;
@@ -102,6 +103,7 @@ export const DEFAULT_SETTINGS: SystemSettings = {
   animatedBootScreen: false,
   triangleExperiment: true,
   triangleExperimentVersion: 1,
+  tabbedSparkle: false,
   newWatchTab: false,
   fluentIcons: false,
   dynamicSidebarIcons: true,
@@ -198,6 +200,7 @@ export const getStoredSettings = (): SystemSettings => {
           ? (typeof parsed.triangleExperiment === 'boolean' ? parsed.triangleExperiment : true)
           : true,
         triangleExperimentVersion: 1,
+        tabbedSparkle: typeof parsed.tabbedSparkle === 'boolean' ? parsed.tabbedSparkle : false,
         newWatchTab: typeof parsed.newWatchTab === 'boolean' ? parsed.newWatchTab : DEFAULT_SETTINGS.newWatchTab,
         fluentIcons: typeof parsed.fluentIcons === 'boolean' ? parsed.fluentIcons : DEFAULT_SETTINGS.fluentIcons,
         dynamicSidebarIcons: typeof parsed.dynamicSidebarIcons === 'boolean' ? parsed.dynamicSidebarIcons : true,

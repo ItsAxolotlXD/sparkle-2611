@@ -213,8 +213,8 @@ export const SparkleOOBEDebug: React.FC<SparkleOOBEDebugProps> = ({
             />
             <DebugAction
               icon={<FlaskConical className="size-[18px]" aria-hidden="true" />}
-              title="Open Insider experiments"
-              description="Close setup and open Insider experiments in Settings."
+              title="Open Velocity Features"
+              description="Close setup and open Velocity Features in Settings."
               descriptionId="debug-insider-description"
               onClick={onOpenInsiderExperiments}
             />

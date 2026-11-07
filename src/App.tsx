@@ -53,6 +53,38 @@ import { NEWS_DATA } from './data/news';
 import { Channel, NewsArticle } from './types';
 import { useSettings } from './hooks/useSettings';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
+import { type AppTab } from './components/SparkleTabBar';
+
+export function getRouteTitle(route: string, channel?: Channel): string {
+  if (route === '/' || route === '/home' || route === '/home-preview') return 'Home';
+  if (route.startsWith('/live-tv') || route.startsWith('/watch')) {
+    return channel?.name ? channel.name : 'Watch';
+  }
+  if (route.startsWith('/news') || route.startsWith('/updates')) return 'Update blogs';
+  if (route.startsWith('/article/')) {
+    const slug = route.replace('/article/', '');
+    const found = NEWS_DATA.find((n) => n.slug === slug);
+    return found ? found.title.replace(/^#\s*/, '') : 'Article';
+  }
+  if (route.startsWith('/gallery')) return 'Gallery';
+  if (route.startsWith('/notes') || route.startsWith('/write')) return 'Notes';
+  if (route.startsWith('/craftmine')) return 'Craftmine';
+  if (route.startsWith('/photopea')) return 'Photopea';
+  if (route.startsWith('/draws')) return 'Ink Canvas';
+  if (route.startsWith('/vlc')) return 'Screenbox';
+  if (route.startsWith('/camera')) return 'Camera';
+  if (route.startsWith('/settings')) return 'Settings';
+  if (route.startsWith('/winui-3') || route.startsWith('/winui')) return 'WinUI 3';
+  if (route.startsWith('/feedback')) return 'Feedback';
+  if (route.startsWith('/channels')) return 'Channels';
+  if (route.startsWith('/favorites')) return 'Favorites';
+  if (route.startsWith('/test')) return 'Test Channels';
+  if (route.startsWith('/search')) return 'Search';
+  if (route.startsWith('/about')) return 'About';
+  if (route.startsWith('/auth')) return 'Account';
+  const clean = route.replace(/^\//, '').split(/[/?#]/)[0];
+  return clean ? clean.charAt(0).toUpperCase() + clean.slice(1) : 'Home';
+}
 
 export default function App() {
   const { settings, draftSettings, hasChanges, applyDraftSettings, discardDraftSettings } = useSettings();
@@ -98,6 +130,19 @@ export default function App() {
       [currentRoute]: query
     }));
   };
+
+  // Tabbed Sparkle multi-tasking tabs state
+  const [tabs, setTabs] = useState<AppTab[]>(() => {
+    const initRoute = window.location.pathname === '/' ? '/' : window.location.pathname;
+    return [
+      {
+        id: 'tab-1',
+        title: getRouteTitle(initRoute),
+        route: initRoute,
+      },
+    ];
+  });
+  const [activeTabId, setActiveTabId] = useState<string>('tab-1');
 
   // Helper to load channels with custom channels, overrides and exclusions
   const loadInitialChannels = (): Channel[] => {
@@ -459,17 +504,17 @@ export default function App() {
     if (currentRoute !== '/search') {
       previousRouteRef.current = currentRoute;
     }
-
     setRouteState(state);
     
+    let matchedChannel: Channel | undefined;
     // Parse query params if any
     if (path.includes('?')) {
       const [parsedBaseRoute, query] = path.split('?');
       const params = new URLSearchParams(query);
       const chSlug = params.get('channel');
       if (chSlug) {
-        const matched = channels.find((c) => c.slug === chSlug);
-        if (matched) setCurrentChannel(matched);
+        matchedChannel = channels.find((c) => c.slug === chSlug);
+        if (matchedChannel) setCurrentChannel(matchedChannel);
       }
       window.history.pushState(null, '', path);
       setCurrentRoute(parsedBaseRoute);
@@ -478,9 +523,147 @@ export default function App() {
       setCurrentRoute(path);
     }
 
+    // Update active tab in multi-tasking tabs state
+    const title = getRouteTitle(targetRoute, matchedChannel || currentChannel);
+    setTabs((prev) =>
+      prev.map((t) =>
+        t.id === activeTabId
+          ? {
+              ...t,
+              route: path,
+              title: title,
+              routeState: state,
+              channelId: matchedChannel ? matchedChannel.id : t.channelId,
+            }
+          : t
+      )
+    );
+
     // Scroll to top on navigation
     window.scrollTo({ top: 0, behavior: 'smooth' });
-  }, [channels, currentRoute]);
+  }, [channels, currentChannel, currentRoute, activeTabId]);
+
+  // Tab management handlers for Tabbed Sparkle
+  const handleSelectTab = useCallback((tabId: string) => {
+    setActiveTabId(tabId);
+    setTabs((prev) => {
+      const targetTab = prev.find((t) => t.id === tabId);
+      if (targetTab) {
+        if (targetTab.channelId) {
+          const ch = channels.find((c) => c.id === targetTab.channelId);
+          if (ch) setCurrentChannel(ch);
+        }
+        setRouteState(targetTab.routeState || null);
+        const targetPath = targetTab.route;
+        const base = targetPath.includes('?') ? targetPath.split('?')[0] : targetPath;
+        window.history.pushState(null, '', targetPath);
+        setCurrentRoute(base);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+      return prev;
+    });
+  }, [channels]);
+
+  const handleCreateTab = useCallback((initialRoute = '/') => {
+    const newId = `tab-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
+    const newTab: AppTab = {
+      id: newId,
+      title: getRouteTitle(initialRoute),
+      route: initialRoute,
+    };
+    setTabs((prev) => [...prev, newTab]);
+    setActiveTabId(newId);
+    setCurrentRoute(initialRoute);
+    setRouteState(null);
+    window.history.pushState(null, '', initialRoute);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, []);
+
+  const handleCloseTab = useCallback((tabId: string) => {
+    setTabs((prev) => {
+      if (prev.length <= 1) {
+        // Reset single tab to Home
+        setCurrentRoute('/');
+        setRouteState(null);
+        window.history.pushState(null, '', '/');
+        return [{ id: prev[0].id, title: 'Home', route: '/' }];
+      }
+      const closeIdx = prev.findIndex((t) => t.id === tabId);
+      const remaining = prev.filter((t) => t.id !== tabId);
+      if (activeTabId === tabId) {
+        const nextIdx = Math.min(closeIdx, remaining.length - 1);
+        const nextTab = remaining[nextIdx];
+        setActiveTabId(nextTab.id);
+        const base = nextTab.route.includes('?') ? nextTab.route.split('?')[0] : nextTab.route;
+        setCurrentRoute(base);
+        setRouteState(nextTab.routeState || null);
+        if (nextTab.channelId) {
+          const ch = channels.find((c) => c.id === nextTab.channelId);
+          if (ch) setCurrentChannel(ch);
+        }
+        window.history.pushState(null, '', nextTab.route);
+      }
+      return remaining;
+    });
+  }, [activeTabId, channels]);
+
+  const handleDuplicateTab = useCallback((tabId: string) => {
+    setTabs((prev) => {
+      const sourceTab = prev.find((t) => t.id === tabId);
+      if (!sourceTab) return prev;
+      const newId = `tab-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
+      const newTab: AppTab = {
+        ...sourceTab,
+        id: newId,
+      };
+      const idx = prev.findIndex((t) => t.id === tabId);
+      const next = [...prev];
+      next.splice(idx + 1, 0, newTab);
+      setActiveTabId(newId);
+      return next;
+    });
+  }, []);
+
+  const handleCloseOtherTabs = useCallback((tabId: string) => {
+    setTabs((prev) => {
+      const target = prev.find((t) => t.id === tabId);
+      return target ? [target] : prev;
+    });
+    setActiveTabId(tabId);
+  }, []);
+
+  // Keyboard shortcuts for Tabbed Sparkle (Ctrl+T, Ctrl+W, Ctrl+Tab)
+  useEffect(() => {
+    if (!settings.tabbedSparkle) return;
+    const handleTabKeys = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement;
+      const isInput = target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable);
+
+      // Ctrl+T or Cmd+T: New tab
+      if ((e.ctrlKey || e.metaKey) && (e.key === 't' || e.key === 'T') && !e.shiftKey) {
+        e.preventDefault();
+        handleCreateTab('/');
+      }
+      // Ctrl+W or Cmd+W: Close current tab (only when not typing in text field)
+      if ((e.ctrlKey || e.metaKey) && (e.key === 'w' || e.key === 'W') && !e.shiftKey && !isInput) {
+        e.preventDefault();
+        handleCloseTab(activeTabId);
+      }
+      // Ctrl+Tab: Switch tab
+      if ((e.ctrlKey || e.metaKey) && e.key === 'Tab') {
+        e.preventDefault();
+        const currentIndex = tabs.findIndex((t) => t.id === activeTabId);
+        if (currentIndex !== -1) {
+          const nextIndex = e.shiftKey
+            ? (currentIndex - 1 + tabs.length) % tabs.length
+            : (currentIndex + 1) % tabs.length;
+          handleSelectTab(tabs[nextIndex].id);
+        }
+      }
+    };
+    window.addEventListener('keydown', handleTabKeys);
+    return () => window.removeEventListener('keydown', handleTabKeys);
+  }, [settings.tabbedSparkle, activeTabId, tabs, handleCreateTab, handleCloseTab, handleSelectTab]);
 
   // Navigation handler
   const navigate = useCallback((path: string, state?: any) => {
@@ -904,6 +1087,8 @@ export default function App() {
           onOpenUpdate={() => setIsUpdating(true)}
           onOpenOfficeTool={handleOpenOfficeTool}
           isSplashFinished={isSplashFinished}
+          tabSearchQuery={currentTabSearchQuery}
+          onTabSearchChange={handleTabSearchChange}
         />
       )}
 
@@ -954,6 +1139,13 @@ export default function App() {
           onChangeFontSize={handleFontSizeChange}
           showUnsavedTooltip={showUnsavedTooltip}
           onDismissUnsavedTooltip={() => setShowUnsavedTooltip(false)}
+          tabs={tabs}
+          activeTabId={activeTabId}
+          onSelectTab={handleSelectTab}
+          onCreateTab={() => handleCreateTab('/')}
+          onCloseTab={handleCloseTab}
+          onDuplicateTab={handleDuplicateTab}
+          onCloseOtherTabs={handleCloseOtherTabs}
         />}
 
         {/* Dynamic Page Content with slide transition between tab pages like touch keyboard (no splash screen) */}

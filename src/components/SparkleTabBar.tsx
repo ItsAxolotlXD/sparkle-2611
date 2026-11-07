@@ -1,0 +1,428 @@
+import React, { useRef, useState, useEffect, useCallback } from 'react';
+import { createPortal } from 'react-dom';
+import { motion, AnimatePresence } from 'motion/react';
+import { 
+  ChevronLeft, 
+  ChevronRight, 
+  Plus, 
+  X, 
+  Copy, 
+  Trash2 
+} from 'lucide-react';
+import { flyoutPanelClassName, flyoutPanelStyle } from './FlyoutDropdown';
+import {
+  FluentHomeIcon,
+  FluentWatchIcon,
+  FluentLiveTvIcon,
+  FluentNewsIcon,
+  FluentNotesIcon,
+  FluentGalleryIcon,
+  FluentSettingsIcon,
+  FluentSearchIcon,
+  FluentCraftmineIcon,
+  FluentPhotopeaIcon,
+  FluentCameraIcon,
+  FluentVlcIcon,
+  FluentPersonFeedbackIcon,
+  FluentInkCanvasIcon,
+} from './FluentIcons';
+import {
+  Fluent3DHomeIcon,
+  Fluent3DArticlesIcon,
+  Fluent3DWatchPreviewIcon,
+  Fluent3DGalleryIcon,
+  Fluent3DDrawsIcon,
+  Fluent3DNotesIcon,
+  Fluent3DCraftmineIcon,
+  Fluent3DPhotopeaIcon,
+  Fluent3DVlcIcon,
+  Fluent3DCameraIcon,
+  Fluent3DSettingsIcon,
+  Fluent3DFolderSearchIcon,
+} from './Fluent3DIcons';
+import { useSettings } from '../hooks/useSettings';
+
+export interface AppTab {
+  id: string;
+  title: string;
+  route: string;
+  routeState?: any;
+  channelId?: string;
+}
+
+interface SparkleTabBarProps {
+  tabs: AppTab[];
+  activeTabId: string;
+  onSelectTab: (tabId: string) => void;
+  onCreateTab: () => void;
+  onCloseTab: (tabId: string) => void;
+  onDuplicateTab: (tabId: string) => void;
+  onCloseOtherTabs: (tabId: string) => void;
+  isLightMode: boolean;
+}
+
+interface TabContextMenuState {
+  x: number;
+  y: number;
+  tabId: string;
+}
+
+// Renders the exact same icons as on the sidebar
+const TabIcon: React.FC<{ route: string; active: boolean; dynamicIcons: boolean }> = ({
+  route,
+  dynamicIcons,
+}) => {
+  const iconClass = 'w-4 h-4 shrink-0';
+
+  if (route === '/' || route === '/home' || route === '/home-preview') {
+    return <FluentHomeIcon className={`${iconClass} text-black dark:text-white`} />;
+  }
+  if (route.startsWith('/news') || route.startsWith('/article') || route.startsWith('/updates')) {
+    return <FluentNewsIcon className={`${iconClass} text-black dark:text-white`} />;
+  }
+  if (route.startsWith('/live-tv') || route.startsWith('/watch')) {
+    return dynamicIcons ? (
+      <Fluent3DWatchPreviewIcon className={iconClass} />
+    ) : (
+      <FluentWatchIcon className={`${iconClass} text-black dark:text-white`} />
+    );
+  }
+  if (route.startsWith('/gallery')) {
+    return dynamicIcons ? (
+      <Fluent3DGalleryIcon className={iconClass} />
+    ) : (
+      <FluentGalleryIcon className={`${iconClass} text-black dark:text-white`} />
+    );
+  }
+  if (route.startsWith('/notes') || route.startsWith('/write')) {
+    return dynamicIcons ? (
+      <Fluent3DNotesIcon className={iconClass} />
+    ) : (
+      <FluentNotesIcon className={`${iconClass} text-black dark:text-white`} />
+    );
+  }
+  if (route.startsWith('/draws')) {
+    return dynamicIcons ? (
+      <Fluent3DDrawsIcon className={iconClass} />
+    ) : (
+      <FluentInkCanvasIcon className={`${iconClass} text-black dark:text-white`} />
+    );
+  }
+  if (route.startsWith('/camera')) {
+    return dynamicIcons ? (
+      <Fluent3DCameraIcon className={iconClass} />
+    ) : (
+      <FluentCameraIcon className={`${iconClass} text-black dark:text-white`} />
+    );
+  }
+  if (route.startsWith('/vlc') || route.startsWith('/screenbox')) {
+    return dynamicIcons ? (
+      <Fluent3DVlcIcon className={iconClass} />
+    ) : (
+      <FluentVlcIcon className={`${iconClass} text-black dark:text-white`} />
+    );
+  }
+  if (route.startsWith('/craftmine')) {
+    return dynamicIcons ? (
+      <Fluent3DCraftmineIcon className={iconClass} />
+    ) : (
+      <FluentCraftmineIcon className={`${iconClass} text-black dark:text-white`} />
+    );
+  }
+  if (route.startsWith('/photopea')) {
+    return dynamicIcons ? (
+      <Fluent3DPhotopeaIcon className={iconClass} />
+    ) : (
+      <FluentPhotopeaIcon className={`${iconClass} text-black dark:text-white`} />
+    );
+  }
+  if (route.startsWith('/settings')) {
+    return <FluentSettingsIcon className={`${iconClass} text-black dark:text-white`} />;
+  }
+  if (route.startsWith('/feedback')) {
+    return <FluentPersonFeedbackIcon className={`${iconClass} text-black dark:text-white`} />;
+  }
+  if (route.startsWith('/search')) {
+    return <FluentSearchIcon className={`${iconClass} text-black dark:text-white`} />;
+  }
+  if (route.startsWith('/channels') || route.startsWith('/test')) {
+    return <FluentLiveTvIcon className={`${iconClass} text-black dark:text-white`} />;
+  }
+
+  // Fallback
+  return <FluentHomeIcon className={`${iconClass} text-black dark:text-white`} />;
+};
+
+export const SparkleTabBar: React.FC<SparkleTabBarProps> = ({
+  tabs,
+  activeTabId,
+  onSelectTab,
+  onCreateTab,
+  onCloseTab,
+  onDuplicateTab,
+  onCloseOtherTabs,
+  isLightMode,
+}) => {
+  const { settings } = useSettings();
+  const dynamicIcons = settings.dynamicSidebarIcons !== false;
+  const tabsContainerRef = useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
+  const [contextMenu, setContextMenu] = useState<TabContextMenuState | null>(null);
+
+  // Check overflow and scroll bounds for the two pole navigation arrows
+  const updateScrollStatus = useCallback(() => {
+    const el = tabsContainerRef.current;
+    if (!el) return;
+    const { scrollLeft, scrollWidth, clientWidth } = el;
+    setCanScrollLeft(scrollLeft > 2);
+    setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 2);
+  }, []);
+
+  useEffect(() => {
+    const el = tabsContainerRef.current;
+    if (!el) return;
+    updateScrollStatus();
+    el.addEventListener('scroll', updateScrollStatus, { passive: true });
+    window.addEventListener('resize', updateScrollStatus);
+    return () => {
+      el.removeEventListener('scroll', updateScrollStatus);
+      window.removeEventListener('resize', updateScrollStatus);
+    };
+  }, [tabs.length, updateScrollStatus]);
+
+  // Scroll active tab into view when switched
+  useEffect(() => {
+    const el = tabsContainerRef.current;
+    if (!el) return;
+    const activeEl = el.querySelector(`[data-tab-id="${activeTabId}"]`) as HTMLElement | null;
+    if (activeEl) {
+      activeEl.scrollIntoView({ behavior: 'smooth', inline: 'nearest', block: 'nearest' });
+    }
+    setTimeout(updateScrollStatus, 160);
+  }, [activeTabId, updateScrollStatus]);
+
+  const handleScrollLeft = () => {
+    tabsContainerRef.current?.scrollBy({ left: -150, behavior: 'smooth' });
+  };
+
+  const handleScrollRight = () => {
+    tabsContainerRef.current?.scrollBy({ left: 150, behavior: 'smooth' });
+  };
+
+  // Close context menu on outside click or escape
+  useEffect(() => {
+    if (!contextMenu) return;
+    const handleClose = () => setContextMenu(null);
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setContextMenu(null);
+    };
+    window.addEventListener('click', handleClose);
+    window.addEventListener('keydown', handleKey);
+    return () => {
+      window.removeEventListener('click', handleClose);
+      window.removeEventListener('keydown', handleKey);
+    };
+  }, [contextMenu]);
+
+  return (
+    <div className="flex-1 flex items-end min-w-0 h-full relative select-none pl-1 pr-1">
+      {/* 1. Left Pole Arrow (<) for horizontal scrolling when tabs overflow */}
+      {canScrollLeft && (
+        <button
+          type="button"
+          onClick={handleScrollLeft}
+          title="Scroll tabs left"
+          aria-label="Scroll tabs left"
+          className="h-[28px] w-5 mb-0.5 mr-1 rounded-[4px] flex items-center justify-center text-neutral-500 hover:text-black dark:text-neutral-400 dark:hover:text-white hover:bg-black/10 dark:hover:bg-white/10 shrink-0 cursor-pointer z-10 transition-colors border-none"
+        >
+          <ChevronLeft className="w-3.5 h-3.5" />
+        </button>
+      )}
+
+      {/* 2. Scrollable Tabs Strip with Fade-In Animation on Tab Creation */}
+      <div
+        ref={tabsContainerRef}
+        onWheel={(e) => {
+          if (e.deltaY !== 0 && tabsContainerRef.current) {
+            tabsContainerRef.current.scrollLeft += e.deltaY;
+            updateScrollStatus();
+          }
+        }}
+        className="flex-1 flex items-end overflow-x-auto no-scrollbar scroll-smooth h-full space-x-1"
+      >
+        <AnimatePresence initial={false}>
+          {tabs.map((tab) => {
+            const isActive = tab.id === activeTabId;
+
+            return (
+              <motion.div
+                key={tab.id}
+                data-tab-id={tab.id}
+                role="tab"
+                aria-selected={isActive}
+                initial={{ opacity: 0, y: 5, scale: 0.94 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+                layout
+                onClick={() => onSelectTab(tab.id)}
+                onAuxClick={(e) => {
+                  // Middle click closes tab
+                  if (e.button === 1) {
+                    e.preventDefault();
+                    onCloseTab(tab.id);
+                  }
+                }}
+                onContextMenu={(e) => {
+                  e.preventDefault();
+                  setContextMenu({
+                    x: Math.min(e.clientX, window.innerWidth - 200),
+                    y: e.clientY,
+                    tabId: tab.id,
+                  });
+                }}
+                title={tab.title}
+                style={{
+                  minWidth: tabs.length > 8 ? '68px' : tabs.length > 5 ? '92px' : '120px',
+                  maxWidth: '210px',
+                }}
+                className={`group relative flex-1 shrink h-[30px] flex items-center justify-between px-2.5 cursor-pointer rounded-t-[6px] transition-colors duration-150 border-none outline-none ${
+                  isActive
+                    ? isLightMode
+                      ? 'bg-white text-[#111827] shadow-xs z-10'
+                      : 'bg-[#202020] text-white shadow-xs z-10'
+                    : isLightMode
+                    ? 'bg-transparent text-[#4b5563] hover:bg-black/[0.04] hover:text-[#111827]'
+                    : 'bg-transparent text-[#9ca3af] hover:bg-white/[0.05] hover:text-[#e5e7eb]'
+                }`}
+              >
+                {/* Tab Icon & Title using Sidebar's Fluent Artwork */}
+                <div className="flex items-center gap-2 min-w-0 flex-1 mr-1">
+                  <TabIcon route={tab.route} active={isActive} dynamicIcons={dynamicIcons} />
+                  <span
+                    className={`text-[12px] truncate flex-1 leading-none ${
+                      isActive ? 'font-medium' : 'font-normal'
+                    }`}
+                  >
+                    {tab.title}
+                  </span>
+                </div>
+
+                {/* Tab Close Button ('x') */}
+                <button
+                  type="button"
+                  aria-label={`Close ${tab.title}`}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onCloseTab(tab.id);
+                  }}
+                  className={`w-[16px] h-[16px] rounded-[3px] flex items-center justify-center shrink-0 transition-colors cursor-pointer border-none ${
+                    isActive
+                      ? 'text-neutral-400 hover:text-black dark:hover:text-white hover:bg-black/10 dark:hover:bg-white/15'
+                      : 'opacity-0 group-hover:opacity-100 text-neutral-400 hover:text-black dark:hover:text-white hover:bg-black/10 dark:hover:bg-white/15'
+                  }`}
+                >
+                  <X className="w-3 h-3 stroke-[2.2]" />
+                </button>
+              </motion.div>
+            );
+          })}
+        </AnimatePresence>
+      </div>
+
+      {/* 3. Right Pole Arrow (>) for horizontal scrolling when tabs overflow */}
+      {canScrollRight && (
+        <button
+          type="button"
+          onClick={handleScrollRight}
+          title="Scroll tabs right"
+          aria-label="Scroll tabs right"
+          className="h-[28px] w-5 mb-0.5 ml-1 rounded-[4px] flex items-center justify-center text-neutral-500 hover:text-black dark:text-neutral-400 dark:hover:text-white hover:bg-black/10 dark:hover:bg-white/10 shrink-0 cursor-pointer z-10 transition-colors border-none"
+        >
+          <ChevronRight className="w-3.5 h-3.5" />
+        </button>
+      )}
+
+      {/* 4. Add Tab Button (+) */}
+      <button
+        type="button"
+        id="btn-sparkle-add-tab"
+        onClick={onCreateTab}
+        title="New tab (Ctrl+T)"
+        aria-label="New tab"
+        className="w-[28px] h-[28px] mb-0.5 ml-1 rounded-[5px] flex items-center justify-center text-neutral-500 hover:text-black dark:text-neutral-400 dark:hover:text-white hover:bg-black/10 dark:hover:bg-white/10 active:bg-black/15 dark:active:bg-white/15 transition-colors cursor-pointer shrink-0 z-10 border-none"
+      >
+        <Plus className="w-3.5 h-3.5 stroke-[2.2]" />
+      </button>
+
+      {/* 5. Tab Right-Click Context Menu */}
+      {contextMenu &&
+        createPortal(
+          <div
+            role="menu"
+            style={{
+              ...flyoutPanelStyle,
+              position: 'fixed',
+              left: contextMenu.x,
+              top: contextMenu.y,
+              zIndex: 2147483647,
+            }}
+            className={`w-[190px] p-1 ${flyoutPanelClassName} fluent-context-menu`}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              type="button"
+              role="menuitem"
+              onClick={() => {
+                onCreateTab();
+                setContextMenu(null);
+              }}
+              className="w-full h-8 px-2.5 rounded-[4px] flex items-center gap-2.5 text-[12px] text-[#111827] dark:text-white hover:bg-black/5 dark:hover:bg-white/10 cursor-pointer text-left border-none"
+            >
+              <Plus className="w-3.5 h-3.5 text-neutral-400" />
+              <span>New tab</span>
+            </button>
+            <button
+              type="button"
+              role="menuitem"
+              onClick={() => {
+                onDuplicateTab(contextMenu.tabId);
+                setContextMenu(null);
+              }}
+              className="w-full h-8 px-2.5 rounded-[4px] flex items-center gap-2.5 text-[12px] text-[#111827] dark:text-white hover:bg-black/5 dark:hover:bg-white/10 cursor-pointer text-left border-none"
+            >
+              <Copy className="w-3.5 h-3.5 text-neutral-400" />
+              <span>Duplicate tab</span>
+            </button>
+            <div className="h-[1px] my-1 bg-black/10 dark:bg-white/10" />
+            <button
+              type="button"
+              role="menuitem"
+              onClick={() => {
+                onCloseTab(contextMenu.tabId);
+                setContextMenu(null);
+              }}
+              className="w-full h-8 px-2.5 rounded-[4px] flex items-center gap-2.5 text-[12px] text-[#111827] dark:text-white hover:bg-black/5 dark:hover:bg-white/10 cursor-pointer text-left border-none"
+            >
+              <X className="w-3.5 h-3.5 text-neutral-400" />
+              <span>Close tab</span>
+            </button>
+            <button
+              type="button"
+              role="menuitem"
+              onClick={() => {
+                onCloseOtherTabs(contextMenu.tabId);
+                setContextMenu(null);
+              }}
+              className="w-full h-8 px-2.5 rounded-[4px] flex items-center gap-2.5 text-[12px] text-[#111827] dark:text-white hover:bg-black/5 dark:hover:bg-white/10 cursor-pointer text-left border-none"
+            >
+              <Trash2 className="w-3.5 h-3.5 text-neutral-400" />
+              <span>Close other tabs</span>
+            </button>
+          </div>,
+          document.body
+        )}
+    </div>
+  );
+};

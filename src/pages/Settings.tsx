@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { AnimatedBootScreen } from '../components/AnimatedBootScreen';
 import { SparkleRecoveryModal } from '../components/SparkleRecoveryModal';
+import { VelocityActivationModal } from '../components/VelocityActivationModal';
 import { motion, AnimatePresence } from 'motion/react';
 import { useSettings, FONT_SCALE_CONFIG, SystemSettings } from '../hooks/useSettings';
 import { modalDialogVariants, modalBackdropVariants } from '../utils/animations';
@@ -129,6 +130,24 @@ export const Settings: React.FC<SettingsProps> = ({
     return Boolean(collapsedCategories[catId]);
   };
 
+  const [velocityModalOpen, setVelocityModalOpen] = useState(false);
+  const [pendingVelocityAction, setPendingVelocityAction] = useState<(() => void) | null>(null);
+
+  const triggerVelocityFeatureToggle = <K extends keyof SystemSettings>(key: K, nextValue: SystemSettings[K]) => {
+    setPendingVelocityAction(() => () => {
+      updateDraft(key, nextValue);
+    });
+    setVelocityModalOpen(true);
+  };
+
+  const handleVelocityModalComplete = () => {
+    if (pendingVelocityAction) {
+      pendingVelocityAction();
+      setPendingVelocityAction(null);
+    }
+    setVelocityModalOpen(false);
+  };
+
   const updateDraft = <K extends keyof SystemSettings>(key: K, value: SystemSettings[K], silentToast = false) => {
     updateDraftSetting(key, value);
     if (!silentToast) {
@@ -186,7 +205,7 @@ export const Settings: React.FC<SettingsProps> = ({
   };
 
   const matchesExperimental =
-    matchesSearch(['Insider experiments', 'Insider Flags', 'thử nghiệm', 'touch keyboard', 'native keyboard', 'bàn phím cảm ứng', 'bàn phím ảo', 'immersive search', 'fluent icons', 'flumojs', 'fluent emojis', 'emoji', '3d icons', 'animated boot screen', 'boot screen', 'khởi động', 'video khởi động']);
+    matchesSearch(['Velocity Features', 'Velocity', 'vivetool', 'tabbed sparkle', 'tabbed', 'Insider experiments', 'Insider Flags', 'thử nghiệm', 'touch keyboard', 'native keyboard', 'bàn phím cảm ứng', 'bàn phím ảo', 'immersive search', 'fluent icons', 'flumojs', 'fluent emojis', 'emoji', '3d icons', 'animated boot screen', 'boot screen', 'khởi động', 'video khởi động']);
   const matchesInterface = 
     matchesSearch(['Appearance', 'Interface', 'giao diện', 'chế độ ứng dụng', 'ban ngày', 'ban đêm', 'light', 'dark', 'thanh điều hướng', 'navigation', 'side view', 'top view', 'tab view', 'thu phóng giao diện', 'font', 'vị trí thanh bên', 'siêu chế độ tối', 'super dark']);
   const matchesAccessibility = matchesSearch(['Accessibility', 'trợ năng', 'hover to expand']);
@@ -268,7 +287,7 @@ export const Settings: React.FC<SettingsProps> = ({
                 <div className="flex items-center gap-2.5">
                   <img src="/icons/settings/insider.png" alt="" aria-hidden="true" draggable={false} className="fluent-3d-icon w-6 h-6 object-contain shrink-0" />
                   <h2 className="text-base sm:text-lg font-bold text-[#111827] dark:text-white tracking-tight">
-                    Insider experiments
+                    Velocity Features
                   </h2>
                 </div>
                 <ChevronDown 
@@ -291,6 +310,62 @@ export const Settings: React.FC<SettingsProps> = ({
               className="overflow-hidden"
             >
               <div className="space-y-2.5 bg-transparent pt-0.5">
+                {/* 1. Tabbed Sparkle (Velocity Feature) */}
+                {matchesSearch(['Tabbed Sparkle', 'Velocity Features', 'Velocity', 'tab bar', 'multitasking', 'multi-tab', 'tabs', 'vivetool']) && (
+                  <motion.div
+                    variants={slideUpVariant}
+                    initial="hidden"
+                    animate="visible"
+                    custom={elementIndex++}
+                    id="setting-velocity-tabbed-sparkle"
+                    onClick={() => triggerVelocityFeatureToggle('tabbedSparkle', !draftSettings.tabbedSparkle)}
+                    className="settings-block-card rounded-[6px] bg-white dark:bg-[#2c3037] shadow-xs px-4 py-3 sm:py-3.5 flex items-center justify-between gap-4 settings-block-card cursor-pointer hover:bg-black/[0.02] dark:hover:bg-[#363b43] transition-colors border-none"
+                  >
+                    <div className="flex items-center gap-3 min-w-0 flex-1 pr-2">
+                      <div className="w-9 h-9 flex items-center justify-center shrink-0">
+                        <svg className="w-6 h-6 text-[#0078d4] dark:text-[#4cc2ff]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M3 7a2 2 0 0 1 2-2h4.5a2 2 0 0 1 1.6.8L12.5 8H19a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z"/>
+                          <line x1="8" y1="13" x2="16" y2="13"/>
+                          <line x1="12" y1="9" x2="12" y2="17"/>
+                        </svg>
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div
+                          id="tabbed-sparkle-label"
+                          className="font-normal text-sm text-[#111827] dark:text-white flex items-center gap-2"
+                          style={{ fontWeight: 400 }}
+                        >
+                          <span>Tabbed Sparkle</span>
+                          <span className="text-[10px] px-1.5 py-0.5 rounded-[6px] uppercase tracking-wider bg-[#0078d4]/10 dark:bg-[#4cc2ff]/20 text-[#0078d4] dark:text-[#4cc2ff] font-semibold">
+                            Velocity
+                          </span>
+                        </div>
+                        <p
+                          id="tabbed-sparkle-description"
+                          className="mt-1 text-xs leading-relaxed text-[#6B7280] dark:text-[#9CA3AF]"
+                        >
+                          Transforms the top bar into a multi-tab bar like Windows 11 File Explorer. Search box moves to the sidebar for easy multitasking across tabs.
+                        </p>
+                      </div>
+                    </div>
+                    <button
+                      id="toggle-tabbed-sparkle"
+                      type="button"
+                      role="switch"
+                      aria-labelledby="tabbed-sparkle-label"
+                      aria-describedby="tabbed-sparkle-description"
+                      aria-checked={draftSettings.tabbedSparkle}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        triggerVelocityFeatureToggle('tabbedSparkle', !draftSettings.tabbedSparkle);
+                      }}
+                      className="toggle-switch-btn focus:outline-none shrink-0 border-none"
+                    >
+                      <span className="toggle-switch-thumb" />
+                    </button>
+                  </motion.div>
+                )}
+
                 {/* Touch keyboard */}
                 {matchesSearch(['Touch keyboard', 'Native keyboard', 'bàn phím cảm ứng', 'bàn phím ảo']) && (
                   <motion.div
@@ -299,7 +374,7 @@ export const Settings: React.FC<SettingsProps> = ({
                     animate="visible"
                     custom={elementIndex++}
                     id="setting-experimental-touch-keyboard"
-                    onClick={() => updateDraft('nativeKeyboard', !draftSettings.nativeKeyboard)}
+                    onClick={() => triggerVelocityFeatureToggle('nativeKeyboard', !draftSettings.nativeKeyboard)}
                     className="settings-block-card rounded-[6px] bg-white dark:bg-[#2c3037] shadow-xs px-4 py-3 sm:py-3.5 flex items-center justify-between gap-4 settings-block-card cursor-pointer hover:bg-black/[0.02] dark:hover:bg-[#363b43] transition-colors border-none"
                   >
                     <div className="min-w-0 flex-1 pr-2">
@@ -317,7 +392,6 @@ export const Settings: React.FC<SettingsProps> = ({
                         Shows an on-screen keyboard when you focus a text field. On by default on mobile and off by default on desktop; you can change it anytime.
                       </p>
                     </div>
-
                     <button
                       id="toggle-touch-keyboard"
                       type="button"
@@ -327,7 +401,7 @@ export const Settings: React.FC<SettingsProps> = ({
                       aria-checked={draftSettings.nativeKeyboard}
                       onClick={(e) => {
                         e.stopPropagation();
-                        updateDraft('nativeKeyboard', !draftSettings.nativeKeyboard);
+                        triggerVelocityFeatureToggle('nativeKeyboard', !draftSettings.nativeKeyboard);
                       }}
                       className="toggle-switch-btn focus:outline-none shrink-0 border-none"
                     >
@@ -442,7 +516,7 @@ export const Settings: React.FC<SettingsProps> = ({
                     animate="visible"
                     custom={elementIndex++}
                     id="setting-use-flumojs"
-                    onClick={() => updateDraft('useFlumojs', !draftSettings.useFlumojs)}
+                    onClick={() => triggerVelocityFeatureToggle('useFlumojs', !draftSettings.useFlumojs)}
                     className="settings-block-card rounded-[6px] bg-white dark:bg-[#2c3037] shadow-xs px-4 py-3 sm:py-3.5 flex items-center justify-between gap-4 settings-block-card cursor-pointer hover:bg-black/[0.02] dark:hover:bg-[#363b43] transition-colors border-none"
                   >
                     <div className="flex items-center gap-3 min-w-0 flex-1 pr-2">
@@ -461,7 +535,6 @@ export const Settings: React.FC<SettingsProps> = ({
                         </p>
                       </div>
                     </div>
-
                     <button
                       id="toggle-use-flumojs"
                       type="button"
@@ -471,7 +544,7 @@ export const Settings: React.FC<SettingsProps> = ({
                       aria-checked={draftSettings.useFlumojs}
                       onClick={(e) => {
                         e.stopPropagation();
-                        updateDraft('useFlumojs', !draftSettings.useFlumojs);
+                        triggerVelocityFeatureToggle('useFlumojs', !draftSettings.useFlumojs);
                       }}
                       className="toggle-switch-btn focus:outline-none shrink-0 border-none"
                     >
@@ -488,7 +561,7 @@ export const Settings: React.FC<SettingsProps> = ({
                     animate="visible"
                     custom={elementIndex++}
                     id="setting-dynamic-sidebar-icons"
-                    onClick={() => updateDraft('dynamicSidebarIcons', !draftSettings.dynamicSidebarIcons)}
+                    onClick={() => triggerVelocityFeatureToggle('dynamicSidebarIcons', !draftSettings.dynamicSidebarIcons)}
                     className="settings-block-card rounded-[6px] bg-white dark:bg-[#2c3037] shadow-xs px-4 py-3 sm:py-3.5 flex items-center justify-between gap-4 settings-block-card cursor-pointer hover:bg-black/[0.02] dark:hover:bg-[#363b43] transition-colors border-none"
                   >
                     <div className="flex items-center gap-3 min-w-0 flex-1 pr-2">
@@ -507,7 +580,6 @@ export const Settings: React.FC<SettingsProps> = ({
                         </div>
                       </div>
                     </div>
-
                     <button
                       id="toggle-dynamic-sidebar-icons"
                       type="button"
@@ -515,7 +587,7 @@ export const Settings: React.FC<SettingsProps> = ({
                       aria-checked={draftSettings.dynamicSidebarIcons}
                       onClick={(e) => {
                         e.stopPropagation();
-                        updateDraft('dynamicSidebarIcons', !draftSettings.dynamicSidebarIcons);
+                        triggerVelocityFeatureToggle('dynamicSidebarIcons', !draftSettings.dynamicSidebarIcons);
                       }}
                       className="toggle-switch-btn focus:outline-none shrink-0 border-none"
                     >
@@ -532,7 +604,7 @@ export const Settings: React.FC<SettingsProps> = ({
                     animate="visible"
                     custom={elementIndex++}
                     id="setting-animated-boot-screen"
-                    onClick={() => updateDraft('animatedBootScreen', !draftSettings.animatedBootScreen)}
+                    onClick={() => triggerVelocityFeatureToggle('animatedBootScreen', !draftSettings.animatedBootScreen)}
                     className="settings-block-card rounded-[6px] bg-white dark:bg-[#2c3037] shadow-xs px-4 py-3 sm:py-3.5 flex items-center justify-between gap-4 settings-block-card cursor-pointer hover:bg-black/[0.02] dark:hover:bg-[#363b43] transition-colors border-none"
                   >
                     <div className="flex items-center gap-3 min-w-0 flex-1 pr-2">
@@ -557,7 +629,6 @@ export const Settings: React.FC<SettingsProps> = ({
                         </div>
                       </div>
                     </div>
-
                     <div className="flex items-center gap-2 sm:gap-3 shrink-0">
                       <button
                         type="button"
@@ -571,7 +642,6 @@ export const Settings: React.FC<SettingsProps> = ({
                         <Play className="w-3 h-3 fill-current" />
                         <span className="hidden sm:inline">Xem thử</span>
                       </button>
-
                       <button
                         id="toggle-animated-boot-screen"
                         type="button"
@@ -579,7 +649,7 @@ export const Settings: React.FC<SettingsProps> = ({
                         aria-checked={draftSettings.animatedBootScreen}
                         onClick={(e) => {
                           e.stopPropagation();
-                          updateDraft('animatedBootScreen', !draftSettings.animatedBootScreen);
+                          triggerVelocityFeatureToggle('animatedBootScreen', !draftSettings.animatedBootScreen);
                         }}
                         className="toggle-switch-btn focus:outline-none shrink-0 border-none"
                       >
@@ -1711,6 +1781,12 @@ export const Settings: React.FC<SettingsProps> = ({
         isOpen={isRecoveryOpen}
         onClose={() => setIsRecoveryOpen(false)}
         navigate={navigate}
+      />
+
+      {/* WinUI 3 Velocity Activation Modal (5-second GIF loader) */}
+      <VelocityActivationModal
+        isOpen={velocityModalOpen}
+        onComplete={handleVelocityModalComplete}
       />
     </motion.div>
   );
