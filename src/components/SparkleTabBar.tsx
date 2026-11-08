@@ -423,7 +423,7 @@ export const SparkleTabBar: React.FC<SparkleTabBarProps> = ({
           transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
           aria-label="Search"
           aria-describedby={searchTooltip ? 'sparkle-search-tooltip' : undefined}
-          className="w-[30px] h-[30px] mb-0.5 mr-1.5 rounded-[10px] flex items-center justify-center bg-transparent hover:bg-black/10 dark:hover:bg-white/10 active:bg-black/15 dark:active:bg-white/15 transition-colors cursor-pointer shrink-0 z-10 border-none shadow-none"
+          className="w-[30px] h-[30px] mb-0.5 mr-1.5 rounded-[8px] flex items-center justify-center bg-transparent hover:bg-black/10 dark:hover:bg-white/10 active:bg-black/15 dark:active:bg-white/15 transition-colors cursor-pointer shrink-0 z-10 border-none shadow-none"
         >
           <FluentSearchIcon className="w-[15px] h-[15px] text-black dark:text-white shrink-0 pointer-events-none select-none" />
         </motion.button>

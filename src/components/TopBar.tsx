@@ -1643,7 +1643,7 @@ export const TopBar: React.FC<TopBarProps> = ({
 
   return (
     <header className={`w-full ${
-      settings.tabbedSparkle ? 'h-[42px] sm:h-[44px] pt-1 pl-1.5 sm:pl-2.5 md:pl-3 pr-2 sm:pr-4 md:pr-6' : 'h-14 px-2 sm:px-4 md:px-6'
+      settings.tabbedSparkle ? 'h-14 pt-1 pl-1.5 sm:pl-2.5 md:pl-3 pr-2 sm:pr-4 md:pr-6' : 'h-14 px-2 sm:px-4 md:px-6'
     } relative bg-[#f3f3f3] dark:bg-[#1b1f24] flex items-end justify-between gap-1.5 sm:gap-2.5 sticky top-0 ${
       isSearchFlyoutOpen || isSearchFocused ? 'z-[2147483647]' : '!z-[200]'
     } select-none border-b border-black/5 dark:border-white/5`}>
