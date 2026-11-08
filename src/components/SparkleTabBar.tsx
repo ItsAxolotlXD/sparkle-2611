@@ -149,7 +149,6 @@ const TabContextMenu: React.FC<TabContextMenuProps> = ({
         left: position.left,
         top: position.top,
         zIndex: 2147483647,
-        clipPath: 'inset(0% -60px -60px -60px)',
       }}
       className="fluent-context-menu-wrapper pointer-events-auto"
       onContextMenu={(e) => {

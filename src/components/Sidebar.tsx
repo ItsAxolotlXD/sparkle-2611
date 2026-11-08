@@ -1037,7 +1037,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
           left: position.left,
           top: position.top,
           zIndex: 2147483647,
-          clipPath: isUpward ? 'inset(-60px -60px 0% -60px)' : 'inset(0% -60px -60px -60px)',
         }}
         className="fluent-context-menu-wrapper pointer-events-auto"
         onContextMenu={(e) => e.preventDefault()}
