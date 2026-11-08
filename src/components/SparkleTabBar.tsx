@@ -1,6 +1,6 @@
 import React, { useRef, useState, useEffect, useLayoutEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence, Reorder } from 'motion/react';
 import { 
   ChevronLeft, 
   ChevronRight, 
@@ -59,6 +59,7 @@ interface SparkleTabBarProps {
   onCloseTab: (tabId: string) => void;
   onDuplicateTab: (tabId: string) => void;
   onCloseOtherTabs: (tabId: string) => void;
+  onReorderTabs: (reorderedTabs: AppTab[]) => void;
   isLightMode: boolean;
   onOpenSearch?: () => void;
 }
@@ -323,6 +324,7 @@ export const SparkleTabBar: React.FC<SparkleTabBarProps> = ({
   onCloseTab,
   onDuplicateTab,
   onCloseOtherTabs,
+  onReorderTabs,
   isLightMode,
   onOpenSearch,
 }) => {
@@ -421,7 +423,7 @@ export const SparkleTabBar: React.FC<SparkleTabBarProps> = ({
           transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
           aria-label="Search"
           aria-describedby={searchTooltip ? 'sparkle-search-tooltip' : undefined}
-          className="w-[30px] h-[30px] mb-0.5 mr-1.5 rounded-[100px] flex items-center justify-center bg-transparent hover:bg-black/10 dark:hover:bg-white/10 active:bg-black/15 dark:active:bg-white/15 transition-colors cursor-pointer shrink-0 z-10 border-none shadow-none"
+          className="w-[30px] h-[30px] mb-0.5 mr-1.5 rounded-[10px] flex items-center justify-center bg-transparent hover:bg-black/10 dark:hover:bg-white/10 active:bg-black/15 dark:active:bg-white/15 transition-colors cursor-pointer shrink-0 z-10 border-none shadow-none"
         >
           <FluentSearchIcon className="w-[15px] h-[15px] text-black dark:text-white shrink-0 pointer-events-none select-none" />
         </motion.button>
@@ -478,34 +480,61 @@ export const SparkleTabBar: React.FC<SparkleTabBarProps> = ({
             updateScrollStatus();
           }
         }}
-        onContextMenu={(e) => {
-          if (e.target === e.currentTarget) {
-            e.preventDefault();
-            e.stopPropagation();
-            setContextMenu({
-              x: e.clientX,
-              y: e.clientY + 2,
-              tabId: '',
-            });
-          }
-        }}
-        className="flex-1 flex items-end overflow-x-auto no-scrollbar scroll-smooth h-full space-x-1"
+        className="flex-1 flex items-end overflow-x-auto no-scrollbar scroll-smooth h-full"
       >
-        <AnimatePresence initial={false}>
+        <Reorder.Group
+          as="div"
+          axis="x"
+          values={tabs}
+          onReorder={onReorderTabs}
+          role="tablist"
+          aria-label="Open tabs"
+          onContextMenu={(e) => {
+            if (e.target === e.currentTarget) {
+              e.preventDefault();
+              e.stopPropagation();
+              setContextMenu({
+                x: e.clientX,
+                y: e.clientY + 2,
+                tabId: '',
+              });
+            }
+          }}
+          className="flex items-end space-x-1 h-full w-max min-w-full"
+        >
+          <AnimatePresence initial={false}>
           {tabs.map((tab) => {
             const isActive = tab.id === activeTabId;
 
             return (
-              <motion.div
+              <Reorder.Item
+                as="div"
                 key={tab.id}
+                value={tab}
                 data-tab-id={tab.id}
                 role="tab"
                 aria-selected={isActive}
+                aria-keyshortcuts="Shift+ArrowLeft Shift+ArrowRight"
+                tabIndex={0}
                 initial={{ opacity: 0, y: 22 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 22 }}
                 transition={{ duration: 0.24, ease: [0.16, 1, 0.3, 1] }}
                 layout
+                dragMomentum={false}
+                whileDrag={{ scale: 1.02, zIndex: 50 }}
+                onKeyDown={(e) => {
+                  if (!e.shiftKey || (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight')) return;
+                  const currentIndex = tabs.findIndex((currentTab) => currentTab.id === tab.id);
+                  const targetIndex = currentIndex + (e.key === 'ArrowLeft' ? -1 : 1);
+                  if (targetIndex < 0 || targetIndex >= tabs.length) return;
+
+                  e.preventDefault();
+                  const reorderedTabs = [...tabs];
+                  const [movedTab] = reorderedTabs.splice(currentIndex, 1);
+                  reorderedTabs.splice(targetIndex, 0, movedTab);
+                  onReorderTabs(reorderedTabs);
+                }}
                 onClick={() => onSelectTab(tab.id)}
                 onAuxClick={(e) => {
                   // Middle click closes tab
@@ -528,7 +557,7 @@ export const SparkleTabBar: React.FC<SparkleTabBarProps> = ({
                   minWidth: tabs.length > 8 ? '68px' : tabs.length > 5 ? '92px' : '120px',
                   maxWidth: '210px',
                 }}
-                className={`group relative flex-1 shrink h-[32px] flex items-center justify-between px-2.5 cursor-pointer rounded-t-[6px] transition-colors duration-150 border-none outline-none ${
+                className={`group relative flex-1 shrink h-[34px] flex items-center justify-between px-2.5 cursor-grab active:cursor-grabbing rounded-t-[6px] transition-colors duration-150 border-none outline-none ${
                   isActive
                     ? isLightMode
                       ? 'bg-[#f9f9f9] text-[#111827] shadow-xs z-10'
@@ -556,6 +585,7 @@ export const SparkleTabBar: React.FC<SparkleTabBarProps> = ({
                 <button
                   type="button"
                   aria-label={`Close ${tab.title}`}
+                  onPointerDown={(e) => e.stopPropagation()}
                   onClick={(e) => {
                     e.stopPropagation();
                     onCloseTab(tab.id);
@@ -568,10 +598,11 @@ export const SparkleTabBar: React.FC<SparkleTabBarProps> = ({
                 >
                   <X className="w-3 h-3 stroke-[2.2]" />
                 </button>
-              </motion.div>
+              </Reorder.Item>
             );
           })}
-        </AnimatePresence>
+          </AnimatePresence>
+        </Reorder.Group>
       </div>
 
       {/* 3. Right Pole Arrow (>) for horizontal scrolling when tabs overflow */}
