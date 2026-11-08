@@ -334,6 +334,14 @@ export const SparkleTabBar: React.FC<SparkleTabBarProps> = ({
   const [canScrollRight, setCanScrollRight] = useState(false);
   const [contextMenu, setContextMenu] = useState<TabContextMenuState | null>(null);
   const [addTabTooltip, setAddTabTooltip] = useState<{ top: number; left: number } | null>(null);
+  const [searchTooltip, setSearchTooltip] = useState<{ top: number; left: number } | null>(null);
+
+  const showSearchTooltip = (e: React.SyntheticEvent<HTMLElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    setSearchTooltip({ top: rect.bottom + 6, left: rect.left + rect.width / 2 });
+  };
+
+  const hideSearchTooltip = () => setSearchTooltip(null);
 
   const showAddTabTooltip = (e: React.MouseEvent<HTMLElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -404,15 +412,49 @@ export const SparkleTabBar: React.FC<SparkleTabBarProps> = ({
           id="btn-sparkle-tabbar-search"
           onClick={(e) => {
             e.stopPropagation();
+            hideSearchTooltip();
             onOpenSearch();
           }}
+          onMouseEnter={showSearchTooltip}
+          onMouseLeave={hideSearchTooltip}
+          onFocus={showSearchTooltip}
+          onBlur={hideSearchTooltip}
           transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
-          title="Search (Ctrl+E)"
           aria-label="Search"
+          aria-describedby={searchTooltip ? 'sparkle-search-tooltip' : undefined}
           className="w-[30px] h-[30px] mb-0.5 mr-1.5 rounded-[100px] flex items-center justify-center bg-transparent hover:bg-black/10 dark:hover:bg-white/10 active:bg-black/15 dark:active:bg-white/15 transition-colors cursor-pointer shrink-0 z-10 border-none shadow-none"
         >
           <FluentSearchIcon className="w-[15px] h-[15px] text-black dark:text-white shrink-0 pointer-events-none select-none" />
         </motion.button>
+      )}
+
+      {typeof document !== 'undefined' && createPortal(
+        <AnimatePresence>
+          {searchTooltip && (
+            <motion.div
+              id="sparkle-search-tooltip"
+              role="tooltip"
+              key="sparkle-search-tooltip"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.18, ease: 'easeOut' }}
+              style={{
+                position: 'fixed',
+                top: `${searchTooltip.top}px`,
+                left: `${searchTooltip.left}px`,
+                transform: 'translateX(-50%)',
+                backgroundColor: isLightMode ? 'rgba(255, 255, 255, 0.50)' : 'rgba(24, 24, 28, 0.50)',
+                backdropFilter: 'blur(16px) saturate(140%)',
+                WebkitBackdropFilter: 'blur(16px) saturate(140%)',
+              }}
+              className="z-[99999] px-3 py-1.5 min-h-[30px] flex items-center rounded-[6px] text-[#111827] dark:text-white text-xs font-medium shadow-[0_4px_20px_rgba(0,0,0,0.18)] border-0 outline-none pointer-events-none whitespace-nowrap select-none"
+            >
+              Search here
+            </motion.div>
+          )}
+        </AnimatePresence>,
+        document.body
       )}
 
       {/* 1. Left Pole Arrow (<) for horizontal scrolling when tabs overflow */}
@@ -487,7 +529,7 @@ export const SparkleTabBar: React.FC<SparkleTabBarProps> = ({
                   minWidth: tabs.length > 8 ? '68px' : tabs.length > 5 ? '92px' : '120px',
                   maxWidth: '210px',
                 }}
-                className={`group relative flex-1 shrink h-[30px] flex items-center justify-between px-2.5 cursor-pointer rounded-t-[6px] transition-colors duration-150 border-none outline-none ${
+                className={`group relative flex-1 shrink h-[32px] flex items-center justify-between px-2.5 cursor-pointer rounded-t-[6px] transition-colors duration-150 border-none outline-none ${
                   isActive
                     ? isLightMode
                       ? 'bg-[#f9f9f9] text-[#111827] shadow-xs z-10'

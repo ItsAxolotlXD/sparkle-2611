@@ -53,7 +53,7 @@ import {
   Fluent3DMapsIcon,
   Fluent3DMailIcon
 } from './Fluent3DIcons';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence, LayoutGroup } from 'motion/react';
 import { useSettings, SystemSettings } from '../hooks/useSettings';
 import { useIsMobile } from '../hooks/useIsMobile';
 import { useNotes } from '../context/NotesContext';
@@ -843,7 +843,7 @@ export const TopBar: React.FC<TopBarProps> = ({
         id: 'flag-search-categories',
         title: 'Search Categories',
         subtitle: 'Search Setting',
-        keywords: 'settings search categories chuyên mục phân mục',
+        keywords: 'settings search categories chuyên mục phân m���c',
         type: 'setting-toggle',
         settingKey: 'searchCategories',
         onSelect: () => navigate('/settings'),
@@ -1745,6 +1745,7 @@ export const TopBar: React.FC<TopBarProps> = ({
       </div>
 
       {/* 2. Center Search Box OR Tab Bar (Tabbed Sparkle) */}
+      <LayoutGroup id="sparkle-tab-search-transition">
       {settings.tabbedSparkle && !isTabSearchExpanded && tabs && tabs.length > 0 ? (
         <SparkleTabBar
           tabs={tabs}
@@ -2312,8 +2313,9 @@ export const TopBar: React.FC<TopBarProps> = ({
             )}
           </AnimatePresence>
         </div>
-      </div>
+        </div>
       )}
+      </LayoutGroup>
 
       {/* 3. Right Action Icons: Settings */}
       <div className={`flex items-center gap-1.5 sm:gap-2 shrink-0 z-10 ${settings.tabbedSparkle ? 'mb-1' : ''}`}>
