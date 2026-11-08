@@ -28,7 +28,8 @@ export const CanvasContextMenu: React.FC<CanvasContextMenuProps> = ({ x, y, onAc
   useLayoutEffect(() => {
     const menu = menuRef.current;
     if (!menu) return;
-    const { width, height } = menu.getBoundingClientRect();
+    const width = menu.offsetWidth;
+    const height = menu.offsetHeight;
     setPosition({
       left: Math.max(8, Math.min(x, window.innerWidth - width - 8)),
       top: Math.max(8, y > window.innerHeight - height - 8 ? y - height : y),
@@ -69,14 +70,19 @@ export const CanvasContextMenu: React.FC<CanvasContextMenuProps> = ({ x, y, onAc
       ref={menuRef}
       role="menu"
       aria-label="Canvas actions"
-      initial={{ opacity: 0, y: 22 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: 14 }}
-      transition={{ duration: 0.38, ease: [0.16, 1, 0.3, 1] }}
+      initial={{ opacity: 0, scale: 0.9 }}
+      animate={{ opacity: 1, scale: 1 }}
+      exit={{ opacity: 0, scale: 0.96 }}
+      transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
       onContextMenu={(event) => event.preventDefault()}
       onMouseDown={(event) => event.stopPropagation()}
       className={`fixed z-[2147483647] w-[232px] ${flyoutPanelClassName} fluent-context-menu`}
-      style={{ ...flyoutPanelStyle, left: position.left, top: position.top }}
+      style={{
+        ...flyoutPanelStyle,
+        left: position.left,
+        top: position.top,
+        transformOrigin: `${x - position.left}px ${y - position.top}px`,
+      }}
     >
       {entries.map((entry, index) => {
         const Icon = entry.icon;
@@ -85,9 +91,9 @@ export const CanvasContextMenu: React.FC<CanvasContextMenuProps> = ({ x, y, onAc
             key={entry.action}
             type="button"
             role="menuitem"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.38, delay: index * 0.04, ease: [0.16, 1, 0.3, 1] }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.16, delay: index * 0.025, ease: 'easeOut' }}
             onMouseDown={(e) => e.stopPropagation()}
             onClick={(e) => {
               e.preventDefault();

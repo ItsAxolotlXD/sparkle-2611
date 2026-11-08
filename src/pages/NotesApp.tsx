@@ -118,7 +118,8 @@ const NoteContextMenu: React.FC<NoteContextMenuProps> = ({ x, y, isPinned, onAct
   useLayoutEffect(() => {
     const menu = menuRef.current;
     if (!menu) return;
-    const { width, height } = menu.getBoundingClientRect();
+    const width = menu.offsetWidth;
+    const height = menu.offsetHeight;
     setPosition({
       left: Math.max(8, Math.min(x, window.innerWidth - width - 8)),
       top: Math.max(8, y > window.innerHeight - height - 8 ? y - height : y),
@@ -171,14 +172,19 @@ const NoteContextMenu: React.FC<NoteContextMenuProps> = ({ x, y, isPinned, onAct
     <motion.div
       ref={menuRef}
       role="menu"
-      initial={{ opacity: 0, y: 18 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: 12 }}
-      transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
+      initial={{ opacity: 0, scale: 0.9 }}
+      animate={{ opacity: 1, scale: 1 }}
+      exit={{ opacity: 0, scale: 0.96 }}
+      transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
       onContextMenu={(e) => e.preventDefault()}
       onMouseDown={(e) => e.stopPropagation()}
       className={`fixed z-[2147483647] w-[220px] ${flyoutPanelClassName} fluent-context-menu`}
-      style={{ ...flyoutPanelStyle, left: position.left, top: position.top }}
+      style={{
+        ...flyoutPanelStyle,
+        left: position.left,
+        top: position.top,
+        transformOrigin: `${x - position.left}px ${y - position.top}px`,
+      }}
     >
       {items.map((item) => {
         const Icon = item.icon;
@@ -1116,7 +1122,7 @@ export const NotesApp: React.FC<NotesAppProps> = ({
         </div>
         <div className="flex items-center gap-3">
           <span>UTF-8</span>
-          <span>•</span>
+          <span>���</span>
           <span>WinUI 3 Note</span>
         </div>
       </footer>

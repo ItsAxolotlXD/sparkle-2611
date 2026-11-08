@@ -162,11 +162,11 @@ const TabContextMenu: React.FC<TabContextMenuProps> = ({
       <motion.div
         role="menu"
         aria-label="Tab actions"
-        initial={{ y: '-100%' }}
-        animate={{ y: '0%' }}
-        exit={{ y: '-100%' }}
-        transition={{ duration: 0.13, ease: 'easeOut' }}
-        style={flyoutPanelStyle}
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.96 }}
+        transition={{ duration: 0.16, ease: [0.16, 1, 0.3, 1] }}
+        style={{ ...flyoutPanelStyle, transformOrigin: `${x - position.left}px ${y - position.top}px` }}
         className={`w-[190px] p-1 ${flyoutPanelClassName} fluent-context-menu`}
       >
         <div className="w-full flex flex-col">
@@ -423,7 +423,7 @@ export const SparkleTabBar: React.FC<SparkleTabBarProps> = ({
           transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
           aria-label="Search"
           aria-describedby={searchTooltip ? 'sparkle-search-tooltip' : undefined}
-          className="w-[30px] h-[30px] mb-0.5 mr-1.5 rounded-[8px] flex items-center justify-center bg-transparent hover:bg-black/10 dark:hover:bg-white/10 active:bg-black/15 dark:active:bg-white/15 transition-colors cursor-pointer shrink-0 z-10 border-none shadow-none"
+          className="w-[30px] h-[30px] self-center mr-1.5 rounded-[8px] flex items-center justify-center bg-transparent hover:bg-black/10 dark:hover:bg-white/10 active:bg-black/15 dark:active:bg-white/15 transition-colors cursor-pointer shrink-0 z-10 border-none shadow-none"
         >
           <FluentSearchIcon className="w-[15px] h-[15px] text-black dark:text-white shrink-0 pointer-events-none select-none" />
         </motion.button>
@@ -465,7 +465,7 @@ export const SparkleTabBar: React.FC<SparkleTabBarProps> = ({
           onClick={handleScrollLeft}
           title="Scroll tabs left"
           aria-label="Scroll tabs left"
-          className="h-[28px] w-5 mb-0.5 mr-1 rounded-[4px] flex items-center justify-center text-neutral-500 hover:text-black dark:text-neutral-400 dark:hover:text-white hover:bg-black/10 dark:hover:bg-white/10 shrink-0 cursor-pointer z-10 transition-colors border-none"
+          className="h-[28px] w-5 self-center mr-1 rounded-[4px] flex items-center justify-center text-neutral-500 hover:text-black dark:text-neutral-400 dark:hover:text-white hover:bg-black/10 dark:hover:bg-white/10 shrink-0 cursor-pointer z-10 transition-colors border-none"
         >
           <ChevronLeft className="w-3.5 h-3.5" />
         </button>
@@ -557,7 +557,7 @@ export const SparkleTabBar: React.FC<SparkleTabBarProps> = ({
                   minWidth: tabs.length > 8 ? '68px' : tabs.length > 5 ? '92px' : '120px',
                   maxWidth: '210px',
                 }}
-                className={`group relative flex-1 shrink h-[34px] flex items-center justify-between px-2.5 cursor-grab active:cursor-grabbing rounded-t-[6px] transition-colors duration-150 border-none outline-none ${
+                className={`group relative flex-1 shrink h-[38px] flex items-center justify-between px-2.5 cursor-grab active:cursor-grabbing rounded-t-[6px] transition-colors duration-150 border-none outline-none ${
                   isActive
                     ? isLightMode
                       ? 'bg-[#f9f9f9] text-[#111827] shadow-xs z-10'
@@ -612,7 +612,7 @@ export const SparkleTabBar: React.FC<SparkleTabBarProps> = ({
           onClick={handleScrollRight}
           title="Scroll tabs right"
           aria-label="Scroll tabs right"
-          className="h-[28px] w-5 mb-0.5 ml-1 rounded-[4px] flex items-center justify-center text-neutral-500 hover:text-black dark:text-neutral-400 dark:hover:text-white hover:bg-black/10 dark:hover:bg-white/10 shrink-0 cursor-pointer z-10 transition-colors border-none"
+          className="h-[28px] w-5 self-center ml-1 rounded-[4px] flex items-center justify-center text-neutral-500 hover:text-black dark:text-neutral-400 dark:hover:text-white hover:bg-black/10 dark:hover:bg-white/10 shrink-0 cursor-pointer z-10 transition-colors border-none"
         >
           <ChevronRight className="w-3.5 h-3.5" />
         </button>
@@ -629,7 +629,7 @@ export const SparkleTabBar: React.FC<SparkleTabBarProps> = ({
         onMouseEnter={showAddTabTooltip}
         onMouseLeave={hideAddTabTooltip}
         aria-label="New tab"
-        className="w-[28px] h-[28px] mb-0.5 ml-1 rounded-[5px] flex items-center justify-center text-neutral-500 hover:text-black dark:text-neutral-400 dark:hover:text-white hover:bg-black/10 dark:hover:bg-white/10 active:bg-black/15 dark:active:bg-white/15 transition-colors cursor-pointer shrink-0 z-10 border-none"
+        className="w-[28px] h-[28px] self-center ml-1 rounded-[5px] flex items-center justify-center text-neutral-500 hover:text-black dark:text-neutral-400 dark:hover:text-white hover:bg-black/10 dark:hover:bg-white/10 active:bg-black/15 dark:active:bg-white/15 transition-colors cursor-pointer shrink-0 z-10 border-none"
       >
         <Plus className="w-3.5 h-3.5 stroke-[2.2]" />
       </button>

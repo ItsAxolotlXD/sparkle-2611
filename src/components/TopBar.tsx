@@ -1765,7 +1765,7 @@ export const TopBar: React.FC<TopBarProps> = ({
         <div 
           ref={searchContainerRef}
           id="topbar-search-container"
-          className={`flex-1 flex items-center justify-center min-w-0 transition-all ${
+          className={`self-center flex-1 flex items-center justify-center min-w-0 transition-all ${
             isSearchFlyoutOpen || isSearchFocused
               ? 'fixed md:absolute inset-x-0 top-0 h-14 md:h-auto md:top-auto px-2.5 sm:px-4 z-[2147483647] bg-[#f3f3f3] dark:bg-[#1b1f24] md:bg-transparent md:left-1/2 md:-translate-x-1/2 md:w-full md:max-w-[460px]'
               : 'px-1 sm:px-4 z-40 md:absolute md:left-1/2 md:-translate-x-1/2 md:w-full md:max-w-[460px]'

@@ -1044,11 +1044,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
         <motion.div
           role="menu"
           aria-label="Sidebar actions"
-          initial={{ y: isUpward ? '100%' : '-100%' }}
-          animate={{ y: '0%' }}
-          exit={{ y: isUpward ? '100%' : '-100%' }}
-          transition={{ duration: 0.13, ease: 'easeOut' }}
-          style={flyoutPanelStyle}
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.96 }}
+          transition={{ duration: 0.16, ease: [0.16, 1, 0.3, 1] }}
+          style={{ ...flyoutPanelStyle, transformOrigin: `${x - position.left}px ${y - position.top}px` }}
           className={`w-[232px] p-1.5 ${flyoutPanelClassName} fluent-context-menu`}
         >
           <div className="w-full flex flex-col space-y-0.5">

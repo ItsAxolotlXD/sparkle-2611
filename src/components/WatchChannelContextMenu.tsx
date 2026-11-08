@@ -42,7 +42,8 @@ export const WatchChannelContextMenu: React.FC<WatchChannelContextMenuProps> = (
   useLayoutEffect(() => {
     const el = menuRef.current;
     if (!el) return;
-    const { width, height } = el.getBoundingClientRect();
+    const width = el.offsetWidth;
+    const height = el.offsetHeight;
     const maxLeft = window.innerWidth - width - VIEWPORT_MARGIN;
     const maxTop = window.innerHeight - height - VIEWPORT_MARGIN;
     setPosition({
@@ -97,14 +98,13 @@ export const WatchChannelContextMenu: React.FC<WatchChannelContextMenuProps> = (
         key={entry.action}
         type="button"
         role="menuitem"
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0 }}
         animate={{
           opacity: 1,
-          y: 0,
           transition: {
-            duration: 0.38,
+            duration: 0.16,
             delay,
-            ease: [0.16, 1, 0.3, 1],
+            ease: 'easeOut',
           },
         }}
         onClick={() => {
@@ -130,38 +130,41 @@ export const WatchChannelContextMenu: React.FC<WatchChannelContextMenuProps> = (
       ref={menuRef}
       role="menu"
       aria-label="Channel options"
-      initial={{ opacity: 0, y: 22 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: 14 }}
-      transition={{ duration: 0.38, ease: [0.16, 1, 0.3, 1] }}
+      initial={{ opacity: 0, scale: 0.9 }}
+      animate={{ opacity: 1, scale: 1 }}
+      exit={{ opacity: 0, scale: 0.96 }}
+      transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
       onContextMenu={(e) => e.preventDefault()}
       className={`fixed z-[2147483647] w-[232px] ${flyoutPanelClassName} fluent-context-menu`}
-      style={{ ...flyoutPanelStyle, left: position.left, top: position.top }}
+      style={{
+        ...flyoutPanelStyle,
+        left: position.left,
+        top: position.top,
+        transformOrigin: `${x - position.left}px ${y - position.top}px`,
+      }}
     >
       {actions.map((entry, idx) => renderEntry(entry, idx * 0.04))}
 
       {/* Divider */}
       <motion.div
         role="separator"
-        initial={{ opacity: 0, scaleX: 0.8 }}
+        initial={{ opacity: 0 }}
         animate={{
           opacity: 1,
-          scaleX: 1,
-          transition: { duration: 0.38, delay: 0.12, ease: [0.16, 1, 0.3, 1] },
+          transition: { duration: 0.16, delay: 0.08, ease: 'easeOut' },
         }}
         className="h-px bg-black/10 dark:bg-white/10 my-1 mx-1 origin-left"
       />
 
       {/* Disabled 'More to come soon...' */}
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0 }}
         animate={{
           opacity: 1,
-          y: 0,
           transition: {
-            duration: 0.38,
-            delay: 0.16,
-            ease: [0.16, 1, 0.3, 1],
+            duration: 0.16,
+            delay: 0.1,
+            ease: 'easeOut',
           },
         }}
         className="w-full h-[32px] px-3 flex items-center text-[12px] text-[#6B7280] dark:text-[#9CA3AF] select-none italic cursor-default opacity-60"
