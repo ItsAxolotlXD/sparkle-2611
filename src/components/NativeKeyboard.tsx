@@ -533,11 +533,16 @@ export const NativeKeyboard: React.FC = () => {
         height: `${keyboardHeight}px`,
         zIndex: 2147483647,
       }}
-      className={`touch-keyboard-shell fixed inset-x-0 bottom-0 z-50 rounded-none transition-all duration-[440ms] [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] will-change-transform select-none flex flex-col justify-between ${
-        isOpen ? 'translate-y-0 opacity-100 pointer-events-auto' : 'translate-y-full opacity-0 pointer-events-none'
+      aria-hidden={!isOpen}
+      className={`touch-keyboard-shell fixed inset-x-0 bottom-0 z-50 rounded-none transition-opacity duration-[440ms] [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] select-none flex flex-col justify-between ${
+        isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
       }`}
     >
-      <div className="w-full max-w-full mx-auto flex flex-col justify-between h-full px-0.5 sm:px-1 md:px-3 lg:px-4 pt-0.5 pb-1 sm:pb-1.5">
+      <div
+        className={`w-full max-w-full mx-auto flex flex-col justify-between h-full px-0.5 sm:px-1 md:px-3 lg:px-4 pt-0.5 pb-1 sm:pb-1.5 transition-transform duration-[440ms] [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] ${
+          isOpen ? 'translate-y-0' : 'translate-y-full'
+        }`}
+      >
         {/* Top bar with Windows 11 Touch Keyboard header icons */}
         <div className="touch-keyboard-header relative flex items-center justify-between gap-2 px-1 pt-0.5 pb-1 select-none min-h-[30px] sm:min-h-[34px] border-b border-black/10 dark:border-white/10 text-black/75 dark:text-white/75">
           {/* Top-left: Settings gear & layout switch icon */}

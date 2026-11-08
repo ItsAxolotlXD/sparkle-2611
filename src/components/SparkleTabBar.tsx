@@ -1,6 +1,6 @@
 import React, { useRef, useState, useEffect, useLayoutEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence, Reorder } from 'motion/react';
 import { 
   ChevronLeft, 
   ChevronRight, 
@@ -59,6 +59,7 @@ interface SparkleTabBarProps {
   onCloseTab: (tabId: string) => void;
   onDuplicateTab: (tabId: string) => void;
   onCloseOtherTabs: (tabId: string) => void;
+  onReorderTabs: (reorderedTabs: AppTab[]) => void;
   isLightMode: boolean;
   onOpenSearch?: () => void;
 }
@@ -149,7 +150,6 @@ const TabContextMenu: React.FC<TabContextMenuProps> = ({
         left: position.left,
         top: position.top,
         zIndex: 2147483647,
-        clipPath: 'inset(0% -60px -60px -60px)',
       }}
       className="fluent-context-menu-wrapper pointer-events-auto"
       onContextMenu={(e) => {
@@ -162,11 +162,11 @@ const TabContextMenu: React.FC<TabContextMenuProps> = ({
       <motion.div
         role="menu"
         aria-label="Tab actions"
-        initial={{ y: '-100%' }}
-        animate={{ y: '0%' }}
-        exit={{ y: '-100%' }}
-        transition={{ duration: 0.13, ease: 'easeOut' }}
-        style={flyoutPanelStyle}
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.96 }}
+        transition={{ duration: 0.16, ease: [0.16, 1, 0.3, 1] }}
+        style={{ ...flyoutPanelStyle, transformOrigin: `${x - position.left}px ${y - position.top}px` }}
         className={`w-[190px] p-1 ${flyoutPanelClassName} fluent-context-menu`}
       >
         <div className="w-full flex flex-col">
@@ -324,6 +324,7 @@ export const SparkleTabBar: React.FC<SparkleTabBarProps> = ({
   onCloseTab,
   onDuplicateTab,
   onCloseOtherTabs,
+  onReorderTabs,
   isLightMode,
   onOpenSearch,
 }) => {
@@ -334,6 +335,14 @@ export const SparkleTabBar: React.FC<SparkleTabBarProps> = ({
   const [canScrollRight, setCanScrollRight] = useState(false);
   const [contextMenu, setContextMenu] = useState<TabContextMenuState | null>(null);
   const [addTabTooltip, setAddTabTooltip] = useState<{ top: number; left: number } | null>(null);
+  const [searchTooltip, setSearchTooltip] = useState<{ top: number; left: number } | null>(null);
+
+  const showSearchTooltip = (e: React.SyntheticEvent<HTMLElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    setSearchTooltip({ top: rect.bottom + 6, left: rect.left + rect.width / 2 });
+  };
+
+  const hideSearchTooltip = () => setSearchTooltip(null);
 
   const showAddTabTooltip = (e: React.MouseEvent<HTMLElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -404,15 +413,49 @@ export const SparkleTabBar: React.FC<SparkleTabBarProps> = ({
           id="btn-sparkle-tabbar-search"
           onClick={(e) => {
             e.stopPropagation();
+            hideSearchTooltip();
             onOpenSearch();
           }}
+          onMouseEnter={showSearchTooltip}
+          onMouseLeave={hideSearchTooltip}
+          onFocus={showSearchTooltip}
+          onBlur={hideSearchTooltip}
           transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
-          title="Search (Ctrl+E)"
           aria-label="Search"
-          className="w-[30px] h-[30px] mb-0.5 mr-1.5 rounded-[100px] flex items-center justify-center bg-transparent hover:bg-black/10 dark:hover:bg-white/10 active:bg-black/15 dark:active:bg-white/15 transition-colors cursor-pointer shrink-0 z-10 border-none shadow-none"
+          aria-describedby={searchTooltip ? 'sparkle-search-tooltip' : undefined}
+          className="w-[30px] h-[30px] self-center mr-1.5 rounded-[8px] flex items-center justify-center bg-transparent hover:bg-black/10 dark:hover:bg-white/10 active:bg-black/15 dark:active:bg-white/15 transition-colors cursor-pointer shrink-0 z-10 border-none shadow-none"
         >
           <FluentSearchIcon className="w-[15px] h-[15px] text-black dark:text-white shrink-0 pointer-events-none select-none" />
         </motion.button>
+      )}
+
+      {typeof document !== 'undefined' && createPortal(
+        <AnimatePresence>
+          {searchTooltip && (
+            <motion.div
+              id="sparkle-search-tooltip"
+              role="tooltip"
+              key="sparkle-search-tooltip"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.18, ease: 'easeOut' }}
+              style={{
+                position: 'fixed',
+                top: `${searchTooltip.top}px`,
+                left: `${searchTooltip.left}px`,
+                transform: 'translateX(-50%)',
+                backgroundColor: isLightMode ? 'rgba(255, 255, 255, 0.50)' : 'rgba(24, 24, 28, 0.50)',
+                backdropFilter: 'blur(16px) saturate(140%)',
+                WebkitBackdropFilter: 'blur(16px) saturate(140%)',
+              }}
+              className="z-[99999] px-3 py-1.5 min-h-[30px] flex items-center rounded-[6px] text-[#111827] dark:text-white text-xs font-medium shadow-[0_4px_20px_rgba(0,0,0,0.18)] border-0 outline-none pointer-events-none whitespace-nowrap select-none"
+            >
+              Search here
+            </motion.div>
+          )}
+        </AnimatePresence>,
+        document.body
       )}
 
       {/* 1. Left Pole Arrow (<) for horizontal scrolling when tabs overflow */}
@@ -422,7 +465,7 @@ export const SparkleTabBar: React.FC<SparkleTabBarProps> = ({
           onClick={handleScrollLeft}
           title="Scroll tabs left"
           aria-label="Scroll tabs left"
-          className="h-[28px] w-5 mb-0.5 mr-1 rounded-[4px] flex items-center justify-center text-neutral-500 hover:text-black dark:text-neutral-400 dark:hover:text-white hover:bg-black/10 dark:hover:bg-white/10 shrink-0 cursor-pointer z-10 transition-colors border-none"
+          className="h-[28px] w-5 self-center mr-1 rounded-[4px] flex items-center justify-center text-neutral-500 hover:text-black dark:text-neutral-400 dark:hover:text-white hover:bg-black/10 dark:hover:bg-white/10 shrink-0 cursor-pointer z-10 transition-colors border-none"
         >
           <ChevronLeft className="w-3.5 h-3.5" />
         </button>
@@ -437,34 +480,61 @@ export const SparkleTabBar: React.FC<SparkleTabBarProps> = ({
             updateScrollStatus();
           }
         }}
-        onContextMenu={(e) => {
-          if (e.target === e.currentTarget) {
-            e.preventDefault();
-            e.stopPropagation();
-            setContextMenu({
-              x: e.clientX,
-              y: e.clientY + 2,
-              tabId: '',
-            });
-          }
-        }}
-        className="flex-1 flex items-end overflow-x-auto no-scrollbar scroll-smooth h-full space-x-1"
+        className="flex-1 flex items-end overflow-x-auto no-scrollbar scroll-smooth h-full"
       >
-        <AnimatePresence initial={false}>
+        <Reorder.Group
+          as="div"
+          axis="x"
+          values={tabs}
+          onReorder={onReorderTabs}
+          role="tablist"
+          aria-label="Open tabs"
+          onContextMenu={(e) => {
+            if (e.target === e.currentTarget) {
+              e.preventDefault();
+              e.stopPropagation();
+              setContextMenu({
+                x: e.clientX,
+                y: e.clientY + 2,
+                tabId: '',
+              });
+            }
+          }}
+          className="flex items-end space-x-1 h-full w-max min-w-full"
+        >
+          <AnimatePresence initial={false}>
           {tabs.map((tab) => {
             const isActive = tab.id === activeTabId;
 
             return (
-              <motion.div
+              <Reorder.Item
+                as="div"
                 key={tab.id}
+                value={tab}
                 data-tab-id={tab.id}
                 role="tab"
                 aria-selected={isActive}
+                aria-keyshortcuts="Shift+ArrowLeft Shift+ArrowRight"
+                tabIndex={0}
                 initial={{ opacity: 0, y: 22 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 22 }}
                 transition={{ duration: 0.24, ease: [0.16, 1, 0.3, 1] }}
                 layout
+                dragMomentum={false}
+                whileDrag={{ scale: 1.02, zIndex: 50 }}
+                onKeyDown={(e) => {
+                  if (!e.shiftKey || (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight')) return;
+                  const currentIndex = tabs.findIndex((currentTab) => currentTab.id === tab.id);
+                  const targetIndex = currentIndex + (e.key === 'ArrowLeft' ? -1 : 1);
+                  if (targetIndex < 0 || targetIndex >= tabs.length) return;
+
+                  e.preventDefault();
+                  const reorderedTabs = [...tabs];
+                  const [movedTab] = reorderedTabs.splice(currentIndex, 1);
+                  reorderedTabs.splice(targetIndex, 0, movedTab);
+                  onReorderTabs(reorderedTabs);
+                }}
                 onClick={() => onSelectTab(tab.id)}
                 onAuxClick={(e) => {
                   // Middle click closes tab
@@ -487,7 +557,7 @@ export const SparkleTabBar: React.FC<SparkleTabBarProps> = ({
                   minWidth: tabs.length > 8 ? '68px' : tabs.length > 5 ? '92px' : '120px',
                   maxWidth: '210px',
                 }}
-                className={`group relative flex-1 shrink h-[30px] flex items-center justify-between px-2.5 cursor-pointer rounded-t-[6px] transition-colors duration-150 border-none outline-none ${
+                className={`group relative flex-1 shrink h-[38px] flex items-center justify-between px-2.5 cursor-grab active:cursor-grabbing rounded-t-[6px] transition-colors duration-150 border-none outline-none ${
                   isActive
                     ? isLightMode
                       ? 'bg-[#f9f9f9] text-[#111827] shadow-xs z-10'
@@ -515,6 +585,7 @@ export const SparkleTabBar: React.FC<SparkleTabBarProps> = ({
                 <button
                   type="button"
                   aria-label={`Close ${tab.title}`}
+                  onPointerDown={(e) => e.stopPropagation()}
                   onClick={(e) => {
                     e.stopPropagation();
                     onCloseTab(tab.id);
@@ -527,10 +598,11 @@ export const SparkleTabBar: React.FC<SparkleTabBarProps> = ({
                 >
                   <X className="w-3 h-3 stroke-[2.2]" />
                 </button>
-              </motion.div>
+              </Reorder.Item>
             );
           })}
-        </AnimatePresence>
+          </AnimatePresence>
+        </Reorder.Group>
       </div>
 
       {/* 3. Right Pole Arrow (>) for horizontal scrolling when tabs overflow */}
@@ -540,7 +612,7 @@ export const SparkleTabBar: React.FC<SparkleTabBarProps> = ({
           onClick={handleScrollRight}
           title="Scroll tabs right"
           aria-label="Scroll tabs right"
-          className="h-[28px] w-5 mb-0.5 ml-1 rounded-[4px] flex items-center justify-center text-neutral-500 hover:text-black dark:text-neutral-400 dark:hover:text-white hover:bg-black/10 dark:hover:bg-white/10 shrink-0 cursor-pointer z-10 transition-colors border-none"
+          className="h-[28px] w-5 self-center ml-1 rounded-[4px] flex items-center justify-center text-neutral-500 hover:text-black dark:text-neutral-400 dark:hover:text-white hover:bg-black/10 dark:hover:bg-white/10 shrink-0 cursor-pointer z-10 transition-colors border-none"
         >
           <ChevronRight className="w-3.5 h-3.5" />
         </button>
@@ -557,7 +629,7 @@ export const SparkleTabBar: React.FC<SparkleTabBarProps> = ({
         onMouseEnter={showAddTabTooltip}
         onMouseLeave={hideAddTabTooltip}
         aria-label="New tab"
-        className="w-[28px] h-[28px] mb-0.5 ml-1 rounded-[5px] flex items-center justify-center text-neutral-500 hover:text-black dark:text-neutral-400 dark:hover:text-white hover:bg-black/10 dark:hover:bg-white/10 active:bg-black/15 dark:active:bg-white/15 transition-colors cursor-pointer shrink-0 z-10 border-none"
+        className="w-[28px] h-[28px] self-center ml-1 rounded-[5px] flex items-center justify-center text-neutral-500 hover:text-black dark:text-neutral-400 dark:hover:text-white hover:bg-black/10 dark:hover:bg-white/10 active:bg-black/15 dark:active:bg-white/15 transition-colors cursor-pointer shrink-0 z-10 border-none"
       >
         <Plus className="w-3.5 h-3.5 stroke-[2.2]" />
       </button>

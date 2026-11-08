@@ -124,7 +124,6 @@ export const GalleryContextMenu: React.FC<GalleryContextMenuProps> = ({ x, y, is
         left: position.left,
         top: position.top,
         zIndex: 2147483647,
-        clipPath: isUpward ? 'inset(-60px -60px 0% -60px)' : 'inset(0% -60px -60px -60px)',
       }}
       className="fluent-context-menu-wrapper pointer-events-auto"
       onContextMenu={(e) => e.preventDefault()}
@@ -132,11 +131,11 @@ export const GalleryContextMenu: React.FC<GalleryContextMenuProps> = ({ x, y, is
       <motion.div
         role="menu"
         aria-label="File actions"
-        initial={{ y: isUpward ? '100%' : '-100%' }}
-        animate={{ y: '0%' }}
-        exit={{ y: isUpward ? '100%' : '-100%' }}
-        transition={{ duration: 0.13, ease: 'easeOut' }}
-        style={flyoutPanelStyle}
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.96 }}
+        transition={{ duration: 0.16, ease: [0.16, 1, 0.3, 1] }}
+        style={{ ...flyoutPanelStyle, transformOrigin: `${x - position.left}px ${y - position.top}px` }}
         className={`w-[232px] p-1.5 ${flyoutPanelClassName} fluent-context-menu`}
       >
         <div className="w-full flex flex-col space-y-0.5">

@@ -1,6 +1,16 @@
 @import "tailwindcss";
 @custom-variant dark (&:where(.dark, .dark *));
 
+.fluent-context-menu {
+  background-color: rgba(27, 31, 36, 0.62) !important;
+  backdrop-filter: blur(40px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(40px) saturate(180%) !important;
+}
+
+html.light-mode .fluent-context-menu {
+  background-color: rgba(255, 255, 255, 0.66) !important;
+}
+
 @font-face {
   font-family: 'Google Sans';
   font-style: normal;

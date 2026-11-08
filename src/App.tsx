@@ -544,6 +544,10 @@ export default function App() {
   }, [channels, currentChannel, currentRoute, activeTabId]);
 
   // Tab management handlers for Tabbed Sparkle
+  const handleReorderTabs = useCallback((reorderedTabs: AppTab[]) => {
+    setTabs(reorderedTabs);
+  }, []);
+
   const handleSelectTab = useCallback((tabId: string) => {
     setActiveTabId(tabId);
     setTabs((prev) => {
@@ -1166,6 +1170,7 @@ export default function App() {
           onCloseTab={handleCloseTab}
           onDuplicateTab={handleDuplicateTab}
           onCloseOtherTabs={handleCloseOtherTabs}
+          onReorderTabs={handleReorderTabs}
         />}
 
         {/* Dynamic Page Content with slide transition between tab pages like touch keyboard (no splash screen) */}

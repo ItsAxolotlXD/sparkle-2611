@@ -53,7 +53,7 @@ import {
   Fluent3DMapsIcon,
   Fluent3DMailIcon
 } from './Fluent3DIcons';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence, LayoutGroup } from 'motion/react';
 import { useSettings, SystemSettings } from '../hooks/useSettings';
 import { useIsMobile } from '../hooks/useIsMobile';
 import { useNotes } from '../context/NotesContext';
@@ -131,6 +131,7 @@ interface TopBarProps {
   onCloseTab?: (tabId: string) => void;
   onDuplicateTab?: (tabId: string) => void;
   onCloseOtherTabs?: (tabId: string) => void;
+  onReorderTabs?: (reorderedTabs: AppTab[]) => void;
 }
 
 export const TopBar: React.FC<TopBarProps> = ({
@@ -161,6 +162,7 @@ export const TopBar: React.FC<TopBarProps> = ({
   onCloseTab = () => {},
   onDuplicateTab = () => {},
   onCloseOtherTabs = () => {},
+  onReorderTabs = () => {},
 }) => {
   const { settings, hasChanges, applyDraftSettings, updateSetting } = useSettings();
   const { notes, setActiveNoteId, createNote, isStickyVisible, toggleSticky } = useNotes();
@@ -843,7 +845,7 @@ export const TopBar: React.FC<TopBarProps> = ({
         id: 'flag-search-categories',
         title: 'Search Categories',
         subtitle: 'Search Setting',
-        keywords: 'settings search categories chuyên mục phân mục',
+        keywords: 'settings search categories chuyên mục phân m���c',
         type: 'setting-toggle',
         settingKey: 'searchCategories',
         onSelect: () => navigate('/settings'),
@@ -1641,7 +1643,7 @@ export const TopBar: React.FC<TopBarProps> = ({
 
   return (
     <header className={`w-full ${
-      settings.tabbedSparkle ? 'h-[38px] sm:h-[40px] pt-1 pl-1.5 sm:pl-2.5 md:pl-3 pr-2 sm:pr-4 md:pr-6' : 'h-14 px-2 sm:px-4 md:px-6'
+      settings.tabbedSparkle ? 'h-14 pt-1 pl-1.5 sm:pl-2.5 md:pl-3 pr-2 sm:pr-4 md:pr-6' : 'h-14 px-2 sm:px-4 md:px-6'
     } relative bg-[#f3f3f3] dark:bg-[#1b1f24] flex items-end justify-between gap-1.5 sm:gap-2.5 sticky top-0 ${
       isSearchFlyoutOpen || isSearchFocused ? 'z-[2147483647]' : '!z-[200]'
     } select-none border-b border-black/5 dark:border-white/5`}>
@@ -1745,6 +1747,7 @@ export const TopBar: React.FC<TopBarProps> = ({
       </div>
 
       {/* 2. Center Search Box OR Tab Bar (Tabbed Sparkle) */}
+      <LayoutGroup id="sparkle-tab-search-transition">
       {settings.tabbedSparkle && !isTabSearchExpanded && tabs && tabs.length > 0 ? (
         <SparkleTabBar
           tabs={tabs}
@@ -1754,6 +1757,7 @@ export const TopBar: React.FC<TopBarProps> = ({
           onCloseTab={onCloseTab}
           onDuplicateTab={onDuplicateTab}
           onCloseOtherTabs={onCloseOtherTabs}
+          onReorderTabs={onReorderTabs}
           isLightMode={isLightMode}
           onOpenSearch={handleOpenTabBarSearch}
         />
@@ -1761,7 +1765,7 @@ export const TopBar: React.FC<TopBarProps> = ({
         <div 
           ref={searchContainerRef}
           id="topbar-search-container"
-          className={`flex-1 flex items-center justify-center min-w-0 transition-all ${
+          className={`self-center flex-1 flex items-center justify-center min-w-0 transition-all ${
             isSearchFlyoutOpen || isSearchFocused
               ? 'fixed md:absolute inset-x-0 top-0 h-14 md:h-auto md:top-auto px-2.5 sm:px-4 z-[2147483647] bg-[#f3f3f3] dark:bg-[#1b1f24] md:bg-transparent md:left-1/2 md:-translate-x-1/2 md:w-full md:max-w-[460px]'
               : 'px-1 sm:px-4 z-40 md:absolute md:left-1/2 md:-translate-x-1/2 md:w-full md:max-w-[460px]'
@@ -2312,8 +2316,9 @@ export const TopBar: React.FC<TopBarProps> = ({
             )}
           </AnimatePresence>
         </div>
-      </div>
+        </div>
       )}
+      </LayoutGroup>
 
       {/* 3. Right Action Icons: Settings */}
       <div className={`flex items-center gap-1.5 sm:gap-2 shrink-0 z-10 ${settings.tabbedSparkle ? 'mb-1' : ''}`}>

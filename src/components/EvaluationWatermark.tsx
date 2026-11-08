@@ -43,7 +43,7 @@ export const EvaluationWatermark: React.FC<EvaluationWatermarkProps> = ({ classN
       style={{ fontFamily: "'Segoe UI Variable Text', 'Segoe UI', system-ui, sans-serif", color: '#ffffff' }}
     >
       <div style={{ color: '#ffffff' }}>Sparkle 27M1 Insider Preview</div>
-      <div style={{ color: '#ffffff' }}>Evaluation copy. Build 26164.Moment 1 (2027)</div>
+      <div style={{ color: '#ffffff' }}>Evaluation copy. Build 26165.Moment 1 (2027)</div>
     </div>
   );
 };
