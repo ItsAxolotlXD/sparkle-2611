@@ -131,9 +131,9 @@ export const GalleryContextMenu: React.FC<GalleryContextMenuProps> = ({ x, y, is
       <motion.div
         role="menu"
         aria-label="File actions"
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1 }}
-        exit={{ opacity: 0, scale: 0.96 }}
+        initial={{ opacity: 0, y: -10, scale: 0.96 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        exit={{ opacity: 0, y: -4, scale: 0.98 }}
         transition={{ duration: 0.16, ease: [0.16, 1, 0.3, 1] }}
         style={{ ...flyoutPanelStyle, transformOrigin: `${x - position.left}px ${y - position.top}px` }}
         className={`w-[232px] p-1.5 ${flyoutPanelClassName} fluent-context-menu`}
