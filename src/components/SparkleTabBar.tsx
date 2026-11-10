@@ -162,9 +162,9 @@ const TabContextMenu: React.FC<TabContextMenuProps> = ({
       <motion.div
         role="menu"
         aria-label="Tab actions"
-initial={{ y: -10 }}
-        animate={{ y: 0 }}
-        exit={{ y: -10 }}
+initial={{ scaleY: 0 }}
+          animate={{ scaleY: 1 }}
+          exit={{ scaleY: 0 }}
           transition={{ duration: 0.2, ease: 'linear' }}
         style={{ ...flyoutPanelStyle, transformOrigin: `${x - position.left}px ${y - position.top}px` }}
         className={`w-[190px] p-1 ${flyoutPanelClassName} fluent-context-menu`}

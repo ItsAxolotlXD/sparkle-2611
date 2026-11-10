@@ -1044,9 +1044,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
         <motion.div
           role="menu"
           aria-label="Sidebar actions"
-initial={{ y: -10 }}
-        animate={{ y: 0 }}
-        exit={{ y: -10 }}
+initial={{ scaleY: 0 }}
+              animate={{ scaleY: 1 }}
+              exit={{ scaleY: 0 }}
         transition={{ duration: 0.2, ease: 'linear' }}
           style={{ ...flyoutPanelStyle, transformOrigin: `${x - position.left}px ${y - position.top}px` }}
           className={`w-[232px] p-1.5 ${flyoutPanelClassName} fluent-context-menu`}
