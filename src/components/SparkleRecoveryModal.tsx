@@ -218,7 +218,7 @@ export const SparkleRecoveryModal: React.FC<SparkleRecoveryModalProps> = ({
     <AnimatePresence>
       <div
         id="sparkle-recovery-modal-container"
-        className="fixed inset-0 z-[100000] flex items-center justify-center p-4 sm:p-6 select-none"
+        className="fixed inset-0 z-[2147483647] flex items-center justify-center p-4 sm:p-6 select-none"
       >
         {/* Backdrop */}
         <motion.div

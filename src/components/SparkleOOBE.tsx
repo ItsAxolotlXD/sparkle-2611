@@ -21,6 +21,7 @@ import {
 import { SPINNING_RING_GIF_URL } from './SpinningRing';
 import { SparkleRecoveryModal } from './SparkleRecoveryModal';
 import { SparkleOOBEDebug } from './SparkleOOBEDebug';
+import { FluentSearchIcon } from './FluentIcons';
 
 interface SparkleOOBEProps {
   isOpen: boolean;
@@ -913,12 +914,11 @@ export const SparkleOOBE: React.FC<SparkleOOBEProps> = ({
       }}
     >
       {/* Centered WinUI 11 / WinUI 3 Setup Window (15px rounded corners) */}
-      {!isRecoveryModalOpen && (
-        <motion.div
-          initial={{ opacity: 0, scale: 0.98, y: 8 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.98, y: 8 }}
-          transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.98, y: 8 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.98, y: 8 }}
+        transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
           className="relative w-full max-w-[820px] min-h-[410px] max-h-[86vh] md:h-[450px] rounded-[15px] bg-white/95 backdrop-blur-2xl border border-black/[0.08] shadow-[0_24px_70px_rgba(0,0,0,0.18)] flex flex-col md:flex-row overflow-hidden my-auto shrink-0"
         >
           {/* TOP BACK BUTTON (Inside Window, only during active steps) */}
@@ -1025,9 +1025,6 @@ export const SparkleOOBE: React.FC<SparkleOOBEProps> = ({
                         <circle cx="166" cy="116" r="3" fill="#a5b4fc" />
                         <circle cx="178" cy="132" r="2" fill="#c7d2fe" />
                       </svg>
-                      <div className="mt-2 text-xs font-medium text-neutral-500">
-                        Visual Appearance & Personalization
-                      </div>
                     </motion.div>
                   )}
 
@@ -1042,9 +1039,6 @@ export const SparkleOOBE: React.FC<SparkleOOBEProps> = ({
                       className="flex flex-col items-center justify-center"
                     >
                       <NativeOobeGlobeArtwork />
-                      <div className="mt-1 text-xs font-medium text-neutral-500">
-                        Regional & Input Localization
-                      </div>
                     </motion.div>
                   )}
 
@@ -1089,9 +1083,6 @@ export const SparkleOOBE: React.FC<SparkleOOBEProps> = ({
                           <circle cx="75" cy="140" r="6" fill="#f1f5f9" />
                         </g>
                       </svg>
-                      <div className="mt-2 text-xs font-medium text-neutral-500">
-                        Sparkle Deployment Engine
-                      </div>
                     </motion.div>
                   )}
 
@@ -1124,9 +1115,6 @@ export const SparkleOOBE: React.FC<SparkleOOBEProps> = ({
                         <circle cx="160" cy="80" r="14" fill="#10b981" />
                         <path d="M155 80L158 83L165 76" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
                       </svg>
-                      <div className="mt-2 text-xs font-medium text-neutral-500">
-                        Personalized Account & Identity
-                      </div>
                     </motion.div>
                   )}
 
@@ -1159,9 +1147,6 @@ export const SparkleOOBE: React.FC<SparkleOOBEProps> = ({
                         <path d="M145 125C145 125 170 120 170 145C170 168 145 185 145 185C145 185 120 168 120 145C120 120 145 125 145 125Z" fill="url(#oobe_shield_grad)" />
                         <path d="M137 145L142 150L153 139" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
                       </svg>
-                      <div className="mt-2 text-xs font-medium text-neutral-500">
-                        Terms & Community Governance
-                      </div>
                     </motion.div>
                   )}
 
@@ -1190,9 +1175,6 @@ export const SparkleOOBE: React.FC<SparkleOOBEProps> = ({
                         <circle cx="185" cy="165" r="9" fill="#34d399" />
                         <circle cx="60" cy="160" r="7" fill="#818cf8" />
                       </svg>
-                      <div className="mt-2 text-xs font-medium text-neutral-500">
-                        Welcome to Sparkle Experience
-                      </div>
                     </motion.div>
                   )}
                 </AnimatePresence>
@@ -1222,7 +1204,7 @@ export const SparkleOOBE: React.FC<SparkleOOBEProps> = ({
                         className="flex flex-col min-h-full justify-between min-h-0"
                       >
                         <div>
-                          <h1 className="text-[24px] sm:text-[28px] font-semibold text-[#111827] leading-tight">
+                          <h1 className="text-[19px] sm:text-[21px] font-semibold text-[#111827] leading-tight">
                             Choose app theme preferences
                           </h1>
                           <p className="text-[13px] sm:text-[14px] text-neutral-600 mt-1.5 leading-normal">
@@ -1327,32 +1309,39 @@ export const SparkleOOBE: React.FC<SparkleOOBEProps> = ({
                         className="flex flex-col min-h-full justify-between min-h-0"
                       >
                         <div>
-                          <h1 className="text-[24px] sm:text-[28px] font-semibold text-[#111827] leading-tight">
+                          <h1 className="text-[19px] sm:text-[21px] font-semibold text-[#111827] leading-tight">
                             Is this the right country or region?
                           </h1>
                           <p className="text-[13px] sm:text-[14px] text-neutral-600 mt-1.5 leading-normal">
                             Welcome to Sparkle Setup Wizard. Choose your country or region to configure localized broadcasting and language.
                           </p>
 
-                          {/* Country Search Filter (WinUI 3 TextBox) */}
-                          <div className="mt-3.5 relative">
-                            <input
-                              type="text"
-                              value={countrySearch}
-                              onChange={(e) => setCountrySearch(e.target.value)}
-                              placeholder="Search country or region..."
-                              className="w-full h-8 pl-8 pr-7 text-xs sm:text-[13px] bg-white border border-black/10 border-b-[2px] border-b-black/45 focus:border-b-[#0067b8] rounded-[15px] text-[#1b1b1b] placeholder:text-neutral-400 outline-none shadow-[0_1px_2px_rgba(0,0,0,0.04)] transition-colors"
-                            />
-                            <Search className="w-3.5 h-3.5 text-neutral-400 absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-                            {countrySearch && (
-                              <button
-                                type="button"
-                                onClick={() => setCountrySearch('')}
-                                className="absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full flex items-center justify-center text-neutral-400 hover:text-neutral-700 hover:bg-black/5"
-                              >
-                                <X className="w-3 h-3" />
-                              </button>
-                            )}
+                          {/* Country Search Filter (TopBar search box design style) */}
+                          <div className="mt-3.5">
+                            <div className="fluent-search-box group relative w-full h-9 bg-[#fbfbfb] hover:bg-black/[0.04] focus-within:bg-white dark:bg-[#282c31] border-none flex items-center px-3.5 gap-2 transition-colors rounded-[6px]">
+                              <FluentSearchIcon className="w-[16px] h-[16px] text-black dark:text-white shrink-0 pointer-events-none select-none" />
+                              <input
+                                type="text"
+                                value={countrySearch}
+                                onChange={(e) => setCountrySearch(e.target.value)}
+                                placeholder="Search country or region..."
+                                spellCheck={false}
+                                autoCapitalize="off"
+                                autoComplete="off"
+                                autoCorrect="off"
+                                className="flex-1 min-w-0 bg-transparent text-xs sm:text-[13px] text-[#111827] dark:text-white placeholder-black/60 dark:placeholder-white outline-none border-none py-1 pr-1"
+                              />
+                              {countrySearch && (
+                                <button
+                                  type="button"
+                                  onClick={() => setCountrySearch('')}
+                                  title="Clear search"
+                                  className="w-5 h-5 rounded-full flex items-center justify-center text-black/60 dark:text-white/60 hover:text-black dark:hover:text-white hover:bg-black/10 dark:hover:bg-white/10 shrink-0 cursor-pointer transition-colors"
+                                >
+                                  <X className="w-3.5 h-3.5" />
+                                </button>
+                              )}
+                            </div>
                           </div>
 
                           {/* Native WinUI custom scrollbar */}
@@ -1428,7 +1417,7 @@ export const SparkleOOBE: React.FC<SparkleOOBEProps> = ({
                         className="flex flex-col min-h-full justify-between min-h-0"
                       >
                         <div>
-                          <h1 className="text-[24px] sm:text-[28px] font-semibold text-[#111827] leading-tight">
+                          <h1 className="text-[19px] sm:text-[21px] font-semibold text-[#111827] leading-tight">
                             Choose what you want to do
                           </h1>
                           <p className="text-[13px] sm:text-[14px] text-neutral-600 mt-1.5 leading-normal">
@@ -1528,7 +1517,7 @@ export const SparkleOOBE: React.FC<SparkleOOBEProps> = ({
                         className="flex flex-col min-h-full justify-between min-h-0"
                       >
                         <div>
-                          <h1 className="text-[24px] sm:text-[28px] font-semibold text-[#111827] leading-tight">
+                          <h1 className="text-[19px] sm:text-[21px] font-semibold text-[#111827] leading-tight">
                             Who is going to use Sparkle?
                           </h1>
                           <p className="text-[13px] sm:text-[14px] text-neutral-600 mt-1.5 leading-normal">
@@ -1585,7 +1574,7 @@ export const SparkleOOBE: React.FC<SparkleOOBEProps> = ({
                         className="flex flex-col min-h-full justify-between min-h-0"
                       >
                         <div>
-                          <h1 className="text-[24px] sm:text-[28px] font-semibold text-[#111827] leading-tight">
+                          <h1 className="text-[19px] sm:text-[21px] font-semibold text-[#111827] leading-tight">
                             Applicable notices and license terms
                           </h1>
                           <p className="text-[13px] sm:text-[14px] text-neutral-600 mt-1.5 leading-normal">
@@ -1663,7 +1652,7 @@ export const SparkleOOBE: React.FC<SparkleOOBEProps> = ({
                         className="flex flex-col min-h-full justify-between min-h-0"
                       >
                         <div>
-                          <h1 className="text-[24px] sm:text-[28px] font-semibold text-[#111827] leading-tight">
+                          <h1 className="text-[19px] sm:text-[21px] font-semibold text-[#111827] leading-tight">
                             Now let&apos;s see what&apos;s new on Sparkle
                           </h1>
                           <p className="text-[13px] sm:text-[14px] text-neutral-600 mt-1.5 leading-normal">
@@ -1823,7 +1812,6 @@ export const SparkleOOBE: React.FC<SparkleOOBEProps> = ({
           )}
         </AnimatePresence>
       </motion.div>
-      )}
 
       {/* Windows 11 Bottom Right Tray (BÊN NGOÀI window oobe) */}
       <div className="absolute bottom-4 right-6 z-30 flex items-center gap-2 select-none">
