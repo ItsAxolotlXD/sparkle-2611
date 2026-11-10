@@ -220,7 +220,7 @@ export const SparkleRecoveryModal: React.FC<SparkleRecoveryModalProps> = ({
         id="sparkle-recovery-modal-container"
         className="fixed inset-0 z-[2147483647] flex items-center justify-center p-4 sm:p-6 select-none"
       >
-        {/* Backdrop */}
+        {/* Backdrop showing OOBE wallpaper behind */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -229,7 +229,7 @@ export const SparkleRecoveryModal: React.FC<SparkleRecoveryModalProps> = ({
           onClick={() => {
             if (step !== 4 && !isTransitioning) onClose();
           }}
-          className="fixed inset-0 bg-black/70 backdrop-blur-[2px]"
+          className="fixed inset-0 bg-black/50 backdrop-blur-xs"
         />
 
         {/* Dark Grey Dialog Frame (#2b2f36) - Static frame with NO animation */}

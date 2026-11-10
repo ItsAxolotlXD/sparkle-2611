@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
 import { SPINNING_RING_GIF_URL } from './SpinningRing';
+import { FluentHourglassArtwork } from './SparkleOOBE';
 import { modalBackdropVariants, modalDialogVariants } from '../utils/animations';
 
 interface SparkleOOBEDebugProps {
@@ -156,7 +157,7 @@ export const SparkleOOBEDebug: React.FC<SparkleOOBEDebugProps> = ({
               type="button"
               onClick={onBack}
               aria-label="Back to setup"
-              className="w-8 h-8 rounded-[15px] flex items-center justify-center text-neutral-600 hover:text-neutral-900 hover:bg-black/5 active:bg-black/10 transition-colors cursor-pointer"
+              className="w-8 h-8 rounded-[10px] flex items-center justify-center text-neutral-600 hover:text-neutral-900 hover:bg-black/5 active:bg-black/10 transition-colors cursor-pointer"
             >
               <ArrowLeft className="w-4 h-4" />
             </button>
@@ -166,35 +167,46 @@ export const SparkleOOBEDebug: React.FC<SparkleOOBEDebugProps> = ({
         {/* Content with Fade Animation */}
         <AnimatePresence mode="wait">
           {isMomentPreviewOpen ? (
-            /* JUST A MOMENT SCREEN PERFECTLY CENTERED INSIDE WINDOW */
+            /* JUST A MOMENT SCREEN SPLIT INTO 2 PARTS */
             <motion.div
               key="debug-just-a-moment-view"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.25, ease: 'easeInOut' }}
-              className="w-full h-full flex-1 flex flex-col items-center justify-center m-auto p-8 select-none text-center"
+              className="w-full h-full flex flex-col md:flex-row overflow-hidden"
             >
-              <div
-                aria-hidden="true"
-                className="w-14 h-14 bg-[#0067b8]"
-                style={{
-                  WebkitMaskImage: `url("${SPINNING_RING_GIF_URL}")`,
-                  maskImage: `url("${SPINNING_RING_GIF_URL}")`,
-                  WebkitMaskSize: 'contain',
-                  maskSize: 'contain',
-                  WebkitMaskRepeat: 'no-repeat',
-                  maskRepeat: 'no-repeat',
-                  WebkitMaskPosition: 'center',
-                  maskPosition: 'center',
-                }}
-              />
-              <span 
-                className="mt-5 text-xl sm:text-2xl font-normal tracking-wide text-neutral-800"
-                style={{ fontWeight: 400 }}
-              >
-                Just a moment...
-              </span>
+              {/* LEFT PART: Fluent Hourglass Icon */}
+              <div className="w-full md:w-[38%] bg-gradient-to-br from-[#f8fafc] via-[#f1f5f9] to-[#edf2f7] border-b md:border-b-0 md:border-r border-black/[0.06] flex items-center justify-center p-4 md:p-6 shrink-0 relative overflow-hidden select-none">
+                <div className="absolute inset-0 bg-radial from-blue-500/10 via-transparent to-transparent pointer-events-none" />
+                <FluentHourglassArtwork />
+              </div>
+
+              {/* RIGHT PART: Loading GIF and "Just a moment..." text (reduced text size) */}
+              <div className="flex-1 min-h-0 flex flex-col items-center justify-center p-6 md:p-8 bg-white select-none text-center">
+                <div className="flex flex-col items-center justify-center text-center">
+                  <div
+                    aria-hidden="true"
+                    className="w-12 h-12 bg-[#0067b8]"
+                    style={{
+                      WebkitMaskImage: `url("${SPINNING_RING_GIF_URL}")`,
+                      maskImage: `url("${SPINNING_RING_GIF_URL}")`,
+                      WebkitMaskSize: 'contain',
+                      maskSize: 'contain',
+                      WebkitMaskRepeat: 'no-repeat',
+                      maskRepeat: 'no-repeat',
+                      WebkitMaskPosition: 'center',
+                      maskPosition: 'center',
+                    }}
+                  />
+                  <span 
+                    className="mt-4 text-[16px] sm:text-[17px] font-normal tracking-wide text-neutral-800"
+                    style={{ fontWeight: 400 }}
+                  >
+                    Just a moment...
+                  </span>
+                </div>
+              </div>
             </motion.div>
           ) : (
             <motion.div
@@ -286,7 +298,7 @@ export const SparkleOOBEDebug: React.FC<SparkleOOBEDebugProps> = ({
                   <button
                     type="button"
                     onClick={onBack}
-                    className="h-8 px-5 rounded-[15px] font-normal text-[#1b1b1b] bg-[#fbfbfb] hover:bg-[#f5f5f5] active:bg-[#eaeaea] border border-black/10 border-b-[2px] border-b-black/20 shadow-[0_1px_2px_rgba(0,0,0,0.05),inset_0_1px_0_rgba(255,255,255,0.8)] active:shadow-none transition-all text-xs sm:text-[13px] flex items-center justify-center cursor-pointer select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0067b8]"
+                    className="h-8 px-5 rounded-[10px] font-normal text-[#1b1b1b] bg-[#fbfbfb] hover:bg-[#f5f5f5] active:bg-[#eaeaea] border border-black/10 border-b-[2px] border-b-black/20 shadow-[0_1px_2px_rgba(0,0,0,0.05),inset_0_1px_0_rgba(255,255,255,0.8)] active:shadow-none transition-all text-xs sm:text-[13px] flex items-center justify-center cursor-pointer select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0067b8]"
                   >
                     Back to setup
                   </button>
@@ -307,7 +319,7 @@ export const SparkleOOBEDebug: React.FC<SparkleOOBEDebugProps> = ({
           type="button"
           onClick={() => {}}
           aria-label="Debug"
-          className="w-8 h-8 rounded-[15px] flex items-center justify-center text-neutral-700 bg-white/75 hover:bg-white/95 active:bg-white backdrop-blur-md border border-black/[0.08] shadow-xs transition-colors cursor-pointer"
+          className="w-8 h-8 rounded-[10px] flex items-center justify-center text-neutral-700 bg-white/75 hover:bg-white/95 active:bg-white backdrop-blur-md border border-black/[0.08] shadow-xs transition-colors cursor-pointer"
         >
           <Bug className="h-4 w-4" aria-hidden="true" />
         </button>
@@ -317,7 +329,7 @@ export const SparkleOOBEDebug: React.FC<SparkleOOBEDebugProps> = ({
           type="button"
           onClick={() => setIsMuted(!isMuted)}
           aria-label={isMuted ? 'Unmute' : 'Mute'}
-          className="w-8 h-8 rounded-[15px] flex items-center justify-center text-neutral-700 bg-white/75 hover:bg-white/95 active:bg-white backdrop-blur-md border border-black/[0.08] shadow-xs transition-colors cursor-pointer"
+          className="w-8 h-8 rounded-[10px] flex items-center justify-center text-neutral-700 bg-white/75 hover:bg-white/95 active:bg-white backdrop-blur-md border border-black/[0.08] shadow-xs transition-colors cursor-pointer"
         >
           {isMuted ? <VolumeX className="w-4 h-4 text-red-500" /> : <Volume2 className="w-4 h-4" />}
         </button>
@@ -326,13 +338,13 @@ export const SparkleOOBEDebug: React.FC<SparkleOOBEDebugProps> = ({
         <button
           type="button"
           aria-label="Accessibility"
-          className="w-8 h-8 rounded-[15px] flex items-center justify-center text-neutral-700 bg-white/75 hover:bg-white/95 active:bg-white backdrop-blur-md border border-black/[0.08] shadow-xs transition-colors cursor-pointer"
+          className="w-8 h-8 rounded-[10px] flex items-center justify-center text-neutral-700 bg-white/75 hover:bg-white/95 active:bg-white backdrop-blur-md border border-black/[0.08] shadow-xs transition-colors cursor-pointer"
         >
           <Accessibility className="w-4 h-4" />
         </button>
 
         {/* Clock */}
-        <div className="h-8 px-2.5 rounded-[15px] flex items-center justify-center text-neutral-700 text-xs font-normal bg-white/75 backdrop-blur-md border border-black/[0.08] shadow-xs cursor-default">
+        <div className="h-8 px-2.5 rounded-[10px] flex items-center justify-center text-neutral-700 text-xs font-normal bg-white/75 backdrop-blur-md border border-black/[0.08] shadow-xs cursor-default">
           <span className="tracking-wide">{timeString}</span>
         </div>
       </div>
@@ -418,14 +430,14 @@ export const SparkleOOBEDebug: React.FC<SparkleOOBEDebugProps> = ({
                   <button
                     type="button"
                     onClick={closePasscodeDialog}
-                    className="h-8 px-4 rounded-[15px] font-normal text-[#1b1b1b] bg-[#fbfbfb] hover:bg-[#f5f5f5] active:bg-[#eaeaea] border border-black/10 border-b-[2px] border-b-black/20 shadow-[0_1px_2px_rgba(0,0,0,0.05)] text-xs sm:text-[13px] transition-all cursor-pointer"
+                    className="h-8 px-4 rounded-[10px] font-normal text-[#1b1b1b] bg-[#fbfbfb] hover:bg-[#f5f5f5] active:bg-[#eaeaea] border border-black/10 border-b-[2px] border-b-black/20 shadow-[0_1px_2px_rgba(0,0,0,0.05)] text-xs sm:text-[13px] transition-all cursor-pointer"
                   >
                     Cancel
                   </button>
                   {/* WinUI 3 Primary Button */}
                   <button
                     type="submit"
-                    className="h-8 px-5 rounded-[15px] font-normal text-white bg-[#0067b8] hover:bg-[#1879c7] active:bg-[#005a9e] border border-black/10 border-b-[2px] border-b-black/30 shadow-[0_1px_2px_rgba(0,0,0,0.12)] text-xs sm:text-[13px] transition-all cursor-pointer"
+                    className="h-8 px-5 rounded-[10px] font-normal text-white bg-[#0067b8] hover:bg-[#1879c7] active:bg-[#005a9e] border border-black/10 border-b-[2px] border-b-black/30 shadow-[0_1px_2px_rgba(0,0,0,0.12)] text-xs sm:text-[13px] transition-all cursor-pointer"
                   >
                     Continue
                   </button>

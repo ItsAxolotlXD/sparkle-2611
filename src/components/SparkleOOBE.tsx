@@ -16,6 +16,7 @@ import {
   Bug,
   ArrowLeft,
   Accessibility,
+  Heart,
   X
 } from 'lucide-react';
 import { SPINNING_RING_GIF_URL } from './SpinningRing';
@@ -253,189 +254,188 @@ const NativeWinUIScrollArea: React.FC<NativeWinUIScrollAreaProps> = ({
 
 // Steps:
 // 1: Choose app theme preferences (Light / Dark)
-// 2: Choose country or region / keyboard and input methods
-// 3: Choose what you want to do (Install / Recover)
-// 4: Who is going to use Sparkle (Enter username)
-// 5: Applicable notices and license terms (Accept / Decline)
-// 6: Now let's see what's new on Sparkle
-type OOBEStep = 1 | 2 | 3 | 4 | 5 | 6;
+// 2: Choose what you want to do (Install / Recover)
+// 3: Who is going to use Sparkle (Enter username)
+// 4: Applicable notices and license terms (Accept / Decline)
+// 5: Thank you for choosing Sparkle!
+export type OOBEStep = 1 | 2 | 3 | 4 | 5;
 
-// Countries list for Country/Region selection
-const COUNTRIES_LIST = [
-  'Vietnam',
-  'United States',
-  'United Kingdom',
-  'Japan',
-  'South Korea',
-  'France',
-  'Germany',
-  'Canada',
-  'Australia',
-  'Singapore',
-  'Thailand',
-  'Malaysia',
-  'Indonesia',
-  'Philippines',
-  'India',
-  'New Zealand',
-  'Netherlands',
-  'Sweden',
-  'Switzerland',
-  'Brazil',
-  'Argentina',
-  'Austria',
-  'Belgium',
-  'Denmark',
-  'Finland',
-  'Italy',
-  'Norway',
-  'Spain',
-  'Tuvalu',
-  'U.S. Minor Outlying Islands',
-  'U.S. Virgin Islands',
-  'Uganda',
-  'Ukraine',
-  'United Arab Emirates'
-];
+// Fluent 3D Hourglass Artwork for the 2-part "Just a moment" screen
+export const FluentHourglassArtwork: React.FC<{ className?: string }> = ({ className = 'w-[155px] h-[155px]' }) => {
+  const [imgFailed, setImgFailed] = useState(false);
 
-const KEYBOARD_LAYOUTS = [
-  { id: 'vi-telex', name: 'Vietnamese (Telex)' },
-  { id: 'en-us', name: 'United States (QWERTY)' },
-  { id: 'vi-vni', name: 'Vietnamese (VNI)' },
-  { id: 'en-uk', name: 'United Kingdom' }
-];
+  return (
+    <div className={`relative flex items-center justify-center select-none ${className}`}>
+      {!imgFailed ? (
+        <img
+          src="https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Hourglass%20not%20done/3D/hourglass_not_done_3d.png"
+          alt="Hourglass"
+          draggable={false}
+          className="w-full h-full object-contain drop-shadow-md"
+          onError={() => setImgFailed(true)}
+        />
+      ) : (
+        <svg viewBox="0 0 240 240" fill="none" className="w-full h-full drop-shadow-md">
+          <defs>
+            <linearGradient id="hg_stand_grad" x1="40" y1="20" x2="200" y2="40" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stopColor="#38bdf8" />
+              <stop offset="50%" stopColor="#0284c7" />
+              <stop offset="100%" stopColor="#0369a1" />
+            </linearGradient>
+            <linearGradient id="hg_glass_grad" x1="70" y1="40" x2="170" y2="200" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stopColor="#ffffff" stopOpacity="0.8" />
+              <stop offset="30%" stopColor="#e0f2fe" stopOpacity="0.4" />
+              <stop offset="70%" stopColor="#bae6fd" stopOpacity="0.25" />
+              <stop offset="100%" stopColor="#ffffff" stopOpacity="0.7" />
+            </linearGradient>
+            <linearGradient id="hg_sand_top" x1="80" y1="50" x2="160" y2="110" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stopColor="#fde047" />
+              <stop offset="50%" stopColor="#f59e0b" />
+              <stop offset="100%" stopColor="#d97706" />
+            </linearGradient>
+            <linearGradient id="hg_sand_bot" x1="80" y1="130" x2="160" y2="190" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stopColor="#fde047" />
+              <stop offset="60%" stopColor="#f59e0b" />
+              <stop offset="100%" stopColor="#b45309" />
+            </linearGradient>
+          </defs>
 
-// NATIVE SVG ILLUSTRATION: Globe + Suitcase + Paper Airplane + Stack of Books (matching Image 1 natively)
-const NativeOobeGlobeArtwork: React.FC = () => (
-  <svg viewBox="0 0 340 300" fill="none" className="w-full max-w-[220px] sm:max-w-[240px] drop-shadow-md select-none pointer-events-none">
-    <defs>
-      <linearGradient id="globe_stand_grad" x1="100" y1="120" x2="160" y2="210" gradientUnits="userSpaceOnUse">
-        <stop offset="0%" stopColor="#fcd34d" />
-        <stop offset="60%" stopColor="#f59e0b" />
-        <stop offset="100%" stopColor="#d97706" />
-      </linearGradient>
-      <linearGradient id="globe_ocean_grad" x1="70" y1="40" x2="180" y2="160" gradientUnits="userSpaceOnUse">
-        <stop offset="0%" stopColor="#60a5fa" />
-        <stop offset="40%" stopColor="#2563eb" />
-        <stop offset="100%" stopColor="#1d4ed8" />
-      </linearGradient>
-      <linearGradient id="suitcase_grad" x1="190" y1="180" x2="310" y2="290" gradientUnits="userSpaceOnUse">
-        <stop offset="0%" stopColor="#0284c7" />
-        <stop offset="60%" stopColor="#0369a1" />
-        <stop offset="100%" stopColor="#075985" />
-      </linearGradient>
-      <linearGradient id="plane_grad" x1="210" y1="50" x2="310" y2="120" gradientUnits="userSpaceOnUse">
-        <stop offset="0%" stopColor="#ffffff" />
-        <stop offset="60%" stopColor="#e2e8f0" />
-        <stop offset="100%" stopColor="#cbd5e1" />
-      </linearGradient>
-      <filter id="globe_shadow" x="-10%" y="-10%" width="125%" height="125%">
-        <feDropShadow dx="0" dy="4" stdDeviation="4" floodColor="#000" floodOpacity="0.2" />
-      </filter>
-    </defs>
+          {/* Top Cap */}
+          <rect x="52" y="24" width="136" height="16" rx="8" fill="url(#hg_stand_grad)" />
+          <rect x="68" y="38" width="104" height="6" rx="3" fill="#0369a1" />
 
-    {/* Orbiting dotted flight trail */}
-    <g opacity="0.35">
-      <circle cx="28" cy="140" r="2.5" fill="#94a3b8" />
-      <circle cx="34" cy="120" r="2.5" fill="#94a3b8" />
-      <circle cx="56" cy="98" r="2.5" fill="#94a3b8" />
-      <circle cx="185" cy="138" r="2.5" fill="#94a3b8" />
-      <circle cx="205" cy="132" r="2.5" fill="#94a3b8" />
-      <circle cx="218" cy="115" r="2.5" fill="#94a3b8" />
-    </g>
+          {/* Bottom Cap */}
+          <rect x="52" y="200" width="136" height="16" rx="8" fill="url(#hg_stand_grad)" />
+          <rect x="68" y="196" width="104" height="6" rx="3" fill="#0369a1" />
 
-    {/* Stack of Books at bottom-left */}
-    <g filter="url(#globe_shadow)">
-      {/* Bottom Book (Yellow hardcover with white pages) */}
-      <rect x="42" y="248" width="138" height="32" rx="5" fill="#fde68a" />
-      <rect x="44" y="252" width="132" height="24" rx="3" fill="#ffffff" />
-      <line x1="44" y1="260" x2="176" y2="260" stroke="#e2e8f0" strokeWidth="1.5" />
-      <line x1="44" y1="268" x2="176" y2="268" stroke="#e2e8f0" strokeWidth="1.5" />
+          {/* Glass Outer Body */}
+          <path
+            d="M74 44 C74 90, 110 110, 116 120 C110 130, 74 150, 74 196 H166 C166 150, 130 130, 124 120 C130 110, 166 90, 166 44 Z"
+            fill="url(#hg_glass_grad)"
+            stroke="#bae6fd"
+            strokeWidth="2.5"
+          />
 
-      {/* Top Book (White/gray pages with curved spine) */}
-      <rect x="52" y="208" width="124" height="36" rx="6" fill="#f1f5f9" />
-      <path d="M52 208C46 208 42 216 42 226C42 236 46 244 52 244H176V208H52Z" fill="#e2e8f0" />
-      <circle cx="85" cy="226" r="2" fill="#cbd5e1" />
-      <circle cx="115" cy="226" r="2" fill="#cbd5e1" />
-      <circle cx="145" cy="226" r="2" fill="#cbd5e1" />
-    </g>
+          {/* Top Sand Bulb */}
+          <path
+            d="M84 76 C84 96, 112 112, 120 118 C128 112, 156 96, 156 76 C144 80, 96 80, 84 76 Z"
+            fill="url(#hg_sand_top)"
+          />
 
-    {/* 3D Globe Stand & Base */}
-    <g filter="url(#globe_shadow)">
-      {/* Base disc */}
-      <ellipse cx="120" cy="208" rx="42" ry="10" fill="url(#globe_stand_grad)" />
-      {/* Vertical post */}
-      <rect x="114" y="170" width="12" height="38" rx="4" fill="url(#globe_stand_grad)" />
-      {/* Meridian Arc */}
-      <path
-        d="M62 108C62 58 100 24 150 24C164 24 175 27 184 32"
-        stroke="url(#globe_stand_grad)"
-        strokeWidth="11"
-        strokeLinecap="round"
-      />
-      <circle cx="72" cy="36" r="5" fill="#f59e0b" />
-      {/* Axis bottom pin */}
-      <circle cx="166" cy="186" r="5.5" fill="#f59e0b" />
-      <line x1="166" y1="186" x2="148" y2="162" stroke="url(#globe_stand_grad)" strokeWidth="6" strokeLinecap="round" />
-    </g>
+          {/* Sand Falling Stream */}
+          <line x1="120" y1="118" x2="120" y2="182" stroke="#f59e0b" strokeWidth="2.5" strokeDasharray="4 2" />
 
-    {/* 3D Globe Sphere */}
-    <g filter="url(#globe_shadow)">
-      <circle cx="118" cy="98" r="54" fill="url(#globe_ocean_grad)" />
-      {/* Continents in light pastel cyan */}
-      <path
-        d="M95 62C105 60 114 66 120 74C126 82 135 78 142 82C150 86 156 98 152 106C148 114 135 120 128 132C122 142 110 148 98 144C88 140 82 128 78 118C74 108 85 85 95 62Z"
-        fill="#93c5fd"
-        opacity="0.9"
-      />
-      <path
-        d="M130 52C138 52 146 58 150 64C154 70 162 72 165 68C160 58 148 50 130 52Z"
-        fill="#bfdbfe"
-        opacity="0.85"
-      />
-      {/* Spherical specular highlight gloss */}
-      <path
-        d="M80 66C90 56 104 50 120 50C124 50 126 52 125 55C124 58 120 60 116 60C104 60 92 65 84 73C82 75 79 74 78 71C77 69 78 68 80 66Z"
-        fill="#ffffff"
-        opacity="0.6"
-      />
-    </g>
+          {/* Bottom Sand Mound */}
+          <path
+            d="M80 196 C84 176, 108 168, 120 166 C132 168, 156 176, 160 196 Z"
+            fill="url(#hg_sand_bot)"
+          />
 
-    {/* 3D Travel Suitcase at bottom-right */}
-    <g filter="url(#globe_shadow)">
-      {/* Main Suitcase Body */}
-      <rect x="200" y="180" width="120" height="98" rx="14" fill="url(#suitcase_grad)" />
-      {/* Top Handle */}
-      <path
-        d="M242 180V166C242 162 246 158 250 158H270C274 158 278 162 278 166V180"
-        stroke="#fcd34d"
-        strokeWidth="6"
-        fill="none"
-        strokeLinecap="round"
-      />
-      {/* Yellow/Golden Leather Straps */}
-      <rect x="222" y="180" width="10" height="98" fill="#fcd34d" />
-      <rect x="288" y="180" width="10" height="98" fill="#fcd34d" />
-      {/* Brass Corner Protectors */}
-      <circle cx="206" cy="186" r="6" fill="#fbbf24" />
-      <circle cx="314" cy="186" r="6" fill="#fbbf24" />
-      <circle cx="206" cy="272" r="6" fill="#fbbf24" />
-      <circle cx="314" cy="272" r="6" fill="#fbbf24" />
-      {/* Travel Stamp Stickers */}
-      <rect x="248" y="204" width="16" height="16" rx="3" fill="#ffffff" transform="rotate(12 248 204)" opacity="0.95" />
-      <circle cx="244" cy="246" r="8" fill="#ffffff" opacity="0.9" />
-      <polygon points="274,228 266,242 282,242" fill="#ffffff" opacity="0.9" />
-    </g>
+          {/* Glass Specular Highlights */}
+          <path
+            d="M82 52 C80 75, 96 95, 108 106"
+            stroke="#ffffff"
+            strokeWidth="3.5"
+            strokeLinecap="round"
+            opacity="0.75"
+          />
+          <path
+            d="M82 188 C80 165, 96 145, 108 134"
+            stroke="#ffffff"
+            strokeWidth="3"
+            strokeLinecap="round"
+            opacity="0.6"
+          />
 
-    {/* Origami Paper Airplane soaring up-right */}
-    <g filter="url(#globe_shadow)">
-      <polygon points="220,95 320,40 275,130 258,105" fill="url(#plane_grad)" />
-      {/* Crease fold */}
-      <polygon points="258,105 320,40 275,130" fill="#cbd5e1" opacity="0.8" />
-      <line x1="220" y1="95" x2="320" y2="40" stroke="#94a3b8" strokeWidth="1" />
-    </g>
-  </svg>
-);
+          {/* Sparkles */}
+          <circle cx="178" cy="68" r="3" fill="#fde047" />
+          <circle cx="62" cy="145" r="2.5" fill="#38bdf8" />
+        </svg>
+      )}
+    </div>
+  );
+};
+
+// Fluent 3D Heart Face 🥰 & Hearts Artwork for "Thank you for choosing Sparkle!" screen
+export const FluentThreeHeartsArtwork: React.FC<{ className?: string }> = ({ className = 'w-[165px] h-[165px]' }) => {
+  const [imgFailed, setImgFailed] = useState(false);
+
+  return (
+    <div className={`relative flex items-center justify-center select-none ${className}`}>
+      {!imgFailed ? (
+        <img
+          src="https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Smiling%20face%20with%20hearts/3D/smiling_face_with_hearts_3d.png"
+          alt="Fluent Heart Face 🥰"
+          draggable={false}
+          className="w-full h-full object-contain drop-shadow-md"
+          onError={() => setImgFailed(true)}
+        />
+      ) : (
+        <svg viewBox="0 0 240 240" fill="none" className="w-full h-full drop-shadow-md">
+          <defs>
+            <radialGradient id="h_glow" cx="120" cy="120" r="100" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stopColor="#f43f5e" stopOpacity="0.22" />
+              <stop offset="100%" stopColor="#f43f5e" stopOpacity="0" />
+            </radialGradient>
+            <radialGradient id="face_sphere" cx="105" cy="100" r="60" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stopColor="#ffea79" />
+              <stop offset="65%" stopColor="#f59e0b" />
+              <stop offset="100%" stopColor="#d97706" />
+            </radialGradient>
+            <linearGradient id="h_heart" x1="20" y1="20" x2="80" y2="80" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stopColor="#fb7185" />
+              <stop offset="50%" stopColor="#f43f5e" />
+              <stop offset="100%" stopColor="#be123c" />
+            </linearGradient>
+            <filter id="h_shadow" x="-20%" y="-20%" width="140%" height="140%">
+              <feDropShadow dx="0" dy="5" stdDeviation="4" floodColor="#be123c" floodOpacity="0.32" />
+            </filter>
+          </defs>
+
+          {/* Ambient Glow */}
+          <circle cx="120" cy="120" r="95" fill="url(#h_glow)" />
+
+          {/* Central Fluent 3D Emoji Face 🥰 */}
+          <g transform="translate(60, 60)">
+            {/* 3D Sphere */}
+            <circle cx="60" cy="60" r="54" fill="url(#face_sphere)" />
+            {/* Top Gloss */}
+            <ellipse cx="60" cy="24" rx="28" ry="10" fill="#ffffff" opacity="0.35" />
+            {/* Smiling Eyes ^ ^ */}
+            <path d="M36 50 C40 42, 48 42, 52 50" stroke="#78350f" strokeWidth="4.5" strokeLinecap="round" fill="none" />
+            <path d="M68 50 C72 42, 80 42, 84 50" stroke="#78350f" strokeWidth="4.5" strokeLinecap="round" fill="none" />
+            {/* Smiling Mouth */}
+            <path d="M46 72 C54 84, 66 84, 74 72" stroke="#78350f" strokeWidth="4.5" strokeLinecap="round" fill="none" />
+            {/* Rosy Cheeks */}
+            <circle cx="34" cy="62" r="11" fill="#f43f5e" opacity="0.45" />
+            <circle cx="86" cy="62" r="11" fill="#f43f5e" opacity="0.45" />
+          </g>
+
+          {/* Floating Heart 1 (Top Left) */}
+          <g transform="translate(42, 44) rotate(-18) scale(0.48)" filter="url(#h_shadow)">
+            <path d="M60 22 C60 22, 50 2, 28 2 C12 2, 0 14, 0 32 C0 54, 22 76, 60 110 C98 76, 120 54, 120 32 C120 14, 108 2, 92 2 C70 2, 60 22, 60 22 Z" fill="url(#h_heart)" />
+            <path d="M18 18 C28 8, 44 8, 52 18" stroke="#ffffff" strokeWidth="6" strokeLinecap="round" opacity="0.7" />
+          </g>
+
+          {/* Floating Heart 2 (Top Right) */}
+          <g transform="translate(148, 40) rotate(22) scale(0.52)" filter="url(#h_shadow)">
+            <path d="M60 22 C60 22, 50 2, 28 2 C12 2, 0 14, 0 32 C0 54, 22 76, 60 110 C98 76, 120 54, 120 32 C120 14, 108 2, 92 2 C70 2, 60 22, 60 22 Z" fill="url(#h_heart)" />
+            <path d="M18 18 C28 8, 44 8, 52 18" stroke="#ffffff" strokeWidth="6" strokeLinecap="round" opacity="0.7" />
+          </g>
+
+          {/* Floating Heart 3 (Bottom Right) */}
+          <g transform="translate(154, 125) rotate(-10) scale(0.42)" filter="url(#h_shadow)">
+            <path d="M60 22 C60 22, 50 2, 28 2 C12 2, 0 14, 0 32 C0 54, 22 76, 60 110 C98 76, 120 54, 120 32 C120 14, 108 2, 92 2 C70 2, 60 22, 60 22 Z" fill="url(#h_heart)" />
+          </g>
+
+          {/* Twinkles */}
+          <circle cx="198" cy="110" r="3" fill="#fbbf24" />
+          <circle cx="34" cy="130" r="2.5" fill="#f472b6" />
+        </svg>
+      )}
+    </div>
+  );
+};
 
 export const SparkleOOBE: React.FC<SparkleOOBEProps> = ({
   isOpen,
@@ -471,21 +471,17 @@ export const SparkleOOBE: React.FC<SparkleOOBEProps> = ({
     | 'finished';
 
   const [greetingPhase, setGreetingPhase] = useState<GreetingPhase>('idle');
+  const [isAlmostFading, setIsAlmostFading] = useState(false);
   const greetingTimerRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Step 2 State: Country & Keyboard
-  const [selectedCountry, setSelectedCountry] = useState('Vietnam');
-  const [countrySearch, setCountrySearch] = useState('');
-  const [selectedKeyboard, setSelectedKeyboard] = useState('vi-telex');
-
-  // Step 3 State: Action (Install / Recover)
+  // Step 2 State: Action (Install / Recover)
   const [selectedAction, setSelectedAction] = useState<'install' | 'recover'>('install');
   const [isRecoveryModalOpen, setIsRecoveryModalOpen] = useState(false);
 
-  // Step 4 State: Username
+  // Step 3 State: Username
   const [username, setUsername] = useState('Sparkle User');
 
-  // Step 5 State: Terms
+  // Step 4 State: Terms
   const [termsDeclinePrompt, setTermsDeclinePrompt] = useState(false);
 
   // Synchronously reset state during render when isOpen changes to true
@@ -496,6 +492,7 @@ export const SparkleOOBE: React.FC<SparkleOOBEProps> = ({
     setIsStepTransitioning(false);
     setIsFinalLoading(false);
     setGreetingPhase('idle');
+    setIsAlmostFading(false);
     setSelectedAction('install');
     setIsRecoveryModalOpen(false);
   } else if (!isOpen && prevIsOpen) {
@@ -562,30 +559,34 @@ export const SparkleOOBE: React.FC<SparkleOOBEProps> = ({
         setGreetingPhase('almost');
       }, 20000); // 20 seconds as requested
     } else if (greetingPhase === 'almost') {
+      setIsAlmostFading(false);
       greetingTimerRef.current = setTimeout(() => {
-        setGreetingPhase('finished');
-        // Persist theme choice and completion
-        try {
-          localStorage.setItem('sparkle_oobe_completed', 'true');
-          if (username.trim()) {
-            localStorage.setItem('sparkle_username', username.trim());
-          }
-          const currentSettingsStr = localStorage.getItem('waves_system_settings');
-          const parsed = currentSettingsStr ? JSON.parse(currentSettingsStr) : {};
-          parsed.theme = selectedTheme;
-          parsed.themeVersion = 2;
-          localStorage.setItem('waves_system_settings', JSON.stringify(parsed));
+        setIsAlmostFading(true);
+        greetingTimerRef.current = setTimeout(() => {
+          setGreetingPhase('finished');
+          // Persist theme choice and completion
+          try {
+            localStorage.setItem('sparkle_oobe_completed', 'true');
+            if (username.trim()) {
+              localStorage.setItem('sparkle_username', username.trim());
+            }
+            const currentSettingsStr = localStorage.getItem('waves_system_settings');
+            const parsed = currentSettingsStr ? JSON.parse(currentSettingsStr) : {};
+            parsed.theme = selectedTheme;
+            parsed.themeVersion = 2;
+            localStorage.setItem('waves_system_settings', JSON.stringify(parsed));
 
-          if (selectedTheme === 'light') {
-            document.documentElement.classList.add('light-mode');
-            document.documentElement.classList.remove('dark');
-          } else {
-            document.documentElement.classList.remove('light-mode');
-            document.documentElement.classList.add('dark');
-          }
-        } catch {}
-        onComplete();
-      }, 5000);
+            if (selectedTheme === 'light') {
+              document.documentElement.classList.add('light-mode');
+              document.documentElement.classList.remove('dark');
+            } else {
+              document.documentElement.classList.remove('light-mode');
+              document.documentElement.classList.add('dark');
+            }
+          } catch {}
+          onComplete();
+        }, 1200); // 1.2s smooth fade out
+      }, 4500); // freeze for 4.5s then fade out
     }
 
     return () => {
@@ -593,10 +594,6 @@ export const SparkleOOBE: React.FC<SparkleOOBEProps> = ({
     };
   }, [greetingPhase, onComplete, username, selectedTheme]);
 
-  // Filtered countries
-  const filteredCountries = COUNTRIES_LIST.filter((c) =>
-    c.toLowerCase().includes(countrySearch.toLowerCase())
-  );
 
   // Time for bottom right tray
   const now = new Date();
@@ -753,7 +750,7 @@ export const SparkleOOBE: React.FC<SparkleOOBEProps> = ({
               className="absolute inset-0 bg-black flex flex-col items-center justify-center text-center p-6"
             >
               <div 
-                className="oobe-regular-text text-white text-4xl sm:text-5xl md:text-6xl tracking-normal select-none"
+                className="oobe-regular-text text-white text-2xl sm:text-3xl md:text-4xl tracking-normal select-none"
                 style={{ fontWeight: 400, fontFamily: "'Segoe UI Variable Display', 'Segoe UI Variable Text', 'Segoe UI', system-ui, sans-serif" }}
               >
                 Hi.
@@ -772,7 +769,7 @@ export const SparkleOOBE: React.FC<SparkleOOBEProps> = ({
               className="absolute inset-0 bg-black flex flex-col items-center justify-center text-center p-6"
             >
               <div 
-                className="oobe-regular-text text-white text-3xl sm:text-4xl md:text-5xl tracking-normal select-none"
+                className="oobe-regular-text text-white text-2xl sm:text-3xl md:text-4xl tracking-normal select-none"
                 style={{ fontWeight: 400, fontFamily: "'Segoe UI Variable Display', 'Segoe UI Variable Text', 'Segoe UI', system-ui, sans-serif" }}
               >
                 Getting things ready for you
@@ -780,7 +777,7 @@ export const SparkleOOBE: React.FC<SparkleOOBEProps> = ({
             </motion.div>
           )}
 
-          {/* SCREEN 3: "This might take a few minutes." (Freeze 20s, Regular Font, pulsing & radiating vintage ambient aura) */}
+          {/* SCREEN 3: "This might take a few minutes." (Freeze 20s, Regular Font, breathing glow shrinking and expanding slowly) */}
           {greetingPhase === 'minutes' && (
             <motion.div
               key="greeting-minutes"
@@ -793,41 +790,39 @@ export const SparkleOOBE: React.FC<SparkleOOBEProps> = ({
                 background: 'radial-gradient(ellipse at 50% 50%, #0d286d 0%, #061545 45%, #030a24 80%, #010412 100%)',
               }}
             >
-              {/* Vintage Aura 1: Zooms in and out (thu nhỏ phóng to) & radiates outward slowly (toả ra chậm rãi) */}
+              {/* Central Pulsing Ambient Aura: Thu nhỏ dần rồi phóng to ra rồi thu nhỏ dần... lặp lại chậm rãi */}
               <motion.div
                 animate={{
-                  scale: [0.85, 1.35, 1.1, 0.85],
-                  opacity: [0.35, 0.72, 0.45, 0.35],
-                  rotate: [0, 90, 180, 270, 360],
+                  scale: [1.1, 0.62, 1.25, 0.62, 1.1],
+                  opacity: [0.75, 0.35, 0.85, 0.35, 0.75],
                 }}
                 transition={{
-                  duration: 16,
+                  duration: 6,
                   repeat: Infinity,
                   ease: "easeInOut",
                 }}
-                className="absolute -inset-[45%] pointer-events-none mix-blend-screen"
+                className="absolute w-[560px] h-[560px] sm:w-[720px] sm:h-[720px] pointer-events-none mix-blend-screen"
                 style={{
-                  background: 'radial-gradient(ellipse at 50% 50%, rgba(59, 130, 246, 0.55) 0%, rgba(37, 99, 235, 0.35) 40%, rgba(30, 64, 175, 0.15) 70%, transparent 85%)',
-                  filter: 'blur(85px)',
+                  background: 'radial-gradient(circle at 50% 50%, rgba(59, 130, 246, 0.7) 0%, rgba(37, 99, 235, 0.45) 35%, rgba(29, 78, 216, 0.18) 65%, transparent 80%)',
+                  filter: 'blur(75px)',
                 }}
               />
 
-              {/* Vintage Aura 2: Secondary radial pulse blooming and breathing outward */}
+              {/* Secondary Soft Ambient Pulse */}
               <motion.div
                 animate={{
-                  scale: [1.2, 0.88, 1.4, 1.2],
-                  opacity: [0.25, 0.55, 0.32, 0.25],
+                  scale: [0.7, 1.22, 0.7],
+                  opacity: [0.28, 0.58, 0.28],
                 }}
                 transition={{
-                  duration: 12,
+                  duration: 6,
                   repeat: Infinity,
                   ease: "easeInOut",
-                  delay: 1.5,
                 }}
-                className="absolute -inset-[35%] pointer-events-none mix-blend-screen"
+                className="absolute w-[420px] h-[420px] sm:w-[540px] sm:h-[540px] pointer-events-none mix-blend-screen"
                 style={{
-                  background: 'radial-gradient(circle at 50% 50%, rgba(96, 165, 250, 0.45) 0%, rgba(14, 165, 233, 0.22) 50%, transparent 80%)',
-                  filter: 'blur(95px)',
+                  background: 'radial-gradient(circle at 50% 50%, rgba(96, 165, 250, 0.55) 0%, rgba(14, 165, 233, 0.25) 50%, transparent 80%)',
+                  filter: 'blur(60px)',
                 }}
               />
 
@@ -856,18 +851,17 @@ export const SparkleOOBE: React.FC<SparkleOOBEProps> = ({
             </motion.div>
           )}
 
-          {/* SCREEN 4: "Almost there." (Freeze 5s, Regular Font) */}
+          {/* SCREEN 4: "Almost there." (Freeze 4.5s + 1.2s fade out, Regular Font) */}
           {greetingPhase === 'almost' && (
             <motion.div
               key="greeting-almost"
               initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 1.5, ease: 'easeInOut' }}
+              animate={{ opacity: isAlmostFading ? 0 : 1 }}
+              transition={{ duration: 1.2, ease: 'easeInOut' }}
               className="absolute inset-0 bg-black flex flex-col items-center justify-center text-center p-6"
             >
               <div 
-                className="oobe-regular-text text-white text-3xl sm:text-4xl md:text-5xl tracking-normal select-none"
+                className="oobe-regular-text text-white text-2xl sm:text-3xl md:text-4xl tracking-normal select-none"
                 style={{ fontWeight: 400, fontFamily: "'Segoe UI Variable Display', 'Segoe UI Variable Text', 'Segoe UI', system-ui, sans-serif" }}
               >
                 Almost there.
@@ -913,14 +907,17 @@ export const SparkleOOBE: React.FC<SparkleOOBEProps> = ({
         fontFamily: "'Segoe UI Variable Display', 'Segoe UI Variable Text', 'Segoe UI', system-ui, -apple-system, sans-serif"
       }}
     >
-      {/* Centered WinUI 11 / WinUI 3 Setup Window (15px rounded corners) */}
-      <motion.div
-        initial={{ opacity: 0, scale: 0.98, y: 8 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        exit={{ opacity: 0, scale: 0.98, y: 8 }}
-        transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-          className="relative w-full max-w-[820px] min-h-[410px] max-h-[86vh] md:h-[450px] rounded-[15px] bg-white/95 backdrop-blur-2xl border border-black/[0.08] shadow-[0_24px_70px_rgba(0,0,0,0.18)] flex flex-col md:flex-row overflow-hidden my-auto shrink-0"
-        >
+      {/* Centered WinUI 11 / WinUI 3 Setup Window (15px rounded corners) - Hidden when Recovery Modal is open */}
+      <AnimatePresence>
+        {!isRecoveryModalOpen && (
+          <motion.div
+            key="oobe-setup-window"
+            initial={{ opacity: 0, scale: 0.98, y: 8 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.98, y: 8 }}
+            transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+            className="relative w-full max-w-[820px] min-h-[410px] max-h-[86vh] md:h-[450px] rounded-[15px] bg-white/95 backdrop-blur-2xl border border-black/[0.08] shadow-[0_24px_70px_rgba(0,0,0,0.18)] flex flex-col md:flex-row overflow-hidden my-auto shrink-0"
+          >
           {/* TOP BACK BUTTON (Inside Window, only during active steps) */}
           {!isStepTransitioning && !isFinalLoading && currentStep > 1 && (
             <div className="absolute top-4 left-4 z-20">
@@ -928,7 +925,7 @@ export const SparkleOOBE: React.FC<SparkleOOBEProps> = ({
                 type="button"
                 onClick={() => advanceStep((currentStep - 1) as OOBEStep)}
                 aria-label="Back"
-                className="w-8 h-8 rounded-[15px] flex items-center justify-center text-neutral-600 hover:text-neutral-900 hover:bg-black/5 active:bg-black/10 transition-colors cursor-pointer"
+                className="w-8 h-8 rounded-[10px] flex items-center justify-center text-neutral-600 hover:text-neutral-900 hover:bg-black/5 active:bg-black/10 transition-colors cursor-pointer"
               >
                 <ArrowLeft className="w-4 h-4" />
               </button>
@@ -938,36 +935,45 @@ export const SparkleOOBE: React.FC<SparkleOOBEProps> = ({
           {/* WINDOW CONTENT: FADE ANIMATION BETWEEN JUST A MOMENT & WIZARD PAGES */}
           <AnimatePresence mode="wait">
             {isStepTransitioning || isFinalLoading ? (
-              /* JUST A MOMENT SCREEN PERFECTLY CENTERED INSIDE OOBE WINDOW */
+              /* JUST A MOMENT SCREEN SPLIT INTO 2 PARTS */
               <motion.div
                 key="oobe-just-a-moment-view"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.25, ease: 'easeInOut' }}
-                className="w-full h-full flex-1 flex flex-col items-center justify-center m-auto p-8 select-none text-center"
+                className="w-full h-full flex flex-col md:flex-row overflow-hidden"
               >
-                <div className="flex flex-col items-center justify-center text-center">
-                  <div
-                    aria-hidden="true"
-                    className="w-14 h-14 bg-[#0067b8]"
-                    style={{
-                      WebkitMaskImage: `url("${SPINNING_RING_GIF_URL}")`,
-                      maskImage: `url("${SPINNING_RING_GIF_URL}")`,
-                      WebkitMaskSize: 'contain',
-                      maskSize: 'contain',
-                      WebkitMaskRepeat: 'no-repeat',
-                      maskRepeat: 'no-repeat',
-                      WebkitMaskPosition: 'center',
-                      maskPosition: 'center',
-                    }}
-                  />
-                  <span 
-                    className="mt-5 text-xl sm:text-2xl font-normal tracking-wide text-neutral-800"
-                    style={{ fontWeight: 400 }}
-                  >
-                    Just a moment...
-                  </span>
+                {/* LEFT PART: Fluent Hourglass Icon */}
+                <div className="w-full md:w-[38%] bg-gradient-to-br from-[#f8fafc] via-[#f1f5f9] to-[#edf2f7] border-b md:border-b-0 md:border-r border-black/[0.06] flex items-center justify-center p-4 md:p-6 shrink-0 relative overflow-hidden select-none">
+                  <div className="absolute inset-0 bg-radial from-blue-500/10 via-transparent to-transparent pointer-events-none" />
+                  <FluentHourglassArtwork />
+                </div>
+
+                {/* RIGHT PART: Loading GIF and "Just a moment..." text (reduced text size) */}
+                <div className="flex-1 min-h-0 flex flex-col items-center justify-center p-6 md:p-8 bg-white select-none text-center">
+                  <div className="flex flex-col items-center justify-center text-center">
+                    <div
+                      aria-hidden="true"
+                      className="w-12 h-12 bg-[#0067b8]"
+                      style={{
+                        WebkitMaskImage: `url("${SPINNING_RING_GIF_URL}")`,
+                        maskImage: `url("${SPINNING_RING_GIF_URL}")`,
+                        WebkitMaskSize: 'contain',
+                        maskSize: 'contain',
+                        WebkitMaskRepeat: 'no-repeat',
+                        maskRepeat: 'no-repeat',
+                        WebkitMaskPosition: 'center',
+                        maskPosition: 'center',
+                      }}
+                    />
+                    <span 
+                      className="mt-4 text-[16px] sm:text-[17px] font-normal tracking-wide text-neutral-800"
+                      style={{ fontWeight: 400 }}
+                    >
+                      Just a moment...
+                    </span>
+                  </div>
                 </div>
               </motion.div>
             ) : (
@@ -1028,24 +1034,10 @@ export const SparkleOOBE: React.FC<SparkleOOBEProps> = ({
                     </motion.div>
                   )}
 
-                  {/* STEP 2: NATIVE SVG Globe & Travel */}
+                  {/* STEP 2: Setup Box & Recovery */}
                   {currentStep === 2 && (
                     <motion.div
-                      key="left-step2-globe"
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                      transition={{ duration: 0.25, ease: 'easeInOut' }}
-                      className="flex flex-col items-center justify-center"
-                    >
-                      <NativeOobeGlobeArtwork />
-                    </motion.div>
-                  )}
-
-                  {/* STEP 3: Setup Box & Recovery */}
-                  {currentStep === 3 && (
-                    <motion.div
-                      key="left-step3-action"
+                      key="left-step2-action"
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       exit={{ opacity: 0 }}
@@ -1086,10 +1078,10 @@ export const SparkleOOBE: React.FC<SparkleOOBEProps> = ({
                     </motion.div>
                   )}
 
-                  {/* STEP 4: User Profile Avatar */}
-                  {currentStep === 4 && (
+                  {/* STEP 3: User Profile Avatar */}
+                  {currentStep === 3 && (
                     <motion.div
-                      key="left-step4-user"
+                      key="left-step3-user"
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       exit={{ opacity: 0 }}
@@ -1118,10 +1110,10 @@ export const SparkleOOBE: React.FC<SparkleOOBEProps> = ({
                     </motion.div>
                   )}
 
-                  {/* STEP 5: Legal terms */}
-                  {currentStep === 5 && (
+                  {/* STEP 4: Legal terms */}
+                  {currentStep === 4 && (
                     <motion.div
-                      key="left-step5-terms"
+                      key="left-step4-terms"
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       exit={{ opacity: 0 }}
@@ -1150,31 +1142,17 @@ export const SparkleOOBE: React.FC<SparkleOOBEProps> = ({
                     </motion.div>
                   )}
 
-                  {/* STEP 6: Sparkle Features */}
-                  {currentStep === 6 && (
+                  {/* STEP 5: Thank you for choosing Sparkle! (Fluent 3 Hearts) */}
+                  {currentStep === 5 && (
                     <motion.div
-                      key="left-step6-features"
+                      key="left-step5-thankyou"
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       exit={{ opacity: 0 }}
                       transition={{ duration: 0.25, ease: 'easeInOut' }}
                       className="flex flex-col items-center justify-center text-center select-none"
                     >
-                      <svg viewBox="0 0 240 240" fill="none" className="w-[170px] h-[170px] drop-shadow-md">
-                        <defs>
-                          <linearGradient id="oobe_star_grad" x1="60" y1="50" x2="180" y2="180" gradientUnits="userSpaceOnUse">
-                            <stop offset="0%" stopColor="#fb7185" />
-                            <stop offset="35%" stopColor="#f43f5e" />
-                            <stop offset="70%" stopColor="#d946ef" />
-                            <stop offset="100%" stopColor="#8b5cf6" />
-                          </linearGradient>
-                        </defs>
-                        <path d="M120 30L135 95L200 110L135 125L120 190L105 125L40 110L105 95Z" fill="url(#oobe_star_grad)" />
-                        <circle cx="65" cy="65" r="8" fill="#38bdf8" />
-                        <circle cx="180" cy="60" r="12" fill="#fbbf24" />
-                        <circle cx="185" cy="165" r="9" fill="#34d399" />
-                        <circle cx="60" cy="160" r="7" fill="#818cf8" />
-                      </svg>
+                      <FluentThreeHeartsArtwork className="w-[165px] h-[165px]" />
                     </motion.div>
                   )}
                 </AnimatePresence>
@@ -1290,7 +1268,7 @@ export const SparkleOOBE: React.FC<SparkleOOBEProps> = ({
                           <button
                             type="button"
                             onClick={() => advanceStep(2)}
-                            className="h-8 px-7 rounded-[15px] font-normal text-white bg-[#0067b8] hover:bg-[#1879c7] active:bg-[#005a9e] border border-black/10 border-b-[2px] border-b-black/30 shadow-[0_1px_2px_rgba(0,0,0,0.12),inset_0_1px_0_rgba(255,255,255,0.16)] active:shadow-none transition-all text-xs sm:text-[13px] flex items-center justify-center cursor-pointer select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0067b8]"
+                            className="h-8 px-7 rounded-[10px] font-normal text-white bg-[#0067b8] hover:bg-[#1879c7] active:bg-[#005a9e] border border-black/10 border-b-[2px] border-b-black/30 shadow-[0_1px_2px_rgba(0,0,0,0.12),inset_0_1px_0_rgba(255,255,255,0.16)] active:shadow-none transition-all text-xs sm:text-[13px] flex items-center justify-center cursor-pointer select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0067b8]"
                           >
                             Next
                           </button>
@@ -1298,116 +1276,8 @@ export const SparkleOOBE: React.FC<SparkleOOBEProps> = ({
                       </motion.div>
                     )}
 
-                    {/* STEP 2: Welcome to Sparkle Setup Wizard (Country/Region & Keyboard) */}
+                    {/* STEP 2: Choose what you want to do (Install / Recover) */}
                     {currentStep === 2 && (
-                      <motion.div
-                        key="step-country-region"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        transition={{ duration: 0.25, ease: 'easeInOut' }}
-                        className="flex flex-col min-h-full justify-between min-h-0"
-                      >
-                        <div>
-                          <h1 className="text-[19px] sm:text-[21px] font-semibold text-[#111827] leading-tight">
-                            Is this the right country or region?
-                          </h1>
-                          <p className="text-[13px] sm:text-[14px] text-neutral-600 mt-1.5 leading-normal">
-                            Welcome to Sparkle Setup Wizard. Choose your country or region to configure localized broadcasting and language.
-                          </p>
-
-                          {/* Country Search Filter (TopBar search box design style) */}
-                          <div className="mt-3.5">
-                            <div className="fluent-search-box group relative w-full h-9 bg-[#fbfbfb] hover:bg-black/[0.04] focus-within:bg-white dark:bg-[#282c31] border-none flex items-center px-3.5 gap-2 transition-colors rounded-[6px]">
-                              <FluentSearchIcon className="w-[16px] h-[16px] text-black dark:text-white shrink-0 pointer-events-none select-none" />
-                              <input
-                                type="text"
-                                value={countrySearch}
-                                onChange={(e) => setCountrySearch(e.target.value)}
-                                placeholder="Search country or region..."
-                                spellCheck={false}
-                                autoCapitalize="off"
-                                autoComplete="off"
-                                autoCorrect="off"
-                                className="flex-1 min-w-0 bg-transparent text-xs sm:text-[13px] text-[#111827] dark:text-white placeholder-black/60 dark:placeholder-white outline-none border-none py-1 pr-1"
-                              />
-                              {countrySearch && (
-                                <button
-                                  type="button"
-                                  onClick={() => setCountrySearch('')}
-                                  title="Clear search"
-                                  className="w-5 h-5 rounded-full flex items-center justify-center text-black/60 dark:text-white/60 hover:text-black dark:hover:text-white hover:bg-black/10 dark:hover:bg-white/10 shrink-0 cursor-pointer transition-colors"
-                                >
-                                  <X className="w-3.5 h-3.5" />
-                                </button>
-                              )}
-                            </div>
-                          </div>
-
-                          {/* Native WinUI custom scrollbar */}
-                          <NativeWinUIScrollArea height={165} className="mt-2.5">
-                            {filteredCountries.map((country) => {
-                              const isSelected = selectedCountry === country;
-                              return (
-                                <button
-                                  key={country}
-                                  type="button"
-                                  onClick={() => setSelectedCountry(country)}
-                                  className={`w-full text-left px-3 py-1.5 text-xs sm:text-[13px] rounded-[15px] transition-colors flex items-center justify-between cursor-pointer ${
-                                    isSelected
-                                      ? 'bg-[#0067b8] text-white font-medium shadow-xs'
-                                      : 'text-neutral-800 hover:bg-black/[0.04]'
-                                  }`}
-                                >
-                                  <span>{country}</span>
-                                  {isSelected && <Check className="w-3.5 h-3.5 text-white" />}
-                                </button>
-                              );
-                            })}
-                          </NativeWinUIScrollArea>
-
-                          {/* Keyboard layout selection (WinUI 3 ComboBox) */}
-                          <div className="mt-2.5">
-                            <label className="text-xs font-semibold text-neutral-800 block mb-1">
-                              Keyboard and input methods
-                            </label>
-                            <select
-                              value={selectedKeyboard}
-                              onChange={(e) => setSelectedKeyboard(e.target.value)}
-                              className="w-full h-8 px-3 text-xs sm:text-[13px] bg-white border border-black/10 border-b-[2px] border-b-black/45 focus:border-b-[#0067b8] rounded-[15px] text-[#1b1b1b] outline-none shadow-[0_1px_2px_rgba(0,0,0,0.04)] transition-colors cursor-pointer"
-                            >
-                              {KEYBOARD_LAYOUTS.map((kb) => (
-                                <option key={kb.id} value={kb.id} className="bg-white text-neutral-900">
-                                  {kb.name}
-                                </option>
-                              ))}
-                            </select>
-                          </div>
-                        </div>
-
-                        <div className="flex items-center justify-between gap-3 mt-6 pt-4 border-t border-neutral-200">
-                          {/* WinUI 3 Secondary Button */}
-                          <button
-                            type="button"
-                            onClick={() => advanceStep(1)}
-                            className="h-8 px-5 rounded-[15px] font-normal text-[#1b1b1b] bg-[#fbfbfb] hover:bg-[#f5f5f5] active:bg-[#eaeaea] border border-black/10 border-b-[2px] border-b-black/20 shadow-[0_1px_2px_rgba(0,0,0,0.05),inset_0_1px_0_rgba(255,255,255,0.8)] active:shadow-none transition-all text-xs sm:text-[13px] flex items-center justify-center cursor-pointer select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0067b8]"
-                          >
-                            Back
-                          </button>
-                          {/* WinUI 3 Primary Button */}
-                          <button
-                            type="button"
-                            onClick={() => advanceStep(3)}
-                            className="h-8 px-7 rounded-[15px] font-normal text-white bg-[#0067b8] hover:bg-[#1879c7] active:bg-[#005a9e] border border-black/10 border-b-[2px] border-b-black/30 shadow-[0_1px_2px_rgba(0,0,0,0.12),inset_0_1px_0_rgba(255,255,255,0.16)] active:shadow-none transition-all text-xs sm:text-[13px] flex items-center justify-center cursor-pointer select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0067b8]"
-                          >
-                            Yes
-                          </button>
-                        </div>
-                      </motion.div>
-                    )}
-
-                    {/* STEP 3: Choose what you want to do (Install / Recover) */}
-                    {currentStep === 3 && (
                       <motion.div
                         key="step-action-choice"
                         initial={{ opacity: 0 }}
@@ -1483,8 +1353,8 @@ export const SparkleOOBE: React.FC<SparkleOOBEProps> = ({
                           {/* WinUI 3 Secondary Button */}
                           <button
                             type="button"
-                            onClick={() => advanceStep(2)}
-                            className="h-8 px-5 rounded-[15px] font-normal text-[#1b1b1b] bg-[#fbfbfb] hover:bg-[#f5f5f5] active:bg-[#eaeaea] border border-black/10 border-b-[2px] border-b-black/20 shadow-[0_1px_2px_rgba(0,0,0,0.05),inset_0_1px_0_rgba(255,255,255,0.8)] active:shadow-none transition-all text-xs sm:text-[13px] flex items-center justify-center cursor-pointer select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0067b8]"
+                            onClick={() => advanceStep(1)}
+                            className="h-8 px-5 rounded-[10px] font-normal text-[#1b1b1b] bg-[#fbfbfb] hover:bg-[#f5f5f5] active:bg-[#eaeaea] border border-black/10 border-b-[2px] border-b-black/20 shadow-[0_1px_2px_rgba(0,0,0,0.05),inset_0_1px_0_rgba(255,255,255,0.8)] active:shadow-none transition-all text-xs sm:text-[13px] flex items-center justify-center cursor-pointer select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0067b8]"
                           >
                             Back
                           </button>
@@ -1495,10 +1365,10 @@ export const SparkleOOBE: React.FC<SparkleOOBEProps> = ({
                               if (selectedAction === 'recover') {
                                 setIsRecoveryModalOpen(true);
                               } else {
-                                advanceStep(4);
+                                advanceStep(3);
                               }
                             }}
-                            className="h-8 px-7 rounded-[15px] font-normal text-white bg-[#0067b8] hover:bg-[#1879c7] active:bg-[#005a9e] border border-black/10 border-b-[2px] border-b-black/30 shadow-[0_1px_2px_rgba(0,0,0,0.12),inset_0_1px_0_rgba(255,255,255,0.16)] active:shadow-none transition-all text-xs sm:text-[13px] flex items-center justify-center cursor-pointer select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0067b8]"
+                            className="h-8 px-7 rounded-[10px] font-normal text-white bg-[#0067b8] hover:bg-[#1879c7] active:bg-[#005a9e] border border-black/10 border-b-[2px] border-b-black/30 shadow-[0_1px_2px_rgba(0,0,0,0.12),inset_0_1px_0_rgba(255,255,255,0.16)] active:shadow-none transition-all text-xs sm:text-[13px] flex items-center justify-center cursor-pointer select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0067b8]"
                           >
                             Next
                           </button>
@@ -1506,8 +1376,8 @@ export const SparkleOOBE: React.FC<SparkleOOBEProps> = ({
                       </motion.div>
                     )}
 
-                    {/* STEP 4: Who is going to use Sparkle (Username) */}
-                    {currentStep === 4 && (
+                    {/* STEP 3: Who is going to use Sparkle (Username) */}
+                    {currentStep === 3 && (
                       <motion.div
                         key="step-username"
                         initial={{ opacity: 0 }}
@@ -1528,15 +1398,21 @@ export const SparkleOOBE: React.FC<SparkleOOBEProps> = ({
                             <label className="text-xs font-semibold text-neutral-800 block mb-1.5">
                               User name
                             </label>
-                            {/* WinUI 3 TextBox */}
-                            <input
-                              type="text"
-                              value={username}
-                              onChange={(e) => setUsername(e.target.value)}
-                              placeholder="Enter username"
-                              className="w-full h-8 px-3 text-xs sm:text-[13px] bg-white border border-black/10 border-b-[2px] border-b-black/45 focus:border-b-[#0067b8] rounded-[15px] text-[#1b1b1b] outline-none shadow-[0_1px_2px_rgba(0,0,0,0.04)] placeholder:text-neutral-400 transition-colors"
-                            />
-                            <p className="text-[11.5px] text-neutral-500 mt-2">
+                            {/* WinUI 3 Gallery TextBox */}
+                            <div className="fluent-input-box relative w-full h-9 bg-black/5 hover:bg-black/[0.08] focus-within:bg-black/5 flex items-center px-3.5 rounded-[6px] transition-colors border-none backdrop-blur-[50px]">
+                              <input
+                                type="text"
+                                value={username}
+                                onChange={(e) => setUsername(e.target.value)}
+                                placeholder="Enter a name"
+                                spellCheck={false}
+                                autoCapitalize="off"
+                                autoComplete="off"
+                                autoCorrect="off"
+                                className="w-full bg-transparent text-xs sm:text-[13px] text-[#111827] placeholder-[#71717a] outline-none border-none py-1"
+                              />
+                            </div>
+                            <p className="text-[11.5px] text-neutral-500 mt-2 leading-relaxed">
                               This user profile will be used throughout the Sparkle WinUI workspace.
                             </p>
                           </div>
@@ -1546,16 +1422,16 @@ export const SparkleOOBE: React.FC<SparkleOOBEProps> = ({
                           {/* WinUI 3 Secondary Button */}
                           <button
                             type="button"
-                            onClick={() => advanceStep(3)}
-                            className="h-8 px-5 rounded-[15px] font-normal text-[#1b1b1b] bg-[#fbfbfb] hover:bg-[#f5f5f5] active:bg-[#eaeaea] border border-black/10 border-b-[2px] border-b-black/20 shadow-[0_1px_2px_rgba(0,0,0,0.05),inset_0_1px_0_rgba(255,255,255,0.8)] active:shadow-none transition-all text-xs sm:text-[13px] flex items-center justify-center cursor-pointer select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0067b8]"
+                            onClick={() => advanceStep(2)}
+                            className="h-8 px-5 rounded-[10px] font-normal text-[#1b1b1b] bg-[#fbfbfb] hover:bg-[#f5f5f5] active:bg-[#eaeaea] border border-black/10 border-b-[2px] border-b-black/20 shadow-[0_1px_2px_rgba(0,0,0,0.05),inset_0_1px_0_rgba(255,255,255,0.8)] active:shadow-none transition-all text-xs sm:text-[13px] flex items-center justify-center cursor-pointer select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0067b8]"
                           >
                             Back
                           </button>
                           {/* WinUI 3 Primary Button */}
                           <button
                             type="button"
-                            onClick={() => advanceStep(5)}
-                            className="h-8 px-7 rounded-[15px] font-normal text-white bg-[#0067b8] hover:bg-[#1879c7] active:bg-[#005a9e] border border-black/10 border-b-[2px] border-b-black/30 shadow-[0_1px_2px_rgba(0,0,0,0.12),inset_0_1px_0_rgba(255,255,255,0.16)] active:shadow-none transition-all text-xs sm:text-[13px] flex items-center justify-center cursor-pointer select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0067b8]"
+                            onClick={() => advanceStep(4)}
+                            className="h-8 px-7 rounded-[10px] font-normal text-white bg-[#0067b8] hover:bg-[#1879c7] active:bg-[#005a9e] border border-black/10 border-b-[2px] border-b-black/30 shadow-[0_1px_2px_rgba(0,0,0,0.12),inset_0_1px_0_rgba(255,255,255,0.16)] active:shadow-none transition-all text-xs sm:text-[13px] flex items-center justify-center cursor-pointer select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0067b8]"
                           >
                             Next
                           </button>
@@ -1563,8 +1439,8 @@ export const SparkleOOBE: React.FC<SparkleOOBEProps> = ({
                       </motion.div>
                     )}
 
-                    {/* STEP 5: Applicable notices and license terms (Accept / Decline) */}
-                    {currentStep === 5 && (
+                    {/* STEP 4: Applicable notices and license terms (Accept / Decline) */}
+                    {currentStep === 4 && (
                       <motion.div
                         key="step-license-terms"
                         initial={{ opacity: 0 }}
@@ -1611,8 +1487,8 @@ export const SparkleOOBE: React.FC<SparkleOOBEProps> = ({
                           {/* WinUI 3 Secondary Button */}
                           <button
                             type="button"
-                            onClick={() => advanceStep(4)}
-                            className="h-8 px-5 rounded-[15px] font-normal text-[#1b1b1b] bg-[#fbfbfb] hover:bg-[#f5f5f5] active:bg-[#eaeaea] border border-black/10 border-b-[2px] border-b-black/20 shadow-[0_1px_2px_rgba(0,0,0,0.05),inset_0_1px_0_rgba(255,255,255,0.8)] active:shadow-none transition-all text-xs sm:text-[13px] flex items-center justify-center cursor-pointer select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0067b8]"
+                            onClick={() => advanceStep(3)}
+                            className="h-8 px-5 rounded-[10px] font-normal text-[#1b1b1b] bg-[#fbfbfb] hover:bg-[#f5f5f5] active:bg-[#eaeaea] border border-black/10 border-b-[2px] border-b-black/20 shadow-[0_1px_2px_rgba(0,0,0,0.05),inset_0_1px_0_rgba(255,255,255,0.8)] active:shadow-none transition-all text-xs sm:text-[13px] flex items-center justify-center cursor-pointer select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0067b8]"
                           >
                             Back
                           </button>
@@ -1621,7 +1497,7 @@ export const SparkleOOBE: React.FC<SparkleOOBEProps> = ({
                             <button
                               type="button"
                               onClick={() => setTermsDeclinePrompt(true)}
-                              className="h-8 px-5 rounded-[15px] font-normal text-[#1b1b1b] bg-[#fbfbfb] hover:bg-[#f5f5f5] active:bg-[#eaeaea] border border-black/10 border-b-[2px] border-b-black/20 shadow-[0_1px_2px_rgba(0,0,0,0.05),inset_0_1px_0_rgba(255,255,255,0.8)] active:shadow-none transition-all text-xs sm:text-[13px] flex items-center justify-center cursor-pointer select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0067b8]"
+                              className="h-8 px-5 rounded-[10px] font-normal text-[#1b1b1b] bg-[#fbfbfb] hover:bg-[#f5f5f5] active:bg-[#eaeaea] border border-black/10 border-b-[2px] border-b-black/20 shadow-[0_1px_2px_rgba(0,0,0,0.05),inset_0_1px_0_rgba(255,255,255,0.8)] active:shadow-none transition-all text-xs sm:text-[13px] flex items-center justify-center cursor-pointer select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0067b8]"
                             >
                               Decline
                             </button>
@@ -1630,9 +1506,9 @@ export const SparkleOOBE: React.FC<SparkleOOBEProps> = ({
                               type="button"
                               onClick={() => {
                                 setTermsDeclinePrompt(false);
-                                advanceStep(6);
+                                advanceStep(5);
                               }}
-                              className="h-8 px-7 rounded-[15px] font-normal text-white bg-[#0067b8] hover:bg-[#1879c7] active:bg-[#005a9e] border border-black/10 border-b-[2px] border-b-black/30 shadow-[0_1px_2px_rgba(0,0,0,0.12),inset_0_1px_0_rgba(255,255,255,0.16)] active:shadow-none transition-all text-xs sm:text-[13px] flex items-center justify-center cursor-pointer select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0067b8]"
+                              className="h-8 px-7 rounded-[10px] font-normal text-white bg-[#0067b8] hover:bg-[#1879c7] active:bg-[#005a9e] border border-black/10 border-b-[2px] border-b-black/30 shadow-[0_1px_2px_rgba(0,0,0,0.12),inset_0_1px_0_rgba(255,255,255,0.16)] active:shadow-none transition-all text-xs sm:text-[13px] flex items-center justify-center cursor-pointer select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0067b8]"
                             >
                               Accept
                             </button>
@@ -1641,10 +1517,10 @@ export const SparkleOOBE: React.FC<SparkleOOBEProps> = ({
                       </motion.div>
                     )}
 
-                    {/* STEP 6: Now let's see what's new on Sparkle */}
-                    {currentStep === 6 && (
+                    {/* STEP 5: Thank you for choosing Sparkle! */}
+                    {currentStep === 5 && (
                       <motion.div
-                        key="step-features-showcase"
+                        key="step-thank-you"
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
@@ -1653,70 +1529,44 @@ export const SparkleOOBE: React.FC<SparkleOOBEProps> = ({
                       >
                         <div>
                           <h1 className="text-[19px] sm:text-[21px] font-semibold text-[#111827] leading-tight">
-                            Now let&apos;s see what&apos;s new on Sparkle
+                            Thank you for choosing Sparkle!
                           </h1>
                           <p className="text-[13px] sm:text-[14px] text-neutral-600 mt-1.5 leading-normal">
-                            Here are four major capabilities designed directly into your new Sparkle experience.
+                            Your setup is complete and Sparkle is ready for you. Everything is set up to give you the best entertainment, productivity, and community experience.
                           </p>
 
-                          <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
-                            {/* WinUI 3 Feature 1 */}
-                            <div className="p-3 rounded-[15px] bg-[#fcfcfc]/90 border border-black/[0.08] shadow-xs flex items-start gap-3 hover:bg-white hover:border-black/15 transition-all">
-                              <div className="w-8 h-8 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center shrink-0">
-                                <Tv className="w-4 h-4" />
-                              </div>
-                              <div>
-                                <div className="text-xs sm:text-[13px] font-semibold text-neutral-900">
-                                  Unlimited entertainment
+                          <div className="mt-5 space-y-3">
+                            {/* Summary Card: Profile & Theme */}
+                            <div className="p-4 rounded-[12px] bg-black/[0.03] border border-black/[0.08] flex items-center justify-between">
+                              <div className="flex items-center gap-3">
+                                <div className="w-9 h-9 rounded-full bg-[#0067b8]/10 text-[#0067b8] flex items-center justify-center font-semibold text-sm">
+                                  {(username.trim() || 'S').charAt(0).toUpperCase()}
                                 </div>
-                                <div className="text-[11px] text-neutral-600 mt-0.5 leading-snug">
-                                  Truyền hình & phát sóng trực tuyến đa kênh 24/7 với kho đài VTV, HTV, VOV phong phú.
-                                </div>
-                              </div>
-                            </div>
-
-                            {/* WinUI 3 Feature 2 */}
-                            <div className="p-3 rounded-[15px] bg-[#fcfcfc]/90 border border-black/[0.08] shadow-xs flex items-start gap-3 hover:bg-white hover:border-black/15 transition-all">
-                              <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center shrink-0">
-                                <Search className="w-4 h-4" />
-                              </div>
-                              <div>
-                                <div className="text-xs sm:text-[13px] font-semibold text-neutral-900">
-                                  Smarter search experience
-                                </div>
-                                <div className="text-[11px] text-neutral-600 mt-0.5 leading-snug">
-                                  Tìm kiếm tức thì, nhận diện giọng nói tiếng Việt và điều hướng phím tắt mượt mà.
+                                <div>
+                                  <div className="text-xs sm:text-[13px] font-semibold text-neutral-900 flex items-center gap-1.5">
+                                    <span>{username.trim() || 'Sparkle User'}</span>
+                                    <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-medium bg-emerald-100 text-emerald-800">
+                                      Ready
+                                    </span>
+                                  </div>
+                                  <div className="text-[11.5px] text-neutral-500 mt-0.5">
+                                    {selectedTheme === 'dark' ? 'Dark theme' : 'Light theme'} · Standard edition
+                                  </div>
                                 </div>
                               </div>
                             </div>
 
-                            {/* WinUI 3 Feature 3 */}
-                            <div className="p-3 rounded-[15px] bg-[#fcfcfc]/90 border border-black/[0.08] shadow-xs flex items-start gap-3 hover:bg-white hover:border-black/15 transition-all">
-                              <div className="w-8 h-8 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center shrink-0">
-                                <Layers className="w-4 h-4" />
+                            {/* Welcome Highlights Card */}
+                            <div className="p-3.5 rounded-[12px] bg-[#0067b8]/[0.04] border border-[#0067b8]/20 flex items-start gap-3">
+                              <div className="w-8 h-8 rounded-full bg-[#0067b8]/10 flex items-center justify-center shrink-0 mt-0.5 shadow-xs overflow-hidden">
+                                <img
+                                  src="https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Smiling%20face%20with%20hearts/3D/smiling_face_with_hearts_3d.png"
+                                  alt="🥰"
+                                  className="w-5 h-5 object-contain"
+                                />
                               </div>
-                              <div>
-                                <div className="text-xs sm:text-[13px] font-semibold text-neutral-900">
-                                  Modern WinUI design system
-                                </div>
-                                <div className="text-[11px] text-neutral-600 mt-0.5 leading-snug">
-                                  Giao diện Fluent chuẩn WinUI 3 với hiệu ứng Mica, Acrylic, Reveal và bo góc hiện đại.
-                                </div>
-                              </div>
-                            </div>
-
-                            {/* WinUI 3 Feature 4 */}
-                            <div className="p-3 rounded-[15px] bg-[#fcfcfc]/90 border border-black/[0.08] shadow-xs flex items-start gap-3 hover:bg-white hover:border-black/15 transition-all">
-                              <div className="w-8 h-8 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center shrink-0">
-                                <MessageSquare className="w-4 h-4" />
-                              </div>
-                              <div>
-                                <div className="text-xs sm:text-[13px] font-semibold text-neutral-900">
-                                  Developers hear from your speak
-                                </div>
-                                <div className="text-[11px] text-neutral-600 mt-0.5 leading-snug">
-                                  Lắng nghe và đồng hành cùng cộng đồng qua trung tâm phản hồi và cập nhật liên tục.
-                                </div>
+                              <div className="text-xs text-neutral-700 leading-relaxed">
+                                Sparkle is personalized and ready. Click <strong>Get started</strong> below to enter your workspace and enjoy streaming TV, radio, notes, and community updates.
                               </div>
                             </div>
                           </div>
@@ -1726,8 +1576,8 @@ export const SparkleOOBE: React.FC<SparkleOOBEProps> = ({
                           {/* WinUI 3 Secondary Button */}
                           <button
                             type="button"
-                            onClick={() => advanceStep(5)}
-                            className="h-8 px-5 rounded-[15px] font-normal text-[#1b1b1b] bg-[#fbfbfb] hover:bg-[#f5f5f5] active:bg-[#eaeaea] border border-black/10 border-b-[2px] border-b-black/20 shadow-[0_1px_2px_rgba(0,0,0,0.05),inset_0_1px_0_rgba(255,255,255,0.8)] active:shadow-none transition-all text-xs sm:text-[13px] flex items-center justify-center cursor-pointer select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0067b8]"
+                            onClick={() => advanceStep(4)}
+                            className="h-8 px-5 rounded-[10px] font-normal text-[#1b1b1b] bg-[#fbfbfb] hover:bg-[#f5f5f5] active:bg-[#eaeaea] border border-black/10 border-b-[2px] border-b-black/20 shadow-[0_1px_2px_rgba(0,0,0,0.05),inset_0_1px_0_rgba(255,255,255,0.8)] active:shadow-none transition-all text-xs sm:text-[13px] flex items-center justify-center cursor-pointer select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0067b8]"
                           >
                             Back
                           </button>
@@ -1735,7 +1585,7 @@ export const SparkleOOBE: React.FC<SparkleOOBEProps> = ({
                           <button
                             type="button"
                             onClick={startFinalSequence}
-                            className="h-8 px-8 rounded-[15px] font-normal text-white bg-[#0067b8] hover:bg-[#1879c7] active:bg-[#005a9e] border border-black/10 border-b-[2px] border-b-black/30 shadow-[0_1px_2px_rgba(0,0,0,0.12),inset_0_1px_0_rgba(255,255,255,0.16)] active:shadow-none transition-all text-xs sm:text-[13px] flex items-center justify-center cursor-pointer select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0067b8]"
+                            className="h-8 px-8 rounded-[10px] font-normal text-white bg-[#0067b8] hover:bg-[#1879c7] active:bg-[#005a9e] border border-black/10 border-b-[2px] border-b-black/30 shadow-[0_1px_2px_rgba(0,0,0,0.12),inset_0_1px_0_rgba(255,255,255,0.16)] active:shadow-none transition-all text-xs sm:text-[13px] flex items-center justify-center cursor-pointer select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0067b8]"
                           >
                             Get started
                           </button>
@@ -1760,7 +1610,7 @@ export const SparkleOOBE: React.FC<SparkleOOBEProps> = ({
                         e.stopPropagation();
                         rightPaneRef.current?.scrollBy({ top: -140, behavior: 'smooth' });
                       }}
-                      className="w-4 h-4 rounded-[15px] flex items-center justify-center transition-colors cursor-default bg-neutral-100/80 hover:bg-neutral-200 active:bg-neutral-300 text-neutral-600 hover:text-neutral-900 shrink-0 border-none"
+                      className="w-4 h-4 rounded-[10px] flex items-center justify-center transition-colors cursor-default bg-neutral-100/80 hover:bg-neutral-200 active:bg-neutral-300 text-neutral-600 hover:text-neutral-900 shrink-0 border-none"
                       title="Scroll up"
                     >
                       <ChevronUp className="w-2.5 h-2.5 stroke-[2.5]" />
@@ -1800,7 +1650,7 @@ export const SparkleOOBE: React.FC<SparkleOOBEProps> = ({
                         e.stopPropagation();
                         rightPaneRef.current?.scrollBy({ top: 140, behavior: 'smooth' });
                       }}
-                      className="w-4 h-4 rounded-[15px] flex items-center justify-center transition-colors cursor-default bg-neutral-100/80 hover:bg-neutral-200 active:bg-neutral-300 text-neutral-600 hover:text-neutral-900 shrink-0 border-none"
+                      className="w-4 h-4 rounded-[10px] flex items-center justify-center transition-colors cursor-default bg-neutral-100/80 hover:bg-neutral-200 active:bg-neutral-300 text-neutral-600 hover:text-neutral-900 shrink-0 border-none"
                       title="Scroll down"
                     >
                       <ChevronDown className="w-2.5 h-2.5 stroke-[2.5]" />
@@ -1812,6 +1662,15 @@ export const SparkleOOBE: React.FC<SparkleOOBEProps> = ({
           )}
         </AnimatePresence>
       </motion.div>
+    )}
+  </AnimatePresence>
+
+      {/* Sparkle Recovery Modal Dialog on top of OOBE wallpaper */}
+      <SparkleRecoveryModal
+        isOpen={isRecoveryModalOpen}
+        onClose={() => setIsRecoveryModalOpen(false)}
+        navigate={navigate}
+      />
 
       {/* Windows 11 Bottom Right Tray (BÊN NGOÀI window oobe) */}
       <div className="absolute bottom-4 right-6 z-30 flex items-center gap-2 select-none">
@@ -1820,7 +1679,7 @@ export const SparkleOOBE: React.FC<SparkleOOBEProps> = ({
           type="button"
           onClick={() => setIsDebugPageOpen(true)}
           aria-label="Debug"
-          className="w-8 h-8 rounded-[15px] flex items-center justify-center text-neutral-700 bg-white/75 hover:bg-white/95 active:bg-white backdrop-blur-md border border-black/[0.08] shadow-xs transition-colors cursor-pointer"
+          className="w-8 h-8 rounded-[10px] flex items-center justify-center text-neutral-700 bg-white/75 hover:bg-white/95 active:bg-white backdrop-blur-md border border-black/[0.08] shadow-xs transition-colors cursor-pointer"
         >
           <Bug className="h-4 w-4" aria-hidden="true" />
         </button>
@@ -1830,7 +1689,7 @@ export const SparkleOOBE: React.FC<SparkleOOBEProps> = ({
           type="button"
           onClick={() => setIsMuted(!isMuted)}
           aria-label={isMuted ? 'Unmute' : 'Mute'}
-          className="w-8 h-8 rounded-[15px] flex items-center justify-center text-neutral-700 bg-white/75 hover:bg-white/95 active:bg-white backdrop-blur-md border border-black/[0.08] shadow-xs transition-colors cursor-pointer"
+          className="w-8 h-8 rounded-[10px] flex items-center justify-center text-neutral-700 bg-white/75 hover:bg-white/95 active:bg-white backdrop-blur-md border border-black/[0.08] shadow-xs transition-colors cursor-pointer"
         >
           {isMuted ? <VolumeX className="w-4 h-4 text-red-500" /> : <Volume2 className="w-4 h-4" />}
         </button>
@@ -1839,23 +1698,16 @@ export const SparkleOOBE: React.FC<SparkleOOBEProps> = ({
         <button
           type="button"
           aria-label="Accessibility"
-          className="w-8 h-8 rounded-[15px] flex items-center justify-center text-neutral-700 bg-white/75 hover:bg-white/95 active:bg-white backdrop-blur-md border border-black/[0.08] shadow-xs transition-colors cursor-pointer"
+          className="w-8 h-8 rounded-[10px] flex items-center justify-center text-neutral-700 bg-white/75 hover:bg-white/95 active:bg-white backdrop-blur-md border border-black/[0.08] shadow-xs transition-colors cursor-pointer"
         >
           <Accessibility className="w-4 h-4" />
         </button>
 
         {/* Clock Time */}
-        <div className="h-8 px-2.5 rounded-[15px] flex items-center justify-center text-neutral-700 text-xs font-normal bg-white/75 backdrop-blur-md border border-black/[0.08] shadow-xs cursor-default">
+        <div className="h-8 px-2.5 rounded-[10px] flex items-center justify-center text-neutral-700 text-xs font-normal bg-white/75 backdrop-blur-md border border-black/[0.08] shadow-xs cursor-default">
           <span className="tracking-wide">{timeString}</span>
         </div>
       </div>
-
-      {/* Embedded Sparkle Recovery Modal */}
-      <SparkleRecoveryModal
-        isOpen={isRecoveryModalOpen}
-        onClose={() => setIsRecoveryModalOpen(false)}
-        navigate={navigate}
-      />
     </div>
   );
 };
