@@ -70,9 +70,9 @@ export const CanvasContextMenu: React.FC<CanvasContextMenuProps> = ({ x, y, onAc
       ref={menuRef}
       role="menu"
       aria-label="Canvas actions"
-      initial={{ clipPath: `circle(0% at ${x - position.left}px ${y - position.top}px)` }}
-      animate={{ clipPath: `circle(150% at ${x - position.left}px ${y - position.top}px)` }}
-      exit={{ clipPath: `circle(0% at ${x - position.left}px ${y - position.top}px)` }}
+initial={{ scaleY: 0 }}
+        animate={{ scaleY: 1 }}
+        exit={{ scaleY: 0 }}
       transition={{ duration: 0.2, ease: 'linear' }}
       onContextMenu={(event) => event.preventDefault()}
       onMouseDown={(event) => event.stopPropagation()}

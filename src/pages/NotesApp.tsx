@@ -172,9 +172,9 @@ const NoteContextMenu: React.FC<NoteContextMenuProps> = ({ x, y, isPinned, onAct
     <motion.div
       ref={menuRef}
       role="menu"
-initial={{ clipPath: `circle(0% at ${x - position.left}px ${y - position.top}px)` }}
-          animate={{ clipPath: `circle(150% at ${x - position.left}px ${y - position.top}px)` }}
-          exit={{ clipPath: `circle(0% at ${x - position.left}px ${y - position.top}px)` }}
+initial={{ scaleY: 0 }}
+            animate={{ scaleY: 1 }}
+            exit={{ scaleY: 0 }}
           transition={{ duration: 0.2, ease: 'linear' }}
       onContextMenu={(e) => e.preventDefault()}
       onMouseDown={(e) => e.stopPropagation()}
