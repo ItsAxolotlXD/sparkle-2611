@@ -130,10 +130,10 @@ export const WatchChannelContextMenu: React.FC<WatchChannelContextMenuProps> = (
       ref={menuRef}
       role="menu"
       aria-label="Channel options"
-      initial={{ opacity: 0, y: -10, scale: 0.96 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      exit={{ opacity: 0, y: -4, scale: 0.98 }}
-      transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+initial={{ clipPath: `circle(0% at ${x - position.left}px ${y - position.top}px)` }}
+        animate={{ clipPath: `circle(150% at ${x - position.left}px ${y - position.top}px)` }}
+        exit={{ clipPath: `circle(0% at ${x - position.left}px ${y - position.top}px)` }}
+        transition={{ duration: 0.2, ease: 'linear' }}
       onContextMenu={(e) => e.preventDefault()}
       className={`fixed z-[2147483647] w-[232px] ${flyoutPanelClassName} fluent-context-menu`}
       style={{

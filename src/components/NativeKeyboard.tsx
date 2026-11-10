@@ -1575,10 +1575,10 @@ export const NativeKeyboard: React.FC = () => {
                   id="native-keyboard-settings-menu"
                   role="menu"
                   aria-label="Cài đặt bàn phím"
-initial={{ opacity: 0, y: -16 }}
-      animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -8 }}
-                  transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
+initial={{ opacity: 1, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 1, y: -4 }}
+                  transition={{ duration: 0.2, ease: 'linear' }}
                   onContextMenu={(e) => e.preventDefault()}
                   className={`fixed z-[2147483647] w-[236px] max-h-[calc(100vh-80px)] overflow-y-auto ${flyoutPanelClassName} fluent-context-menu select-none`}
                   style={{
@@ -1589,8 +1589,8 @@ initial={{ opacity: 0, y: -16 }}
                 >
                   {/* Header */}
                   <motion.div
-                    initial={{ opacity: 0, y: -8 }}
-                    animate={{ opacity: 1, y: 0, transition: { duration: 0.28, delay: 0, ease: [0.16, 1, 0.3, 1] } }}
+                    initial={{ opacity: 1, y: -8 }}
+                    animate={{ opacity: 1, y: 0, transition: { duration: 0.2, delay: 0, ease: 'linear' } }}
                     className="px-3 py-1.5 text-[11px] font-semibold text-[#6b7280] dark:text-[#9ca3af] uppercase tracking-wider flex items-center justify-between"
                   >
                     <span>Cài đặt bàn phím</span>
