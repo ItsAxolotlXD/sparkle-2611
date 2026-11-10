@@ -4,9 +4,12 @@ import { motion, AnimatePresence, Reorder } from 'motion/react';
 import { 
   ChevronLeft, 
   ChevronRight, 
-  Plus, 
-  X, 
-  Copy, 
+  Plus,
+  MoreHorizontal,
+  Hand,
+  Check,
+  X,
+  Copy,
   Trash2,
   Search
 } from 'lucide-react';
@@ -68,6 +71,13 @@ interface TabContextMenuState {
   x: number;
   y: number;
   tabId: string;
+}
+
+interface TabGroup {
+  id: string;
+  tabIds: string[];
+  name: string;
+  color: string;
 }
 
 interface TabContextMenuProps {
@@ -162,10 +172,10 @@ const TabContextMenu: React.FC<TabContextMenuProps> = ({
       <motion.div
         role="menu"
         aria-label="Tab actions"
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1 }}
-        exit={{ opacity: 0, scale: 0.96 }}
-        transition={{ duration: 0.16, ease: [0.16, 1, 0.3, 1] }}
+initial={{ scaleY: 0 }}
+          animate={{ scaleY: 1 }}
+          exit={{ scaleY: 0 }}
+          transition={{ duration: 0.2, ease: 'linear' }}
         style={{ ...flyoutPanelStyle, transformOrigin: `${x - position.left}px ${y - position.top}px` }}
         className={`w-[190px] p-1 ${flyoutPanelClassName} fluent-context-menu`}
       >
@@ -334,6 +344,12 @@ export const SparkleTabBar: React.FC<SparkleTabBarProps> = ({
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
   const [contextMenu, setContextMenu] = useState<TabContextMenuState | null>(null);
+  const [isOverflowOpen, setIsOverflowOpen] = useState(false);
+  const [isGrouping, setIsGrouping] = useState(false);
+  const [selectedTabIds, setSelectedTabIds] = useState<string[]>([]);
+  const [tabGroups, setTabGroups] = useState<TabGroup[]>([]);
+  const [groupName, setGroupName] = useState('New group');
+  const [groupColor, setGroupColor] = useState('#8b5cf6');
   const [addTabTooltip, setAddTabTooltip] = useState<{ top: number; left: number } | null>(null);
   const [searchTooltip, setSearchTooltip] = useState<{ top: number; left: number } | null>(null);
 
@@ -355,6 +371,31 @@ export const SparkleTabBar: React.FC<SparkleTabBarProps> = ({
   const hideAddTabTooltip = () => {
     setAddTabTooltip(null);
   };
+
+  const toggleGroupingMode = () => {
+    setIsGrouping((current) => !current);
+    setSelectedTabIds([]);
+    setIsOverflowOpen(false);
+  };
+
+  const toggleTabSelection = (tabId: string) => {
+    setSelectedTabIds((current) =>
+      current.includes(tabId) ? current.filter((id) => id !== tabId) : [...current, tabId].slice(-2),
+    );
+  };
+
+  const createTabGroup = () => {
+    if (selectedTabIds.length < 2) return;
+    setTabGroups((current) => [
+      ...current.filter((group) => !group.tabIds.some((id) => selectedTabIds.includes(id))),
+      { id: `tab-group-${Date.now()}`, tabIds: selectedTabIds, name: groupName.trim() || 'New group', color: groupColor },
+    ]);
+    setSelectedTabIds([]);
+    setIsGrouping(false);
+    setGroupName('New group');
+  };
+
+  const getTabGroup = (tabId: string) => tabGroups.find((group) => group.tabIds.includes(tabId));
 
   useEffect(() => {
     setAddTabTooltip(null);
@@ -505,6 +546,7 @@ export const SparkleTabBar: React.FC<SparkleTabBarProps> = ({
           <AnimatePresence initial={false}>
           {tabs.map((tab) => {
             const isActive = tab.id === activeTabId;
+            const group = getTabGroup(tab.id);
 
             return (
               <Reorder.Item
@@ -535,7 +577,7 @@ export const SparkleTabBar: React.FC<SparkleTabBarProps> = ({
                   reorderedTabs.splice(targetIndex, 0, movedTab);
                   onReorderTabs(reorderedTabs);
                 }}
-                onClick={() => onSelectTab(tab.id)}
+                onClick={() => (isGrouping ? toggleTabSelection(tab.id) : onSelectTab(tab.id))}
                 onAuxClick={(e) => {
                   // Middle click closes tab
                   if (e.button === 1) {
@@ -552,12 +594,13 @@ export const SparkleTabBar: React.FC<SparkleTabBarProps> = ({
                     tabId: tab.id,
                   });
                 }}
-                title={tab.title}
+                title={group ? `${tab.title} · ${group.name}` : tab.title}
                 style={{
                   minWidth: tabs.length > 8 ? '68px' : tabs.length > 5 ? '92px' : '120px',
                   maxWidth: '210px',
+                  borderTop: group ? `2px solid ${group.color}` : undefined,
                 }}
-                className={`group relative flex-1 shrink h-[38px] flex items-center justify-between px-2.5 cursor-grab active:cursor-grabbing rounded-t-[6px] transition-colors duration-150 border-none outline-none ${
+                className={`group relative flex-1 shrink h-[38px] flex items-center justify-between px-2.5 cursor-grab active:cursor-grabbing rounded-t-[6px] transition-colors duration-150 border-none outline-none ${isGrouping && selectedTabIds.includes(tab.id) ? 'ring-2 ring-inset ring-violet-400 z-20' : ''} ${
                   isActive
                     ? isLightMode
                       ? 'bg-[#f9f9f9] text-[#111827] shadow-xs z-10'
@@ -618,49 +661,62 @@ export const SparkleTabBar: React.FC<SparkleTabBarProps> = ({
         </button>
       )}
 
-      {/* 4. Add Tab Button (+) with Sidebar-style Floating Tooltip */}
-      <button
-        type="button"
-        id="btn-sparkle-add-tab"
-        onClick={() => {
-          hideAddTabTooltip();
-          onCreateTab();
-        }}
-        onMouseEnter={showAddTabTooltip}
-        onMouseLeave={hideAddTabTooltip}
-        aria-label="New tab"
-        className="w-[28px] h-[28px] self-center ml-1 rounded-[5px] flex items-center justify-center text-neutral-500 hover:text-black dark:text-neutral-400 dark:hover:text-white hover:bg-black/10 dark:hover:bg-white/10 active:bg-black/15 dark:active:bg-white/15 transition-colors cursor-pointer shrink-0 z-10 border-none"
-      >
-        <Plus className="w-3.5 h-3.5 stroke-[2.2]" />
-      </button>
-
-      {/* Floating Tooltip for New tab button (+) matching Sidebar tooltip styling */}
-      {typeof document !== 'undefined' && createPortal(
+      {/* 4. Overflow menu for tab actions */}
+      <div className="relative self-center ml-1 z-30">
+        <button
+          type="button"
+          id="btn-sparkle-tab-actions"
+          aria-label="Tab actions"
+          aria-expanded={isOverflowOpen}
+          onClick={() => setIsOverflowOpen((open) => !open)}
+          className="w-[28px] h-[28px] rounded-[5px] flex items-center justify-center text-neutral-500 hover:text-black dark:text-neutral-400 dark:hover:text-white hover:bg-black/10 dark:hover:bg-white/10 active:bg-black/15 dark:active:bg-white/15 transition-colors cursor-pointer border-none"
+        >
+          <MoreHorizontal className="w-4 h-4 stroke-[2.2]" />
+        </button>
         <AnimatePresence>
-          {addTabTooltip && (
+          {isOverflowOpen && (
             <motion.div
-              key="sparkle-add-tab-tooltip"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.18, ease: 'easeOut' }}
-              style={{
-                position: 'fixed',
-                top: `${addTabTooltip.top}px`,
-                left: `${addTabTooltip.left}px`,
-                transform: 'translateX(-50%)',
-                backgroundColor: isLightMode ? 'rgba(255, 255, 255, 0.50)' : 'rgba(24, 24, 28, 0.50)',
-                backdropFilter: 'blur(16px) saturate(140%)',
-                WebkitBackdropFilter: 'blur(16px) saturate(140%)',
-              }}
-              className="z-[99999] px-3 py-1.5 min-h-[30px] flex items-center rounded-[6px] text-[#111827] dark:text-white text-xs font-medium shadow-[0_4px_20px_rgba(0,0,0,0.18)] border-0 outline-none pointer-events-none whitespace-nowrap select-none"
+              role="menu"
+              initial={{ opacity: 0, y: -6 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -6 }}
+              transition={{ duration: 0.16 }}
+              className="absolute right-0 bottom-[34px] w-[190px] rounded-[8px] p-1 bg-white/95 dark:bg-[#25272b]/95 backdrop-blur-xl border border-black/10 dark:border-white/10 shadow-xl"
             >
-              New tab
+              <button
+                type="button"
+                role="menuitem"
+                onClick={() => { setIsOverflowOpen(false); onCreateTab(); }}
+                className="w-full h-8 px-2.5 rounded-[5px] flex items-center gap-2 text-[12px] text-[#111827] dark:text-white hover:bg-black/5 dark:hover:bg-white/10 border-none cursor-pointer text-left"
+              >
+                <Plus className="w-3.5 h-3.5 text-neutral-400" />
+                <span>New tab</span>
+              </button>
+              <button
+                type="button"
+                role="menuitem"
+                onClick={toggleGroupingMode}
+                className="w-full h-8 px-2.5 rounded-[5px] flex items-center gap-2 text-[12px] text-[#111827] dark:text-white hover:bg-black/5 dark:hover:bg-white/10 border-none cursor-pointer text-left"
+              >
+                <Hand className="w-3.5 h-3.5 text-neutral-400" />
+                <span>{isGrouping ? 'Cancel group tabs' : 'Group tabs'}</span>
+              </button>
+              {isGrouping && (
+                <div className="mt-1 border-t border-black/10 dark:border-white/10 pt-2 px-2 pb-1 space-y-2">
+                  <p className="text-[11px] text-neutral-500 dark:text-neutral-400">Select 2 tabs</p>
+                  <input value={groupName} onChange={(event) => setGroupName(event.target.value)} aria-label="Group name" className="w-full h-7 px-2 rounded border border-black/10 dark:border-white/10 bg-transparent text-[11px] text-black dark:text-white outline-none" />
+                  <div className="flex items-center gap-1.5">
+                    {['#8b5cf6', '#3b82f6', '#10b981', '#f59e0b', '#ef4444'].map((color) => (
+                      <button key={color} type="button" aria-label={`Use ${color} group color`} onClick={() => setGroupColor(color)} className={`w-4 h-4 rounded-full border-2 ${groupColor === color ? 'border-black dark:border-white' : 'border-transparent'}`} style={{ backgroundColor: color }} />
+                    ))}
+                  </div>
+                  <button type="button" disabled={selectedTabIds.length < 2} onClick={createTabGroup} className="w-full h-7 rounded bg-violet-500 text-white text-[11px] disabled:opacity-40 disabled:cursor-not-allowed border-none cursor-pointer">Create group</button>
+                </div>
+              )}
             </motion.div>
           )}
-        </AnimatePresence>,
-        document.body
-      )}
+        </AnimatePresence>
+      </div>
 
       {/* 5. Tab Right-Click Context Menu with Slide-Down Animation from top edge */}
       <AnimatePresence>

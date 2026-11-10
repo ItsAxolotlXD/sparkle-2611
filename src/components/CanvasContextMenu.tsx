@@ -70,10 +70,7 @@ export const CanvasContextMenu: React.FC<CanvasContextMenuProps> = ({ x, y, onAc
       ref={menuRef}
       role="menu"
       aria-label="Canvas actions"
-      initial={{ opacity: 0, scale: 0.9 }}
-      animate={{ opacity: 1, scale: 1 }}
-      exit={{ opacity: 0, scale: 0.96 }}
-      transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+transition={{ duration: 0.2, ease: 'linear' }}
       onContextMenu={(event) => event.preventDefault()}
       onMouseDown={(event) => event.stopPropagation()}
       className={`fixed z-[2147483647] w-[232px] ${flyoutPanelClassName} fluent-context-menu`}
@@ -91,9 +88,9 @@ export const CanvasContextMenu: React.FC<CanvasContextMenuProps> = ({ x, y, onAc
             key={entry.action}
             type="button"
             role="menuitem"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.16, delay: index * 0.025, ease: 'easeOut' }}
+            initial={{ y: -8 }}
+            animate={{ y: 0 }}
+            transition={{ duration: 0.16, delay: index * 0.035, ease: 'linear' }}
             onMouseDown={(e) => e.stopPropagation()}
             onClick={(e) => {
               e.preventDefault();
