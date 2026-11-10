@@ -172,10 +172,10 @@ const NoteContextMenu: React.FC<NoteContextMenuProps> = ({ x, y, isPinned, onAct
     <motion.div
       ref={menuRef}
       role="menu"
-initial={{ scaleY: 0 }}
+            initial={{ scaleY: 0 }}
             animate={{ scaleY: 1 }}
             exit={{ scaleY: 0 }}
-          transition={{ duration: 0.2, ease: 'linear' }}
+            transition={{ duration: 0.11, ease: 'linear' }}
       onContextMenu={(e) => e.preventDefault()}
       onMouseDown={(e) => e.stopPropagation()}
       className={`fixed z-[2147483647] w-[220px] ${flyoutPanelClassName} fluent-context-menu`}

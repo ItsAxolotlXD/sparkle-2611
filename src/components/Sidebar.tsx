@@ -253,6 +253,242 @@ interface SidebarProps {
   onTabSearchChange?: (query: string) => void;
 }
 
+const SIDEBAR_MENU_MARGIN = 8;
+
+interface SidebarContextMenuOverlayProps {
+  x: number;
+  y: number;
+  isCollapsed?: boolean;
+  onToggleCollapse?: () => void;
+  hoverToExpand?: boolean;
+  onToggleHoverToExpand: () => void;
+  fluentIcons?: boolean;
+  onToggleFluentIcons: () => void;
+  dynamicSidebarIcons?: boolean;
+  onToggleDynamicSidebarIcons: () => void;
+  onNavigateSettings: () => void;
+  onGoBack: () => void;
+  onClose: () => void;
+}
+
+const SidebarContextMenuOverlay: React.FC<SidebarContextMenuOverlayProps> = ({
+  x,
+  y,
+  isCollapsed,
+  onToggleCollapse,
+  hoverToExpand,
+  onToggleHoverToExpand,
+  fluentIcons,
+  onToggleFluentIcons,
+  dynamicSidebarIcons,
+  onToggleDynamicSidebarIcons,
+  onNavigateSettings,
+  onGoBack,
+  onClose,
+}) => {
+  const menuRef = useRef<HTMLDivElement>(null);
+  const [position, setPosition] = useState(() => {
+    const maxLeft = (typeof window !== 'undefined' ? window.innerWidth : 800) - 240;
+    const maxTop = (typeof window !== 'undefined' ? window.innerHeight : 600) - 390;
+    return {
+      left: Math.max(SIDEBAR_MENU_MARGIN, Math.min(x, maxLeft)),
+      top: Math.max(SIDEBAR_MENU_MARGIN, Math.min(y, maxTop)),
+    };
+  });
+
+  useLayoutEffect(() => {
+    const el = menuRef.current;
+    if (!el) return;
+    const { width, height } = el.getBoundingClientRect();
+    const safeHeight = height > 60 ? height : 390;
+    const safeWidth = width > 60 ? width : 232;
+    const maxLeft = (typeof window !== 'undefined' ? window.innerWidth : 800) - safeWidth - SIDEBAR_MENU_MARGIN;
+    const maxTop = (typeof window !== 'undefined' ? window.innerHeight : 600) - safeHeight - SIDEBAR_MENU_MARGIN;
+    setPosition({
+      left: Math.max(SIDEBAR_MENU_MARGIN, Math.min(x, maxLeft)),
+      top: Math.max(SIDEBAR_MENU_MARGIN, Math.min(y, maxTop)),
+    });
+    el.querySelector<HTMLButtonElement>('[role="menuitem"]')?.focus({ preventScroll: true });
+  }, [x, y]);
+
+  useEffect(() => {
+    const handlePointerDown = (e: MouseEvent | PointerEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        onClose();
+      }
+    };
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+        return;
+      }
+      if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+        e.preventDefault();
+        const buttons: HTMLButtonElement[] = Array.from(
+          menuRef.current?.querySelectorAll<HTMLButtonElement>('[role="menuitem"]') ?? []
+        );
+        const idx = buttons.indexOf(document.activeElement as HTMLButtonElement);
+        const next = e.key === 'ArrowDown' ? (idx + 1) % buttons.length : (idx - 1 + buttons.length) % buttons.length;
+        buttons[next]?.focus();
+      }
+    };
+
+    const timer = setTimeout(() => {
+      window.addEventListener('pointerdown', handlePointerDown);
+    }, 50);
+
+    window.addEventListener('keydown', handleKey);
+    window.addEventListener('resize', onClose);
+
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener('pointerdown', handlePointerDown);
+      window.removeEventListener('keydown', handleKey);
+      window.removeEventListener('resize', onClose);
+    };
+  }, [onClose]);
+
+  return createPortal(
+    <motion.div
+      ref={menuRef}
+      exit={{ opacity: 1 }}
+      transition={{ duration: 0.11 }}
+      style={{
+        position: 'fixed',
+        left: position.left,
+        top: position.top,
+        zIndex: 2147483647,
+      }}
+      className="fluent-context-menu-wrapper pointer-events-auto"
+      onContextMenu={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+      }}
+      onMouseDown={(e) => e.stopPropagation()}
+      onClick={(e) => e.stopPropagation()}
+    >
+      <motion.div
+        role="menu"
+        aria-label="Sidebar actions"
+        initial={{ scaleY: 0 }}
+        animate={{ scaleY: 1 }}
+        exit={{ scaleY: 0 }}
+        transition={{ duration: 0.11, ease: 'linear' }}
+        style={{ ...flyoutPanelStyle, transformOrigin: `${x - position.left}px ${y - position.top}px` }}
+        className={`w-[232px] p-1.5 ${flyoutPanelClassName} fluent-context-menu`}
+      >
+        <div className="w-full flex flex-col space-y-0.5">
+          <button
+            type="button"
+            role="menuitem"
+            onClick={() => {
+              onClose();
+              window.location.reload();
+            }}
+            className="w-full h-[36px] px-3 rounded-[6px] flex items-center gap-3 text-[13px] font-medium text-left outline-none transition-colors cursor-pointer hover:bg-black/[0.05] dark:hover:bg-white/[0.08] focus-visible:bg-black/[0.05] dark:focus-visible:bg-white/[0.08] active:bg-black/[0.08] dark:active:bg-white/[0.12]"
+          >
+            <RefreshCw className="w-4 h-4 shrink-0 text-black dark:text-neutral-300" />
+            <span className="truncate">Refresh</span>
+          </button>
+
+          <button
+            type="button"
+            role="menuitem"
+            onClick={() => {
+              onClose();
+              onGoBack();
+            }}
+            className="w-full h-[36px] px-3 rounded-[6px] flex items-center gap-3 text-[13px] font-medium text-left outline-none transition-colors cursor-pointer hover:bg-black/[0.05] dark:hover:bg-white/[0.08] focus-visible:bg-black/[0.05] dark:focus-visible:bg-white/[0.08] active:bg-black/[0.08] dark:active:bg-white/[0.12]"
+          >
+            <ArrowLeft className="w-4 h-4 shrink-0 text-black dark:text-neutral-300" />
+            <span className="truncate">Go back</span>
+          </button>
+
+          <button
+            type="button"
+            role="menuitem"
+            onClick={() => {
+              onClose();
+              onToggleCollapse?.();
+            }}
+            className="w-full h-[36px] px-3 rounded-[6px] flex items-center gap-3 text-[13px] font-medium text-left outline-none transition-colors cursor-pointer hover:bg-black/[0.05] dark:hover:bg-white/[0.08] focus-visible:bg-black/[0.05] dark:focus-visible:bg-white/[0.08] active:bg-black/[0.08] dark:active:bg-white/[0.12]"
+          >
+            <PanelLeft className="w-4 h-4 shrink-0 text-black dark:text-neutral-300" />
+            <span className="truncate flex-1">Collapse sidebar</span>
+            {isCollapsed && (
+              <Check className="w-4 h-4 shrink-0 text-black dark:text-[#4cc2ff]" />
+            )}
+          </button>
+
+          <button
+            type="button"
+            role="menuitem"
+            onClick={() => {
+              onClose();
+              onToggleHoverToExpand();
+            }}
+            className="w-full h-[36px] px-3 rounded-[6px] flex items-center gap-3 text-[13px] font-medium text-left outline-none transition-colors cursor-pointer hover:bg-black/[0.05] dark:hover:bg-white/[0.08] focus-visible:bg-black/[0.05] dark:focus-visible:bg-white/[0.08] active:bg-black/[0.08] dark:active:bg-white/[0.12]"
+          >
+            <PanelsTopLeft className="w-4 h-4 shrink-0 text-black dark:text-neutral-300" />
+            <span className="truncate flex-1">Hover to expand</span>
+            {hoverToExpand && (
+              <Check className="w-4 h-4 shrink-0 text-black dark:text-[#4cc2ff]" />
+            )}
+          </button>
+
+          <div className="h-px bg-black/10 dark:bg-white/10 my-1 mx-1" />
+
+          <button
+            type="button"
+            role="menuitem"
+            onClick={() => {
+              onClose();
+              onToggleFluentIcons();
+            }}
+            className="w-full h-[36px] px-3 rounded-[6px] flex items-center gap-3 text-[13px] font-medium text-left outline-none transition-colors cursor-pointer hover:bg-black/[0.05] dark:hover:bg-white/[0.08] focus-visible:bg-black/[0.05] dark:focus-visible:bg-white/[0.08] active:bg-black/[0.08] dark:active:bg-white/[0.12]"
+          >
+            <Palette className="w-4 h-4 shrink-0 text-black dark:text-neutral-300" />
+            <span className="truncate flex-1">Fluent Design</span>
+            {fluentIcons && (
+              <Check className="w-4 h-4 shrink-0 text-black dark:text-[#4cc2ff]" />
+            )}
+          </button>
+
+          <button
+            type="button"
+            role="menuitem"
+            onClick={() => {
+              onClose();
+              onToggleDynamicSidebarIcons();
+            }}
+            className="w-full h-[36px] px-3 rounded-[6px] flex items-center gap-3 text-[13px] font-medium text-left outline-none transition-colors cursor-pointer hover:bg-black/[0.05] dark:hover:bg-white/[0.08] focus-visible:bg-black/[0.05] dark:focus-visible:bg-white/[0.08] active:bg-black/[0.08] dark:active:bg-white/[0.12]"
+          >
+            <Sparkles className="w-4 h-4 shrink-0 text-black dark:text-neutral-300" />
+            <span className="truncate flex-1">Dynamic sidebar icons</span>
+            {dynamicSidebarIcons && (
+              <Check className="w-4 h-4 shrink-0 text-black dark:text-[#4cc2ff]" />
+            )}
+          </button>
+
+          <button
+            type="button"
+            role="menuitem"
+            onClick={() => {
+              onClose();
+              onNavigateSettings();
+            }}
+            className="w-full h-[36px] px-3 rounded-[6px] flex items-center gap-3 text-[13px] font-medium text-left outline-none transition-colors cursor-pointer hover:bg-black/[0.05] dark:hover:bg-white/[0.08] focus-visible:bg-black/[0.05] dark:focus-visible:bg-white/[0.08] active:bg-black/[0.08] dark:active:bg-white/[0.12]"
+          >
+            <Settings2 className="w-4 h-4 shrink-0 text-black dark:text-neutral-300" />
+            <span className="truncate">Interface settings</span>
+          </button>
+        </div>
+      </motion.div>
+    </motion.div>,
+    document.body
+  );
+};
+
 export const Sidebar: React.FC<SidebarProps> = ({
   currentRoute,
   navigate,
@@ -363,10 +599,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   const handleSidebarContextMenu = (e: React.MouseEvent) => {
     e.preventDefault();
+    e.stopPropagation();
     openSidebarContextMenu(e.clientX, e.clientY);
   };
 
   const handleSidebarTouchStart = (e: React.TouchEvent) => {
+    e.stopPropagation();
     const touch = e.touches[0];
     if (!touch) return;
     sidebarHoldTimer.current = setTimeout(() => openSidebarContextMenu(touch.clientX, touch.clientY), 550);
@@ -937,228 +1175,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <span className="font-normal truncate">Continue without account</span>
         </button>
       </motion.div>
-    );
-  };
-
-  const SIDEBAR_MENU_MARGIN = 8;
-
-  interface SidebarContextMenuOverlayProps {
-    x: number;
-    y: number;
-    isCollapsed?: boolean;
-    onToggleCollapse?: () => void;
-    hoverToExpand?: boolean;
-    onToggleHoverToExpand: () => void;
-    fluentIcons?: boolean;
-    onToggleFluentIcons: () => void;
-    dynamicSidebarIcons?: boolean;
-    onToggleDynamicSidebarIcons: () => void;
-    onNavigateSettings: () => void;
-    onGoBack: () => void;
-    onClose: () => void;
-  }
-
-  const SidebarContextMenuOverlay: React.FC<SidebarContextMenuOverlayProps> = ({
-    x,
-    y,
-    isCollapsed,
-    onToggleCollapse,
-    hoverToExpand,
-    onToggleHoverToExpand,
-    fluentIcons,
-    onToggleFluentIcons,
-    dynamicSidebarIcons,
-    onToggleDynamicSidebarIcons,
-    onNavigateSettings,
-    onGoBack,
-    onClose,
-  }) => {
-    const menuRef = useRef<HTMLDivElement>(null);
-    const isUpward = y > (typeof window !== 'undefined' ? window.innerHeight - 340 : 500);
-    const [position, setPosition] = useState(() => {
-      const maxLeft = (typeof window !== 'undefined' ? window.innerWidth : 800) - 240;
-      return {
-        left: Math.max(SIDEBAR_MENU_MARGIN, Math.min(x, maxLeft)),
-        top: Math.max(SIDEBAR_MENU_MARGIN, isUpward ? y - 320 : y),
-      };
-    });
-
-    useLayoutEffect(() => {
-      const el = menuRef.current;
-      if (!el) return;
-      const { width, height } = el.getBoundingClientRect();
-      const maxLeft = window.innerWidth - width - SIDEBAR_MENU_MARGIN;
-      const maxTop = window.innerHeight - height - SIDEBAR_MENU_MARGIN;
-      setPosition({
-        left: Math.max(SIDEBAR_MENU_MARGIN, Math.min(x, maxLeft)),
-        top: Math.max(SIDEBAR_MENU_MARGIN, y > maxTop ? y - height : y),
-      });
-      el.querySelector<HTMLButtonElement>('[role="menuitem"]')?.focus({ preventScroll: true });
-    }, [x, y]);
-
-    useEffect(() => {
-      const handlePointer = (e: PointerEvent) => {
-        if (!menuRef.current?.contains(e.target as Node)) onClose();
-      };
-      const handleKey = (e: KeyboardEvent) => {
-        if (e.key === 'Escape') {
-          onClose();
-          return;
-        }
-        if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
-          e.preventDefault();
-          const buttons: HTMLButtonElement[] = Array.from(
-            menuRef.current?.querySelectorAll<HTMLButtonElement>('[role="menuitem"]') ?? []
-          );
-          const idx = buttons.indexOf(document.activeElement as HTMLButtonElement);
-          const next = e.key === 'ArrowDown' ? (idx + 1) % buttons.length : (idx - 1 + buttons.length) % buttons.length;
-          buttons[next]?.focus();
-        }
-      };
-      document.addEventListener('pointerdown', handlePointer, true);
-      document.addEventListener('keydown', handleKey);
-      window.addEventListener('resize', onClose);
-      window.addEventListener('blur', onClose);
-      return () => {
-        document.removeEventListener('pointerdown', handlePointer, true);
-        document.removeEventListener('keydown', handleKey);
-        window.removeEventListener('resize', onClose);
-        window.removeEventListener('blur', onClose);
-      };
-    }, [onClose]);
-
-    return createPortal(
-      <motion.div
-        ref={menuRef}
-        exit={{ opacity: 1 }}
-        transition={{ duration: 0.13 }}
-        style={{
-          position: 'fixed',
-          left: position.left,
-          top: position.top,
-          zIndex: 2147483647,
-        }}
-        className="fluent-context-menu-wrapper pointer-events-auto"
-        onContextMenu={(e) => e.preventDefault()}
-      >
-        <motion.div
-          role="menu"
-          aria-label="Sidebar actions"
-initial={{ scaleY: 0 }}
-              animate={{ scaleY: 1 }}
-              exit={{ scaleY: 0 }}
-        transition={{ duration: 0.2, ease: 'linear' }}
-          style={{ ...flyoutPanelStyle, transformOrigin: `${x - position.left}px ${y - position.top}px` }}
-          className={`w-[232px] p-1.5 ${flyoutPanelClassName} fluent-context-menu`}
-        >
-          <div className="w-full flex flex-col space-y-0.5">
-            <button
-              type="button"
-              role="menuitem"
-              onClick={() => {
-                onClose();
-                window.location.reload();
-              }}
-              className="w-full h-[36px] px-3 rounded-[6px] flex items-center gap-3 text-[13px] font-medium text-left outline-none transition-colors cursor-pointer hover:bg-black/[0.05] dark:hover:bg-white/[0.08] focus-visible:bg-black/[0.05] dark:focus-visible:bg-white/[0.08] active:bg-black/[0.08] dark:active:bg-white/[0.12]"
-            >
-              <RefreshCw className="w-4 h-4 shrink-0 text-black dark:text-neutral-300" />
-              <span className="truncate">Refresh</span>
-            </button>
-
-            <button
-              type="button"
-              role="menuitem"
-              onClick={() => {
-                onClose();
-                onGoBack();
-              }}
-              className="w-full h-[36px] px-3 rounded-[6px] flex items-center gap-3 text-[13px] font-medium text-left outline-none transition-colors cursor-pointer hover:bg-black/[0.05] dark:hover:bg-white/[0.08] focus-visible:bg-black/[0.05] dark:focus-visible:bg-white/[0.08] active:bg-black/[0.08] dark:active:bg-white/[0.12]"
-            >
-              <ArrowLeft className="w-4 h-4 shrink-0 text-black dark:text-neutral-300" />
-              <span className="truncate">Go back</span>
-            </button>
-
-            <button
-              type="button"
-              role="menuitem"
-              onClick={() => {
-                onClose();
-                onToggleCollapse?.();
-              }}
-              className="w-full h-[36px] px-3 rounded-[6px] flex items-center gap-3 text-[13px] font-medium text-left outline-none transition-colors cursor-pointer hover:bg-black/[0.05] dark:hover:bg-white/[0.08] focus-visible:bg-black/[0.05] dark:focus-visible:bg-white/[0.08] active:bg-black/[0.08] dark:active:bg-white/[0.12]"
-            >
-              <PanelLeft className="w-4 h-4 shrink-0 text-black dark:text-neutral-300" />
-              <span className="truncate">{isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}</span>
-            </button>
-
-            <button
-              type="button"
-              role="menuitem"
-              onClick={() => {
-                onToggleHoverToExpand();
-                onClose();
-              }}
-              className="w-full h-[36px] px-3 rounded-[6px] flex items-center gap-3 text-[13px] font-medium text-left outline-none transition-colors cursor-pointer hover:bg-black/[0.05] dark:hover:bg-white/[0.08] focus-visible:bg-black/[0.05] dark:focus-visible:bg-white/[0.08] active:bg-black/[0.08] dark:active:bg-white/[0.12]"
-            >
-              <PanelsTopLeft className="w-4 h-4 shrink-0 text-black dark:text-neutral-300" />
-              <span className="truncate flex-1">Hover to expand</span>
-              {hoverToExpand && (
-                <Check className="w-4 h-4 shrink-0 text-black dark:text-[#4cc2ff]" />
-              )}
-            </button>
-
-            <div className="h-px bg-black/10 dark:bg-white/10 my-1 mx-1" />
-
-            <button
-              type="button"
-              role="menuitem"
-              aria-label="Bật/tắt nhanh Fluent icons (Insider flag)"
-              onClick={() => {
-                onToggleFluentIcons();
-                onClose();
-              }}
-              className="w-full h-[36px] px-3 rounded-[6px] flex items-center gap-3 text-[13px] font-medium text-left outline-none transition-colors cursor-pointer hover:bg-black/[0.05] dark:hover:bg-white/[0.08] focus-visible:bg-black/[0.05] dark:focus-visible:bg-white/[0.08] active:bg-black/[0.08] dark:active:bg-white/[0.12]"
-            >
-              <Palette className="w-4 h-4 shrink-0 text-black dark:text-neutral-300" />
-              <span className="truncate flex-1">Fluent design icons</span>
-              {fluentIcons && (
-                <Check className="w-4 h-4 shrink-0 text-black dark:text-[#4cc2ff]" />
-              )}
-            </button>
-
-            <button
-              type="button"
-              role="menuitem"
-              aria-label="Dynamic sidebar icons: icon thường cho Sign In, Settings, WinUI 3; icon Fluent 3D màu cho Home, Update blogs, Watch, Gallery, Notes, Ink Canvas..."
-              onClick={() => {
-                onToggleDynamicSidebarIcons();
-                onClose();
-              }}
-              className="w-full h-[36px] px-3 rounded-[6px] flex items-center gap-3 text-[13px] font-medium text-left outline-none transition-colors cursor-pointer hover:bg-black/[0.05] dark:hover:bg-white/[0.08] focus-visible:bg-black/[0.05] dark:focus-visible:bg-white/[0.08] active:bg-black/[0.08] dark:active:bg-white/[0.12]"
-            >
-              <Sparkles className="w-4 h-4 shrink-0 text-black dark:text-neutral-300" />
-              <span className="truncate flex-1">Dynamic sidebar icons</span>
-              {dynamicSidebarIcons && (
-                <Check className="w-4 h-4 shrink-0 text-black dark:text-[#4cc2ff]" />
-              )}
-            </button>
-
-            <button
-              type="button"
-              role="menuitem"
-              onClick={() => {
-                onClose();
-                onNavigateSettings();
-              }}
-              className="w-full h-[36px] px-3 rounded-[6px] flex items-center gap-3 text-[13px] font-medium text-left outline-none transition-colors cursor-pointer hover:bg-black/[0.05] dark:hover:bg-white/[0.08] focus-visible:bg-black/[0.05] dark:focus-visible:bg-white/[0.08] active:bg-black/[0.08] dark:active:bg-white/[0.12]"
-            >
-              <Settings2 className="w-4 h-4 shrink-0 text-black dark:text-neutral-300" />
-              <span className="truncate">Interface settings</span>
-            </button>
-          </div>
-        </motion.div>
-      </motion.div>,
-      document.body
     );
   };
 

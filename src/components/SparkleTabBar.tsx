@@ -172,10 +172,10 @@ const TabContextMenu: React.FC<TabContextMenuProps> = ({
       <motion.div
         role="menu"
         aria-label="Tab actions"
-initial={{ scaleY: 0 }}
-          animate={{ scaleY: 1 }}
-          exit={{ scaleY: 0 }}
-          transition={{ duration: 0.2, ease: 'linear' }}
+        initial={{ scaleY: 0 }}
+        animate={{ scaleY: 1 }}
+        exit={{ scaleY: 0 }}
+        transition={{ duration: 0.11, ease: 'linear' }}
         style={{ ...flyoutPanelStyle, transformOrigin: `${x - position.left}px ${y - position.top}px` }}
         className={`w-[190px] p-1 ${flyoutPanelClassName} fluent-context-menu`}
       >
@@ -345,6 +345,27 @@ export const SparkleTabBar: React.FC<SparkleTabBarProps> = ({
   const [canScrollRight, setCanScrollRight] = useState(false);
   const [contextMenu, setContextMenu] = useState<TabContextMenuState | null>(null);
   const [isOverflowOpen, setIsOverflowOpen] = useState(false);
+  const overflowMenuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!isOverflowOpen) return;
+    const handleOutsideClick = (e: MouseEvent) => {
+      if (overflowMenuRef.current && !overflowMenuRef.current.contains(e.target as Node)) {
+        setIsOverflowOpen(false);
+      }
+    };
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setIsOverflowOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleOutsideClick);
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('mousedown', handleOutsideClick);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isOverflowOpen]);
   const [isGrouping, setIsGrouping] = useState(false);
   const [selectedTabIds, setSelectedTabIds] = useState<string[]>([]);
   const [tabGroups, setTabGroups] = useState<TabGroup[]>([]);
@@ -662,7 +683,7 @@ export const SparkleTabBar: React.FC<SparkleTabBarProps> = ({
       )}
 
       {/* 4. Overflow menu for tab actions */}
-      <div className="relative self-center ml-1 z-30">
+      <div ref={overflowMenuRef} className="relative self-center ml-1 z-30">
         <button
           type="button"
           id="btn-sparkle-tab-actions"
@@ -677,11 +698,12 @@ export const SparkleTabBar: React.FC<SparkleTabBarProps> = ({
           {isOverflowOpen && (
             <motion.div
               role="menu"
-              initial={{ opacity: 0, y: -6 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -6 }}
-              transition={{ duration: 0.16 }}
-              className="absolute right-0 bottom-[34px] w-[190px] rounded-[8px] p-1 bg-white/95 dark:bg-[#25272b]/95 backdrop-blur-xl border border-black/10 dark:border-white/10 shadow-xl"
+              initial={{ scaleY: 0 }}
+              animate={{ scaleY: 1 }}
+              exit={{ scaleY: 0 }}
+              transition={{ duration: 0.11, ease: 'linear' }}
+              style={{ ...flyoutPanelStyle, transformOrigin: 'top right' }}
+              className={`absolute right-0 top-full mt-1.5 w-[190px] p-1 z-50 ${flyoutPanelClassName} fluent-context-menu`}
             >
               <button
                 type="button"

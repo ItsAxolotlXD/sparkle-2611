@@ -129,8 +129,10 @@ export const WatchChannelContextMenu: React.FC<WatchChannelContextMenuProps> = (
     <motion.div
       ref={menuRef}
       role="menu"
-      aria-label="Channel options"
-transition={{ duration: 0.2, ease: 'linear' }}
+      initial={{ scaleY: 0 }}
+      animate={{ scaleY: 1 }}
+      exit={{ scaleY: 0 }}
+      transition={{ duration: 0.11, ease: 'linear' }}
       onContextMenu={(e) => e.preventDefault()}
       className={`fixed z-[2147483647] w-[232px] ${flyoutPanelClassName} fluent-context-menu`}
       style={{

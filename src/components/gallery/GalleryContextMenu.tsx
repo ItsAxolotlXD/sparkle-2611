@@ -26,12 +26,12 @@ const VIEWPORT_MARGIN = 8;
 
 export const GalleryContextMenu: React.FC<GalleryContextMenuProps> = ({ x, y, isFavorite, onAction, onClose }) => {
   const menuRef = useRef<HTMLDivElement>(null);
-  const isUpward = y > (typeof window !== 'undefined' ? window.innerHeight - 340 : 500);
   const [position, setPosition] = useState(() => {
     const maxLeft = (typeof window !== 'undefined' ? window.innerWidth : 800) - 240;
+    const maxTop = (typeof window !== 'undefined' ? window.innerHeight : 600) - 340;
     return {
       left: Math.max(VIEWPORT_MARGIN, Math.min(x, maxLeft)),
-      top: Math.max(VIEWPORT_MARGIN, isUpward ? y - 320 : y),
+      top: Math.max(VIEWPORT_MARGIN, Math.min(y, maxTop)),
     };
   });
 
@@ -52,18 +52,20 @@ export const GalleryContextMenu: React.FC<GalleryContextMenuProps> = ({ x, y, is
     const el = menuRef.current;
     if (!el) return;
     const { width, height } = el.getBoundingClientRect();
-    const maxLeft = window.innerWidth - width - VIEWPORT_MARGIN;
-    const maxTop = window.innerHeight - height - VIEWPORT_MARGIN;
+    const safeHeight = height > 60 ? height : 340;
+    const safeWidth = width > 60 ? width : 232;
+    const maxLeft = (typeof window !== 'undefined' ? window.innerWidth : 800) - safeWidth - VIEWPORT_MARGIN;
+    const maxTop = (typeof window !== 'undefined' ? window.innerHeight : 600) - safeHeight - VIEWPORT_MARGIN;
     setPosition({
       left: Math.max(VIEWPORT_MARGIN, Math.min(x, maxLeft)),
-      top: Math.max(VIEWPORT_MARGIN, y > maxTop ? y - height : y),
+      top: Math.max(VIEWPORT_MARGIN, Math.min(y, maxTop)),
     });
     el.querySelector<HTMLButtonElement>('[role="menuitem"]')?.focus({ preventScroll: true });
   }, [x, y]);
 
   useEffect(() => {
-    const handlePointer = (e: PointerEvent) => {
-      if (!menuRef.current?.contains(e.target as Node)) onClose();
+    const handlePointerDown = (e: MouseEvent | PointerEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) onClose();
     };
     const handleKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
@@ -80,28 +82,29 @@ export const GalleryContextMenu: React.FC<GalleryContextMenuProps> = ({ x, y, is
         buttons[next]?.focus();
       }
     };
-    document.addEventListener('pointerdown', handlePointer, true);
-    document.addEventListener('keydown', handleKey);
+
+    const timer = setTimeout(() => {
+      window.addEventListener('pointerdown', handlePointerDown);
+    }, 50);
+
+    window.addEventListener('keydown', handleKey);
     window.addEventListener('resize', onClose);
-    window.addEventListener('blur', onClose);
+
     return () => {
-      document.removeEventListener('pointerdown', handlePointer, true);
-      document.removeEventListener('keydown', handleKey);
+      clearTimeout(timer);
+      window.removeEventListener('pointerdown', handlePointerDown);
+      window.removeEventListener('keydown', handleKey);
       window.removeEventListener('resize', onClose);
-      window.removeEventListener('blur', onClose);
     };
   }, [onClose]);
 
-  const renderEntry = (entry: MenuEntry, index: number) => {
+  const renderEntry = (entry: MenuEntry) => {
     const Icon = entry.icon;
     return (
-      <motion.button
+      <button
         key={entry.action}
         type="button"
         role="menuitem"
-        initial={{ y: -8 }}
-        animate={{ y: 0 }}
-        transition={{ duration: 0.16, delay: index * 0.035, ease: 'linear' }}
         onClick={() => onAction(entry.action)}
         className={`w-full h-[36px] px-3 rounded-[6px] flex items-center gap-3 text-[13px] font-medium text-left outline-none transition-colors cursor-pointer hover:bg-black/[0.05] dark:hover:bg-white/[0.08] focus-visible:bg-black/[0.05] dark:focus-visible:bg-white/[0.08] active:bg-black/[0.08] dark:active:bg-white/[0.12] ${
           entry.danger ? 'text-[#c42b1c] dark:text-[#ff99a4]' : 'text-[#111827] dark:text-white'
@@ -113,7 +116,7 @@ export const GalleryContextMenu: React.FC<GalleryContextMenuProps> = ({ x, y, is
           }`}
         />
         <span className="truncate">{entry.label}</span>
-      </motion.button>
+      </button>
     );
   };
 
@@ -121,7 +124,7 @@ export const GalleryContextMenu: React.FC<GalleryContextMenuProps> = ({ x, y, is
     <motion.div
       ref={menuRef}
       exit={{ opacity: 1 }}
-      transition={{ duration: 0.13 }}
+      transition={{ duration: 0.11 }}
       style={{
         position: 'fixed',
         left: position.left,
@@ -129,19 +132,27 @@ export const GalleryContextMenu: React.FC<GalleryContextMenuProps> = ({ x, y, is
         zIndex: 2147483647,
       }}
       className="fluent-context-menu-wrapper pointer-events-auto"
-      onContextMenu={(e) => e.preventDefault()}
+      onContextMenu={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+      }}
+      onMouseDown={(e) => e.stopPropagation()}
+      onClick={(e) => e.stopPropagation()}
     >
       <motion.div
         role="menu"
         aria-label="File actions"
-transition={{ duration: 0.2, ease: 'linear' }}
+        initial={{ scaleY: 0 }}
+        animate={{ scaleY: 1 }}
+        exit={{ scaleY: 0 }}
+        transition={{ duration: 0.11, ease: 'linear' }}
         style={{ ...flyoutPanelStyle, transformOrigin: `${x - position.left}px ${y - position.top}px` }}
         className={`w-[232px] p-1.5 ${flyoutPanelClassName} fluent-context-menu`}
       >
         <div className="w-full flex flex-col space-y-0.5">
-          {primary.map((entry, index) => renderEntry(entry, index))}
+          {primary.map((entry) => renderEntry(entry))}
           <div className="h-px bg-black/10 dark:bg-white/10 my-1 mx-1" />
-          {secondary.map((entry, index) => renderEntry(entry, primary.length + index + 1))}
+          {secondary.map((entry) => renderEntry(entry))}
         </div>
       </motion.div>
     </motion.div>,
