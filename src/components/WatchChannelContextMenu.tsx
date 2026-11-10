@@ -98,13 +98,13 @@ export const WatchChannelContextMenu: React.FC<WatchChannelContextMenuProps> = (
         key={entry.action}
         type="button"
         role="menuitem"
-        initial={{ opacity: 0 }}
+        initial={{ y: -8 }}
         animate={{
-          opacity: 1,
+          y: 0,
           transition: {
             duration: 0.16,
             delay,
-            ease: 'easeOut',
+            ease: 'linear',
           },
         }}
         onClick={() => {
@@ -130,10 +130,7 @@ export const WatchChannelContextMenu: React.FC<WatchChannelContextMenuProps> = (
       ref={menuRef}
       role="menu"
       aria-label="Channel options"
-initial={{ scaleY: 0 }}
-          animate={{ scaleY: 1 }}
-          exit={{ scaleY: 0 }}
-        transition={{ duration: 0.2, ease: 'linear' }}
+transition={{ duration: 0.2, ease: 'linear' }}
       onContextMenu={(e) => e.preventDefault()}
       className={`fixed z-[2147483647] w-[232px] ${flyoutPanelClassName} fluent-context-menu`}
       style={{
@@ -148,23 +145,23 @@ initial={{ scaleY: 0 }}
       {/* Divider */}
       <motion.div
         role="separator"
-        initial={{ opacity: 0 }}
+        initial={{ y: -8 }}
         animate={{
-          opacity: 1,
-          transition: { duration: 0.16, delay: 0.08, ease: 'easeOut' },
+          y: 0,
+          transition: { duration: 0.16, delay: 0.08, ease: 'linear' },
         }}
         className="h-px bg-black/10 dark:bg-white/10 my-1 mx-1 origin-left"
       />
 
       {/* Disabled 'More to come soon...' */}
       <motion.div
-        initial={{ opacity: 0 }}
+        initial={{ y: -8 }}
         animate={{
-          opacity: 1,
+          y: 0,
           transition: {
             duration: 0.16,
             delay: 0.1,
-            ease: 'easeOut',
+            ease: 'linear',
           },
         }}
         className="w-full h-[32px] px-3 flex items-center text-[12px] text-[#6B7280] dark:text-[#9CA3AF] select-none italic cursor-default opacity-60"

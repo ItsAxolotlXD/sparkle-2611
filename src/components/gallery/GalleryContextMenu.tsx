@@ -92,13 +92,16 @@ export const GalleryContextMenu: React.FC<GalleryContextMenuProps> = ({ x, y, is
     };
   }, [onClose]);
 
-  const renderEntry = (entry: MenuEntry) => {
+  const renderEntry = (entry: MenuEntry, index: number) => {
     const Icon = entry.icon;
     return (
-      <button
+      <motion.button
         key={entry.action}
         type="button"
         role="menuitem"
+        initial={{ y: -8 }}
+        animate={{ y: 0 }}
+        transition={{ duration: 0.16, delay: index * 0.035, ease: 'linear' }}
         onClick={() => onAction(entry.action)}
         className={`w-full h-[36px] px-3 rounded-[6px] flex items-center gap-3 text-[13px] font-medium text-left outline-none transition-colors cursor-pointer hover:bg-black/[0.05] dark:hover:bg-white/[0.08] focus-visible:bg-black/[0.05] dark:focus-visible:bg-white/[0.08] active:bg-black/[0.08] dark:active:bg-white/[0.12] ${
           entry.danger ? 'text-[#c42b1c] dark:text-[#ff99a4]' : 'text-[#111827] dark:text-white'
@@ -110,7 +113,7 @@ export const GalleryContextMenu: React.FC<GalleryContextMenuProps> = ({ x, y, is
           }`}
         />
         <span className="truncate">{entry.label}</span>
-      </button>
+      </motion.button>
     );
   };
 
@@ -131,17 +134,14 @@ export const GalleryContextMenu: React.FC<GalleryContextMenuProps> = ({ x, y, is
       <motion.div
         role="menu"
         aria-label="File actions"
-initial={{ scaleY: 0 }}
-          animate={{ scaleY: 1 }}
-          exit={{ scaleY: 0 }}
-        transition={{ duration: 0.2, ease: 'linear' }}
+transition={{ duration: 0.2, ease: 'linear' }}
         style={{ ...flyoutPanelStyle, transformOrigin: `${x - position.left}px ${y - position.top}px` }}
         className={`w-[232px] p-1.5 ${flyoutPanelClassName} fluent-context-menu`}
       >
         <div className="w-full flex flex-col space-y-0.5">
-          {primary.map((entry) => renderEntry(entry))}
+          {primary.map((entry, index) => renderEntry(entry, index))}
           <div className="h-px bg-black/10 dark:bg-white/10 my-1 mx-1" />
-          {secondary.map((entry) => renderEntry(entry))}
+          {secondary.map((entry, index) => renderEntry(entry, primary.length + index + 1))}
         </div>
       </motion.div>
     </motion.div>,
