@@ -356,7 +356,7 @@ export const FluentHourglassArtwork: React.FC<{ className?: string }> = ({ class
   );
 };
 
-// Fluent 3D Heart Face 🥰 & Hearts Artwork for "Thank you for choosing Sparkle!" screen
+// Fluent 3D Revolving Hearts (2 trái tim uốn quanh nhau) Artwork for "Thank you for choosing Sparkle!" screen
 export const FluentThreeHeartsArtwork: React.FC<{ className?: string }> = ({ className = 'w-[165px] h-[165px]' }) => {
   const [imgFailed, setImgFailed] = useState(false);
 
@@ -364,8 +364,8 @@ export const FluentThreeHeartsArtwork: React.FC<{ className?: string }> = ({ cla
     <div className={`relative flex items-center justify-center select-none ${className}`}>
       {!imgFailed ? (
         <img
-          src="https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Smiling%20face%20with%20hearts/3D/smiling_face_with_hearts_3d.png"
-          alt="Fluent Heart Face 🥰"
+          src="https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Revolving%20hearts/3D/revolving_hearts_3d.png"
+          alt="Fluent Revolving Hearts 💞"
           draggable={false}
           className="w-full h-full object-contain drop-shadow-md"
           onError={() => setImgFailed(true)}
@@ -373,64 +373,73 @@ export const FluentThreeHeartsArtwork: React.FC<{ className?: string }> = ({ cla
       ) : (
         <svg viewBox="0 0 240 240" fill="none" className="w-full h-full drop-shadow-md">
           <defs>
-            <radialGradient id="h_glow" cx="120" cy="120" r="100" gradientUnits="userSpaceOnUse">
-              <stop offset="0%" stopColor="#f43f5e" stopOpacity="0.22" />
-              <stop offset="100%" stopColor="#f43f5e" stopOpacity="0" />
+            <radialGradient id="rh_glow" cx="120" cy="120" r="100" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stopColor="#ec4899" stopOpacity="0.28" />
+              <stop offset="100%" stopColor="#ec4899" stopOpacity="0" />
             </radialGradient>
-            <radialGradient id="face_sphere" cx="105" cy="100" r="60" gradientUnits="userSpaceOnUse">
-              <stop offset="0%" stopColor="#ffea79" />
-              <stop offset="65%" stopColor="#f59e0b" />
-              <stop offset="100%" stopColor="#d97706" />
-            </radialGradient>
-            <linearGradient id="h_heart" x1="20" y1="20" x2="80" y2="80" gradientUnits="userSpaceOnUse">
-              <stop offset="0%" stopColor="#fb7185" />
-              <stop offset="50%" stopColor="#f43f5e" />
+            <linearGradient id="rh_heart1" x1="20" y1="20" x2="100" y2="100" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stopColor="#ff4d8d" />
+              <stop offset="40%" stopColor="#f43f5e" />
               <stop offset="100%" stopColor="#be123c" />
             </linearGradient>
-            <filter id="h_shadow" x="-20%" y="-20%" width="140%" height="140%">
-              <feDropShadow dx="0" dy="5" stdDeviation="4" floodColor="#be123c" floodOpacity="0.32" />
+            <linearGradient id="rh_heart2" x1="20" y1="20" x2="80" y2="80" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stopColor="#fb7185" />
+              <stop offset="50%" stopColor="#e11d48" />
+              <stop offset="100%" stopColor="#9f1239" />
+            </linearGradient>
+            <linearGradient id="rh_orbit" x1="40" y1="60" x2="200" y2="180" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stopColor="#f43f5e" stopOpacity="0" />
+              <stop offset="50%" stopColor="#f472b6" stopOpacity="0.8" />
+              <stop offset="100%" stopColor="#fb7185" stopOpacity="0" />
+            </linearGradient>
+            <filter id="rh_shadow" x="-20%" y="-20%" width="140%" height="140%">
+              <feDropShadow dx="0" dy="6" stdDeviation="5" floodColor="#881337" floodOpacity="0.35" />
             </filter>
           </defs>
 
           {/* Ambient Glow */}
-          <circle cx="120" cy="120" r="95" fill="url(#h_glow)" />
+          <circle cx="120" cy="120" r="100" fill="url(#rh_glow)" />
 
-          {/* Central Fluent 3D Emoji Face 🥰 */}
-          <g transform="translate(60, 60)">
-            {/* 3D Sphere */}
-            <circle cx="60" cy="60" r="54" fill="url(#face_sphere)" />
-            {/* Top Gloss */}
-            <ellipse cx="60" cy="24" rx="28" ry="10" fill="#ffffff" opacity="0.35" />
-            {/* Smiling Eyes ^ ^ */}
-            <path d="M36 50 C40 42, 48 42, 52 50" stroke="#78350f" strokeWidth="4.5" strokeLinecap="round" fill="none" />
-            <path d="M68 50 C72 42, 80 42, 84 50" stroke="#78350f" strokeWidth="4.5" strokeLinecap="round" fill="none" />
-            {/* Smiling Mouth */}
-            <path d="M46 72 C54 84, 66 84, 74 72" stroke="#78350f" strokeWidth="4.5" strokeLinecap="round" fill="none" />
-            {/* Rosy Cheeks */}
-            <circle cx="34" cy="62" r="11" fill="#f43f5e" opacity="0.45" />
-            <circle cx="86" cy="62" r="11" fill="#f43f5e" opacity="0.45" />
+          {/* Revolving Orbit Paths */}
+          <path
+            d="M50 145 C45 80, 140 50, 190 85"
+            stroke="url(#rh_orbit)"
+            strokeWidth="3.5"
+            strokeLinecap="round"
+            strokeDasharray="8 6"
+          />
+          <path
+            d="M190 95 C195 160, 100 190, 50 155"
+            stroke="url(#rh_orbit)"
+            strokeWidth="3.5"
+            strokeLinecap="round"
+            strokeDasharray="8 6"
+          />
+
+          {/* Heart 1: Front / Lower Left */}
+          <g transform="translate(48, 88) rotate(-14) scale(0.72)" filter="url(#rh_shadow)">
+            <path
+              d="M60 22 C60 22, 50 2, 28 2 C12 2, 0 14, 0 32 C0 54, 22 76, 60 110 C98 76, 120 54, 120 32 C120 14, 108 2, 92 2 C70 2, 60 22, 60 22 Z"
+              fill="url(#rh_heart1)"
+            />
+            {/* Top Gloss Highlight */}
+            <path d="M18 18 C28 8, 44 8, 52 18" stroke="#ffffff" strokeWidth="5.5" strokeLinecap="round" opacity="0.75" />
           </g>
 
-          {/* Floating Heart 1 (Top Left) */}
-          <g transform="translate(42, 44) rotate(-18) scale(0.48)" filter="url(#h_shadow)">
-            <path d="M60 22 C60 22, 50 2, 28 2 C12 2, 0 14, 0 32 C0 54, 22 76, 60 110 C98 76, 120 54, 120 32 C120 14, 108 2, 92 2 C70 2, 60 22, 60 22 Z" fill="url(#h_heart)" />
-            <path d="M18 18 C28 8, 44 8, 52 18" stroke="#ffffff" strokeWidth="6" strokeLinecap="round" opacity="0.7" />
+          {/* Heart 2: Revolving Upper Right */}
+          <g transform="translate(118, 40) rotate(18) scale(0.60)" filter="url(#rh_shadow)">
+            <path
+              d="M60 22 C60 22, 50 2, 28 2 C12 2, 0 14, 0 32 C0 54, 22 76, 60 110 C98 76, 120 54, 120 32 C120 14, 108 2, 92 2 C70 2, 60 22, 60 22 Z"
+              fill="url(#rh_heart2)"
+            />
+            {/* Top Gloss Highlight */}
+            <path d="M18 18 C28 8, 44 8, 52 18" stroke="#ffffff" strokeWidth="5" strokeLinecap="round" opacity="0.7" />
           </g>
 
-          {/* Floating Heart 2 (Top Right) */}
-          <g transform="translate(148, 40) rotate(22) scale(0.52)" filter="url(#h_shadow)">
-            <path d="M60 22 C60 22, 50 2, 28 2 C12 2, 0 14, 0 32 C0 54, 22 76, 60 110 C98 76, 120 54, 120 32 C120 14, 108 2, 92 2 C70 2, 60 22, 60 22 Z" fill="url(#h_heart)" />
-            <path d="M18 18 C28 8, 44 8, 52 18" stroke="#ffffff" strokeWidth="6" strokeLinecap="round" opacity="0.7" />
-          </g>
-
-          {/* Floating Heart 3 (Bottom Right) */}
-          <g transform="translate(154, 125) rotate(-10) scale(0.42)" filter="url(#h_shadow)">
-            <path d="M60 22 C60 22, 50 2, 28 2 C12 2, 0 14, 0 32 C0 54, 22 76, 60 110 C98 76, 120 54, 120 32 C120 14, 108 2, 92 2 C70 2, 60 22, 60 22 Z" fill="url(#h_heart)" />
-          </g>
-
-          {/* Twinkles */}
-          <circle cx="198" cy="110" r="3" fill="#fbbf24" />
-          <circle cx="34" cy="130" r="2.5" fill="#f472b6" />
+          {/* Twinkles / Sparkles */}
+          <circle cx="195" cy="65" r="3" fill="#fde047" />
+          <circle cx="45" cy="85" r="2.5" fill="#f472b6" />
+          <circle cx="110" cy="185" r="2.5" fill="#38bdf8" />
         </svg>
       )}
     </div>
@@ -790,11 +799,11 @@ export const SparkleOOBE: React.FC<SparkleOOBEProps> = ({
                 background: 'radial-gradient(ellipse at 50% 50%, #0d286d 0%, #061545 45%, #030a24 80%, #010412 100%)',
               }}
             >
-              {/* Central Pulsing Ambient Aura: Thu nhỏ dần rồi phóng to ra rồi thu nhỏ dần... lặp lại chậm rãi */}
+              {/* Central Pulsing Ambient Aura: Thu nhỏ sâu hơn ở trạng thái shrink */}
               <motion.div
                 animate={{
-                  scale: [1.1, 0.62, 1.25, 0.62, 1.1],
-                  opacity: [0.75, 0.35, 0.85, 0.35, 0.75],
+                  scale: [1.05, 0.32, 1.25, 0.32, 1.05],
+                  opacity: [0.75, 0.22, 0.85, 0.22, 0.75],
                 }}
                 transition={{
                   duration: 6,
@@ -808,11 +817,11 @@ export const SparkleOOBE: React.FC<SparkleOOBEProps> = ({
                 }}
               />
 
-              {/* Secondary Soft Ambient Pulse */}
+              {/* Secondary Soft Ambient Pulse: Thu nhỏ sâu hơn ở trạng thái shrink */}
               <motion.div
                 animate={{
-                  scale: [0.7, 1.22, 0.7],
-                  opacity: [0.28, 0.58, 0.28],
+                  scale: [0.28, 1.20, 0.28],
+                  opacity: [0.15, 0.55, 0.15],
                 }}
                 transition={{
                   duration: 6,
@@ -1560,8 +1569,8 @@ export const SparkleOOBE: React.FC<SparkleOOBEProps> = ({
                             <div className="p-3.5 rounded-[12px] bg-[#0067b8]/[0.04] border border-[#0067b8]/20 flex items-start gap-3">
                               <div className="w-8 h-8 rounded-full bg-[#0067b8]/10 flex items-center justify-center shrink-0 mt-0.5 shadow-xs overflow-hidden">
                                 <img
-                                  src="https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Smiling%20face%20with%20hearts/3D/smiling_face_with_hearts_3d.png"
-                                  alt="🥰"
+                                  src="https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Revolving%20hearts/3D/revolving_hearts_3d.png"
+                                  alt="💞"
                                   className="w-5 h-5 object-contain"
                                 />
                               </div>
