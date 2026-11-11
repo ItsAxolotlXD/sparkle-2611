@@ -1787,7 +1787,7 @@ export const TopBar: React.FC<TopBarProps> = ({
               layoutId="sparkle-search-box-pill"
               id="topbar-search-box"
               transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
-              className={`group relative w-full h-9 sm:h-9 rounded-[100px] flex items-center px-3.5 gap-2 transition-colors ${
+              className={`group relative w-full h-9 sm:h-9 rounded-full flex items-center px-3.5 gap-2 transition-colors ${
                 isSearchFlyoutOpen || isSearchFocused
                   ? 'search-flyout-open is-focused bg-white dark:bg-[#282c31]'
                   : 'bg-[#fbfbfb] dark:bg-[#282c31]'

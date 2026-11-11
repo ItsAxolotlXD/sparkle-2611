@@ -909,7 +909,7 @@ export const SparkleOOBE: React.FC<SparkleOOBEProps> = ({
     <div 
       className="fixed inset-0 z-[999999] flex flex-col items-center justify-start sm:justify-center p-2 sm:p-4 md:p-6 overflow-y-auto overflow-x-hidden"
       style={{
-        backgroundImage: "url('/assets/aistudio/Wallpaper_Alchemy_-_Windows_11_Abstract_Wave_Wallpaper_4K_e12d77d6.png')",
+        backgroundImage: "url('/assets/aistudio/pink-nature-landscape-with-vegetation-flora_8a81cb83.jpg')",
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat',
@@ -934,7 +934,7 @@ export const SparkleOOBE: React.FC<SparkleOOBEProps> = ({
                 type="button"
                 onClick={() => advanceStep((currentStep - 1) as OOBEStep)}
                 aria-label="Back"
-                className="w-8 h-8 rounded-[10px] flex items-center justify-center text-neutral-600 hover:text-neutral-900 hover:bg-black/5 active:bg-black/10 transition-colors cursor-pointer"
+                className="w-8 h-8 rounded-[7px] flex items-center justify-center text-neutral-600 hover:text-neutral-900 hover:bg-black/5 active:bg-black/10 transition-colors cursor-pointer"
               >
                 <ArrowLeft className="w-4 h-4" />
               </button>
@@ -1277,7 +1277,7 @@ export const SparkleOOBE: React.FC<SparkleOOBEProps> = ({
                           <button
                             type="button"
                             onClick={() => advanceStep(2)}
-                            className="h-8 px-7 rounded-[10px] font-normal text-white bg-[#0067b8] hover:bg-[#1879c7] active:bg-[#005a9e] border border-black/10 border-b-[2px] border-b-black/30 shadow-[0_1px_2px_rgba(0,0,0,0.12),inset_0_1px_0_rgba(255,255,255,0.16)] active:shadow-none transition-all text-xs sm:text-[13px] flex items-center justify-center cursor-pointer select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0067b8]"
+                            className="h-8 px-7 rounded-[7px] font-normal text-white bg-[#0067b8] hover:bg-[#1879c7] active:bg-[#005a9e] border border-black/10 border-b-[2px] border-b-black/30 shadow-[0_1px_2px_rgba(0,0,0,0.12),inset_0_1px_0_rgba(255,255,255,0.16)] active:shadow-none transition-all text-xs sm:text-[13px] flex items-center justify-center cursor-pointer select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0067b8]"
                           >
                             Next
                           </button>
@@ -1363,7 +1363,7 @@ export const SparkleOOBE: React.FC<SparkleOOBEProps> = ({
                           <button
                             type="button"
                             onClick={() => advanceStep(1)}
-                            className="h-8 px-5 rounded-[10px] font-normal text-[#1b1b1b] bg-[#fbfbfb] hover:bg-[#f5f5f5] active:bg-[#eaeaea] border border-black/10 border-b-[2px] border-b-black/20 shadow-[0_1px_2px_rgba(0,0,0,0.05),inset_0_1px_0_rgba(255,255,255,0.8)] active:shadow-none transition-all text-xs sm:text-[13px] flex items-center justify-center cursor-pointer select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0067b8]"
+                            className="h-8 px-5 rounded-[7px] font-normal text-[#1b1b1b] bg-[#fbfbfb] hover:bg-[#f5f5f5] active:bg-[#eaeaea] border border-black/10 border-b-[2px] border-b-black/20 shadow-[0_1px_2px_rgba(0,0,0,0.05),inset_0_1px_0_rgba(255,255,255,0.8)] active:shadow-none transition-all text-xs sm:text-[13px] flex items-center justify-center cursor-pointer select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0067b8]"
                           >
                             Back
                           </button>
@@ -1377,7 +1377,7 @@ export const SparkleOOBE: React.FC<SparkleOOBEProps> = ({
                                 advanceStep(3);
                               }
                             }}
-                            className="h-8 px-7 rounded-[10px] font-normal text-white bg-[#0067b8] hover:bg-[#1879c7] active:bg-[#005a9e] border border-black/10 border-b-[2px] border-b-black/30 shadow-[0_1px_2px_rgba(0,0,0,0.12),inset_0_1px_0_rgba(255,255,255,0.16)] active:shadow-none transition-all text-xs sm:text-[13px] flex items-center justify-center cursor-pointer select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0067b8]"
+                            className="h-8 px-7 rounded-[7px] font-normal text-white bg-[#0067b8] hover:bg-[#1879c7] active:bg-[#005a9e] border border-black/10 border-b-[2px] border-b-black/30 shadow-[0_1px_2px_rgba(0,0,0,0.12),inset_0_1px_0_rgba(255,255,255,0.16)] active:shadow-none transition-all text-xs sm:text-[13px] flex items-center justify-center cursor-pointer select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0067b8]"
                           >
                             Next
                           </button>
@@ -1432,7 +1432,7 @@ export const SparkleOOBE: React.FC<SparkleOOBEProps> = ({
                           <button
                             type="button"
                             onClick={() => advanceStep(2)}
-                            className="h-8 px-5 rounded-[10px] font-normal text-[#1b1b1b] bg-[#fbfbfb] hover:bg-[#f5f5f5] active:bg-[#eaeaea] border border-black/10 border-b-[2px] border-b-black/20 shadow-[0_1px_2px_rgba(0,0,0,0.05),inset_0_1px_0_rgba(255,255,255,0.8)] active:shadow-none transition-all text-xs sm:text-[13px] flex items-center justify-center cursor-pointer select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0067b8]"
+                            className="h-8 px-5 rounded-[7px] font-normal text-[#1b1b1b] bg-[#fbfbfb] hover:bg-[#f5f5f5] active:bg-[#eaeaea] border border-black/10 border-b-[2px] border-b-black/20 shadow-[0_1px_2px_rgba(0,0,0,0.05),inset_0_1px_0_rgba(255,255,255,0.8)] active:shadow-none transition-all text-xs sm:text-[13px] flex items-center justify-center cursor-pointer select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0067b8]"
                           >
                             Back
                           </button>
@@ -1440,7 +1440,7 @@ export const SparkleOOBE: React.FC<SparkleOOBEProps> = ({
                           <button
                             type="button"
                             onClick={() => advanceStep(4)}
-                            className="h-8 px-7 rounded-[10px] font-normal text-white bg-[#0067b8] hover:bg-[#1879c7] active:bg-[#005a9e] border border-black/10 border-b-[2px] border-b-black/30 shadow-[0_1px_2px_rgba(0,0,0,0.12),inset_0_1px_0_rgba(255,255,255,0.16)] active:shadow-none transition-all text-xs sm:text-[13px] flex items-center justify-center cursor-pointer select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0067b8]"
+                            className="h-8 px-7 rounded-[7px] font-normal text-white bg-[#0067b8] hover:bg-[#1879c7] active:bg-[#005a9e] border border-black/10 border-b-[2px] border-b-black/30 shadow-[0_1px_2px_rgba(0,0,0,0.12),inset_0_1px_0_rgba(255,255,255,0.16)] active:shadow-none transition-all text-xs sm:text-[13px] flex items-center justify-center cursor-pointer select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0067b8]"
                           >
                             Next
                           </button>
@@ -1497,7 +1497,7 @@ export const SparkleOOBE: React.FC<SparkleOOBEProps> = ({
                           <button
                             type="button"
                             onClick={() => advanceStep(3)}
-                            className="h-8 px-5 rounded-[10px] font-normal text-[#1b1b1b] bg-[#fbfbfb] hover:bg-[#f5f5f5] active:bg-[#eaeaea] border border-black/10 border-b-[2px] border-b-black/20 shadow-[0_1px_2px_rgba(0,0,0,0.05),inset_0_1px_0_rgba(255,255,255,0.8)] active:shadow-none transition-all text-xs sm:text-[13px] flex items-center justify-center cursor-pointer select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0067b8]"
+                            className="h-8 px-5 rounded-[7px] font-normal text-[#1b1b1b] bg-[#fbfbfb] hover:bg-[#f5f5f5] active:bg-[#eaeaea] border border-black/10 border-b-[2px] border-b-black/20 shadow-[0_1px_2px_rgba(0,0,0,0.05),inset_0_1px_0_rgba(255,255,255,0.8)] active:shadow-none transition-all text-xs sm:text-[13px] flex items-center justify-center cursor-pointer select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0067b8]"
                           >
                             Back
                           </button>
@@ -1506,7 +1506,7 @@ export const SparkleOOBE: React.FC<SparkleOOBEProps> = ({
                             <button
                               type="button"
                               onClick={() => setTermsDeclinePrompt(true)}
-                              className="h-8 px-5 rounded-[10px] font-normal text-[#1b1b1b] bg-[#fbfbfb] hover:bg-[#f5f5f5] active:bg-[#eaeaea] border border-black/10 border-b-[2px] border-b-black/20 shadow-[0_1px_2px_rgba(0,0,0,0.05),inset_0_1px_0_rgba(255,255,255,0.8)] active:shadow-none transition-all text-xs sm:text-[13px] flex items-center justify-center cursor-pointer select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0067b8]"
+                              className="h-8 px-5 rounded-[7px] font-normal text-[#1b1b1b] bg-[#fbfbfb] hover:bg-[#f5f5f5] active:bg-[#eaeaea] border border-black/10 border-b-[2px] border-b-black/20 shadow-[0_1px_2px_rgba(0,0,0,0.05),inset_0_1px_0_rgba(255,255,255,0.8)] active:shadow-none transition-all text-xs sm:text-[13px] flex items-center justify-center cursor-pointer select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0067b8]"
                             >
                               Decline
                             </button>
@@ -1517,7 +1517,7 @@ export const SparkleOOBE: React.FC<SparkleOOBEProps> = ({
                                 setTermsDeclinePrompt(false);
                                 advanceStep(5);
                               }}
-                              className="h-8 px-7 rounded-[10px] font-normal text-white bg-[#0067b8] hover:bg-[#1879c7] active:bg-[#005a9e] border border-black/10 border-b-[2px] border-b-black/30 shadow-[0_1px_2px_rgba(0,0,0,0.12),inset_0_1px_0_rgba(255,255,255,0.16)] active:shadow-none transition-all text-xs sm:text-[13px] flex items-center justify-center cursor-pointer select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0067b8]"
+                              className="h-8 px-7 rounded-[7px] font-normal text-white bg-[#0067b8] hover:bg-[#1879c7] active:bg-[#005a9e] border border-black/10 border-b-[2px] border-b-black/30 shadow-[0_1px_2px_rgba(0,0,0,0.12),inset_0_1px_0_rgba(255,255,255,0.16)] active:shadow-none transition-all text-xs sm:text-[13px] flex items-center justify-center cursor-pointer select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0067b8]"
                             >
                               Accept
                             </button>
@@ -1586,7 +1586,7 @@ export const SparkleOOBE: React.FC<SparkleOOBEProps> = ({
                           <button
                             type="button"
                             onClick={() => advanceStep(4)}
-                            className="h-8 px-5 rounded-[10px] font-normal text-[#1b1b1b] bg-[#fbfbfb] hover:bg-[#f5f5f5] active:bg-[#eaeaea] border border-black/10 border-b-[2px] border-b-black/20 shadow-[0_1px_2px_rgba(0,0,0,0.05),inset_0_1px_0_rgba(255,255,255,0.8)] active:shadow-none transition-all text-xs sm:text-[13px] flex items-center justify-center cursor-pointer select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0067b8]"
+                            className="h-8 px-5 rounded-[7px] font-normal text-[#1b1b1b] bg-[#fbfbfb] hover:bg-[#f5f5f5] active:bg-[#eaeaea] border border-black/10 border-b-[2px] border-b-black/20 shadow-[0_1px_2px_rgba(0,0,0,0.05),inset_0_1px_0_rgba(255,255,255,0.8)] active:shadow-none transition-all text-xs sm:text-[13px] flex items-center justify-center cursor-pointer select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0067b8]"
                           >
                             Back
                           </button>
@@ -1594,7 +1594,7 @@ export const SparkleOOBE: React.FC<SparkleOOBEProps> = ({
                           <button
                             type="button"
                             onClick={startFinalSequence}
-                            className="h-8 px-8 rounded-[10px] font-normal text-white bg-[#0067b8] hover:bg-[#1879c7] active:bg-[#005a9e] border border-black/10 border-b-[2px] border-b-black/30 shadow-[0_1px_2px_rgba(0,0,0,0.12),inset_0_1px_0_rgba(255,255,255,0.16)] active:shadow-none transition-all text-xs sm:text-[13px] flex items-center justify-center cursor-pointer select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0067b8]"
+                            className="h-8 px-8 rounded-[7px] font-normal text-white bg-[#0067b8] hover:bg-[#1879c7] active:bg-[#005a9e] border border-black/10 border-b-[2px] border-b-black/30 shadow-[0_1px_2px_rgba(0,0,0,0.12),inset_0_1px_0_rgba(255,255,255,0.16)] active:shadow-none transition-all text-xs sm:text-[13px] flex items-center justify-center cursor-pointer select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0067b8]"
                           >
                             Get started
                           </button>
@@ -1619,7 +1619,7 @@ export const SparkleOOBE: React.FC<SparkleOOBEProps> = ({
                         e.stopPropagation();
                         rightPaneRef.current?.scrollBy({ top: -140, behavior: 'smooth' });
                       }}
-                      className="w-4 h-4 rounded-[10px] flex items-center justify-center transition-colors cursor-default bg-neutral-100/80 hover:bg-neutral-200 active:bg-neutral-300 text-neutral-600 hover:text-neutral-900 shrink-0 border-none"
+                      className="w-4 h-4 rounded-[7px] flex items-center justify-center transition-colors cursor-default bg-neutral-100/80 hover:bg-neutral-200 active:bg-neutral-300 text-neutral-600 hover:text-neutral-900 shrink-0 border-none"
                       title="Scroll up"
                     >
                       <ChevronUp className="w-2.5 h-2.5 stroke-[2.5]" />
@@ -1659,7 +1659,7 @@ export const SparkleOOBE: React.FC<SparkleOOBEProps> = ({
                         e.stopPropagation();
                         rightPaneRef.current?.scrollBy({ top: 140, behavior: 'smooth' });
                       }}
-                      className="w-4 h-4 rounded-[10px] flex items-center justify-center transition-colors cursor-default bg-neutral-100/80 hover:bg-neutral-200 active:bg-neutral-300 text-neutral-600 hover:text-neutral-900 shrink-0 border-none"
+                      className="w-4 h-4 rounded-[7px] flex items-center justify-center transition-colors cursor-default bg-neutral-100/80 hover:bg-neutral-200 active:bg-neutral-300 text-neutral-600 hover:text-neutral-900 shrink-0 border-none"
                       title="Scroll down"
                     >
                       <ChevronDown className="w-2.5 h-2.5 stroke-[2.5]" />
@@ -1688,7 +1688,7 @@ export const SparkleOOBE: React.FC<SparkleOOBEProps> = ({
           type="button"
           onClick={() => setIsDebugPageOpen(true)}
           aria-label="Debug"
-          className="w-8 h-8 rounded-[10px] flex items-center justify-center text-neutral-700 bg-white/75 hover:bg-white/95 active:bg-white backdrop-blur-md border border-black/[0.08] shadow-xs transition-colors cursor-pointer"
+          className="w-8 h-8 rounded-[7px] flex items-center justify-center text-neutral-700 bg-white/75 hover:bg-white/95 active:bg-white backdrop-blur-md border border-black/[0.08] shadow-xs transition-colors cursor-pointer"
         >
           <Bug className="h-4 w-4" aria-hidden="true" />
         </button>
@@ -1698,7 +1698,7 @@ export const SparkleOOBE: React.FC<SparkleOOBEProps> = ({
           type="button"
           onClick={() => setIsMuted(!isMuted)}
           aria-label={isMuted ? 'Unmute' : 'Mute'}
-          className="w-8 h-8 rounded-[10px] flex items-center justify-center text-neutral-700 bg-white/75 hover:bg-white/95 active:bg-white backdrop-blur-md border border-black/[0.08] shadow-xs transition-colors cursor-pointer"
+          className="w-8 h-8 rounded-[7px] flex items-center justify-center text-neutral-700 bg-white/75 hover:bg-white/95 active:bg-white backdrop-blur-md border border-black/[0.08] shadow-xs transition-colors cursor-pointer"
         >
           {isMuted ? <VolumeX className="w-4 h-4 text-red-500" /> : <Volume2 className="w-4 h-4" />}
         </button>
@@ -1707,13 +1707,13 @@ export const SparkleOOBE: React.FC<SparkleOOBEProps> = ({
         <button
           type="button"
           aria-label="Accessibility"
-          className="w-8 h-8 rounded-[10px] flex items-center justify-center text-neutral-700 bg-white/75 hover:bg-white/95 active:bg-white backdrop-blur-md border border-black/[0.08] shadow-xs transition-colors cursor-pointer"
+          className="w-8 h-8 rounded-[7px] flex items-center justify-center text-neutral-700 bg-white/75 hover:bg-white/95 active:bg-white backdrop-blur-md border border-black/[0.08] shadow-xs transition-colors cursor-pointer"
         >
           <Accessibility className="w-4 h-4" />
         </button>
 
         {/* Clock Time */}
-        <div className="h-8 px-2.5 rounded-[10px] flex items-center justify-center text-neutral-700 text-xs font-normal bg-white/75 backdrop-blur-md border border-black/[0.08] shadow-xs cursor-default">
+        <div className="h-8 px-2.5 rounded-[7px] flex items-center justify-center text-neutral-700 text-xs font-normal bg-white/75 backdrop-blur-md border border-black/[0.08] shadow-xs cursor-default">
           <span className="tracking-wide">{timeString}</span>
         </div>
       </div>

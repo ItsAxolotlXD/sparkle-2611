@@ -4624,16 +4624,25 @@ html.dark .topbar-search-results-dropdown {
   border-color: rgba(255, 255, 255, 0.10) !important;
   color: #ffffff !important;
 }
-/* TopBar Search Box & Fluent Input Boxes: border-radius 6px */
-html.light-mode #topbar-search-box,
+/* TopBar Search Box: border-radius 9999px (pill shape) */
+html.light-mode #topbar-search-box {
+  background-color: rgba(0, 0, 0, 0.05) !important;
+  border-radius: 9999px !important;
+  box-shadow: none !important;
+}
+html.light-mode #topbar-search-box:focus-within,
+html.light-mode #topbar-search-box.search-flyout-open {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+  border-radius: 9999px !important;
+}
+
 html.light-mode .fluent-search-box,
 html.light-mode .fluent-input-box {
   background-color: rgba(0, 0, 0, 0.05) !important;
   border-radius: 6px !important;
   box-shadow: none !important;
 }
-html.light-mode #topbar-search-box:focus-within,
-html.light-mode #topbar-search-box.search-flyout-open,
 html.light-mode .fluent-search-box:focus-within,
 html.light-mode .fluent-input-box:focus-within {
   background-color: #ffffff !important;
@@ -4641,7 +4650,12 @@ html.light-mode .fluent-input-box:focus-within {
   border-radius: 6px !important;
 }
 html:not(.light-mode) #topbar-search-box,
-html.dark #topbar-search-box,
+html.dark #topbar-search-box {
+  background-color: #282c31 !important;
+  border-radius: 9999px !important;
+  box-shadow: none !important;
+}
+
 html:not(.light-mode) .fluent-search-box,
 html.dark .fluent-search-box {
   background-color: #282c31 !important;
@@ -4661,7 +4675,12 @@ html.dark .fluent-input-box {
 html:not(.light-mode) #topbar-search-box:focus-within,
 html.dark #topbar-search-box:focus-within,
 html:not(.light-mode) #topbar-search-box.search-flyout-open,
-html.dark #topbar-search-box.search-flyout-open,
+html.dark #topbar-search-box.search-flyout-open {
+  background-color: #282c31 !important;
+  color: #ffffff !important;
+  border-radius: 9999px !important;
+}
+
 html:not(.light-mode) .fluent-search-box:focus-within,
 html.dark .fluent-search-box:focus-within {
   background-color: #282c31 !important;
@@ -5262,7 +5281,7 @@ input[type="number"]:not([data-no-line]):not(.fluent-search-box input):not(.flue
 }
 
 #topbar-search-box {
-  border-radius: 6px !important;
+  border-radius: 9999px !important;
   border: none !important;
   border-bottom: none !important;
 }
@@ -7591,16 +7610,14 @@ html.light-mode #immersive-search-capsule:focus-within {
 #topbar-search-box.is-focused,
 #topbar-search-box.search-flyout-open,
 #topbar-search-box:focus-within {
-  outline: 2px solid #4cc2ff !important;
-  outline-offset: 0 !important;
+  outline: none !important;
   box-shadow: none !important;
 }
 
 html.light-mode #topbar-search-box.is-focused,
 html.light-mode #topbar-search-box.search-flyout-open,
 html.light-mode #topbar-search-box:focus-within {
-  outline: 2px solid #005fb8 !important;
-  outline-offset: 0 !important;
+  outline: none !important;
   box-shadow: none !important;
 }
 
@@ -8404,9 +8421,11 @@ section[id^="settings-section-"] {
   box-shadow: none !important;
 }
 
-/* TopBar search box: no border/outline when not focused; outline ONLY appears when focused */
+/* TopBar search box: pill shape (100% rounded) without underline when unfocused; underline ONLY appears when focused */
 #topbar-search-box {
   border: none !important;
+  border-bottom: none !important;
+  border-radius: 9999px !important;
   outline: none !important;
   box-shadow: none !important;
   transition: background-color 0.15s ease-in-out;
@@ -8414,18 +8433,22 @@ section[id^="settings-section-"] {
 
 #topbar-search-box:hover {
   border: none !important;
+  border-bottom: none !important;
   outline: none !important;
   box-shadow: none !important;
 }
 
 html.light-mode #topbar-search-box {
   border: none !important;
+  border-bottom: none !important;
+  border-radius: 9999px !important;
   outline: none !important;
   box-shadow: none !important;
 }
 
 html.light-mode #topbar-search-box:hover {
   border: none !important;
+  border-bottom: none !important;
   outline: none !important;
   box-shadow: none !important;
 }
@@ -8446,9 +8469,10 @@ html.dark .fluent-search-box:not(:focus-within):not(.is-focused):hover {
 #topbar-search-box:focus-within,
 #topbar-search-box.is-focused,
 #topbar-search-box.search-flyout-open {
+  border: none !important;
   border-color: transparent !important;
-  outline: 2px solid #4cc2ff !important;
-  outline-offset: 0 !important;
+  border-radius: 9999px !important;
+  outline: none !important;
   box-shadow: none !important;
   z-index: 2147483647 !important;
 }
@@ -8456,9 +8480,10 @@ html.dark .fluent-search-box:not(:focus-within):not(.is-focused):hover {
 html.dark #topbar-search-box:focus-within,
 html.dark #topbar-search-box.is-focused,
 html.dark #topbar-search-box.search-flyout-open {
+  border: none !important;
   border-color: transparent !important;
-  outline: 2px solid #4cc2ff !important;
-  outline-offset: 0 !important;
+  border-radius: 9999px !important;
+  outline: none !important;
   box-shadow: none !important;
   z-index: 2147483647 !important;
 }
@@ -8466,9 +8491,10 @@ html.dark #topbar-search-box.search-flyout-open {
 html.light-mode #topbar-search-box:focus-within,
 html.light-mode #topbar-search-box.is-focused,
 html.light-mode #topbar-search-box.search-flyout-open {
+  border: none !important;
   border-color: transparent !important;
-  outline: 2px solid #005fb8 !important;
-  outline-offset: 0 !important;
+  border-radius: 9999px !important;
+  outline: none !important;
   box-shadow: none !important;
   z-index: 2147483647 !important;
 }
@@ -8624,13 +8650,11 @@ html:not(.light-mode) #feedback-page [class*="bg-[#2c3037]"][class*="shadow-xs"]
 }
 
 /* Subtle bottom edge matching the supplied search reference. */
-#topbar-search-box,
 .fluent-search-box,
 .fluent-input-box {
   border-bottom: 1px solid rgba(255, 255, 255, 0.42) !important;
 }
 
-html.light-mode #topbar-search-box,
 html.light-mode .fluent-search-box,
 html.light-mode .fluent-input-box {
   border-bottom-color: rgba(0, 0, 0, 0.32) !important;
@@ -8656,8 +8680,6 @@ html.light-mode #topbar-search-box.search-flyout-open,
   box-shadow: none !important;
 }
 
-#topbar-search-box::after,
-#topbar-search-box::before,
 .fluent-search-box::after,
 .fluent-search-box::before,
 .fluent-input-box::after,
@@ -8670,7 +8692,6 @@ html.light-mode #topbar-search-box.search-flyout-open,
   pointer-events: none;
 }
 
-#topbar-search-box::after,
 .fluent-search-box::after,
 .fluent-input-box::after {
   left: 0;
@@ -8678,7 +8699,6 @@ html.light-mode #topbar-search-box.search-flyout-open,
   background-color: rgba(255, 255, 255, 0.45);
 }
 
-#topbar-search-box::before,
 .fluent-search-box::before,
 .fluent-input-box::before {
   left: 50%;
@@ -8688,28 +8708,60 @@ html.light-mode #topbar-search-box.search-flyout-open,
   transition: width 240ms cubic-bezier(0.2, 0, 0, 1);
 }
 
-#topbar-search-box.is-focused::before,
-#topbar-search-box.search-flyout-open::before,
-#topbar-search-box:focus-within::before,
 .fluent-search-box.is-focused::before,
 .fluent-search-box:focus-within::before,
 .fluent-input-box:focus-within::before {
   width: 100%;
 }
 
-html.light-mode #topbar-search-box::after,
 html.light-mode .fluent-search-box::after,
 html.light-mode .fluent-input-box::after {
   background-color: rgba(0, 0, 0, 0.32);
 }
 
-html.light-mode #topbar-search-box::before,
 html.light-mode .fluent-search-box::before,
 html.light-mode .fluent-input-box::before {
   background-color: #0078d4;
 }
 
-#topbar-search-box,
+/* TopBar search box: 100% pill shape, no underline when unfocused, underline only when focused */
+#topbar-search-box {
+  border-radius: 9999px !important;
+  border: none !important;
+  border-bottom: none !important;
+  overflow: hidden !important;
+}
+
+#topbar-search-box::after {
+  display: none !important;
+  content: none !important;
+}
+
+#topbar-search-box::before {
+  content: "" !important;
+  position: absolute !important;
+  bottom: 0 !important;
+  height: 2px !important;
+  left: 50% !important;
+  width: 0 !important;
+  transform: translateX(-50%) !important;
+  background-color: var(--ui-accent, #4cc2ff) !important;
+  border-radius: 9999px !important;
+  transition: width 240ms cubic-bezier(0.2, 0, 0, 1) !important;
+  pointer-events: none !important;
+  z-index: 10 !important;
+}
+
+#topbar-search-box.is-focused::before,
+#topbar-search-box.search-flyout-open::before,
+#topbar-search-box:focus-within::before {
+  width: calc(100% - 24px) !important;
+}
+
+html.light-mode #topbar-search-box::before {
+  background-color: var(--ui-accent, #0078d4) !important;
+}
+
 .fluent-search-box,
 .fluent-input-box {
   border-radius: 6px !important;
