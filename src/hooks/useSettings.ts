@@ -46,6 +46,7 @@ export interface SystemSettings {
   triangleExperiment: boolean;
   triangleExperimentVersion?: number;
   tabbedSparkle: boolean;
+  refreshedSearchIcon: boolean;
   newWatchTab: boolean;
   fluentIcons: boolean;
   dynamicSidebarIcons: boolean;
@@ -105,6 +106,7 @@ export const DEFAULT_SETTINGS: SystemSettings = {
   triangleExperiment: true,
   triangleExperimentVersion: 1,
   tabbedSparkle: false,
+  refreshedSearchIcon: false,
   newWatchTab: false,
   fluentIcons: false,
   dynamicSidebarIcons: true,

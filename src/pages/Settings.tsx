@@ -47,6 +47,7 @@ const SETTING_LABELS: Partial<Record<keyof SystemSettings, string>> = {
   loadPagesSequentially: 'Load pages sequentially',
   streamAspectRatio: 'Stream aspect ratio',
   immersiveSearch: 'Immersive search',
+  refreshedSearchIcon: 'Refreshed Search Icon',
   developerMode: 'Developer mode',
   animatedBootScreen: 'Animated boot screen',
   triangleExperiment: 'Loading experiment',
@@ -208,7 +209,7 @@ export const Settings: React.FC<SettingsProps> = ({
   };
 
   const matchesExperimental =
-    matchesSearch(['Velocity Features', 'Velocity', 'vivetool', 'tabbed sparkle', 'tabbed', 'Insider experiments', 'Insider Flags', 'thử nghiệm', 'touch keyboard', 'native keyboard', 'bàn phím cảm ứng', 'bàn phím ảo', 'immersive search', 'fluent icons', 'flumojs', 'fluent emojis', 'emoji', '3d icons', 'animated boot screen', 'boot screen', 'khởi động', 'video khởi động']);
+    matchesSearch(['Velocity Features', 'Velocity', 'vivetool', 'tabbed sparkle', 'tabbed', 'Insider experiments', 'Insider Flags', 'thử nghiệm', 'touch keyboard', 'native keyboard', 'bàn phím cảm ứng', 'bàn phím ảo', 'refreshed search icon', 'search icon', 'immersive search', 'fluent icons', 'flumojs', 'fluent emojis', 'emoji', '3d icons', 'animated boot screen', 'boot screen', 'khởi động', 'video khởi động']);
   const matchesInterface = 
     matchesSearch(['Appearance', 'Interface', 'giao diện', 'chế độ ứng dụng', 'ban ngày', 'ban đêm', 'light', 'dark', 'thanh điều hướng', 'navigation', 'side view', 'top view', 'tab view', 'thu phóng giao diện', 'font', 'vị trí thanh bên', 'siêu chế độ tối', 'super dark', 'Open Settings in new tab', 'open settings', 'tab mới', 'new tab']);
   const matchesAccessibility = matchesSearch(['Accessibility', 'trợ năng', 'hover to expand']);
@@ -361,6 +362,43 @@ export const Settings: React.FC<SettingsProps> = ({
                       onClick={(e) => {
                         e.stopPropagation();
                         triggerVelocityFeatureToggle('tabbedSparkle', !draftSettings.tabbedSparkle);
+                      }}
+                      className="toggle-switch-btn focus:outline-none shrink-0 border-none"
+                    >
+                      <span className="toggle-switch-thumb" />
+                    </button>
+                  </motion.div>
+                )}
+
+                {matchesSearch(['Refreshed Search Icon', 'search icon', 'Velocity Features', 'Velocity', 'top bar search']) && (
+                  <motion.div
+                    variants={slideUpVariant}
+                    initial="hidden"
+                    animate="visible"
+                    custom={elementIndex++}
+                    id="setting-velocity-refreshed-search-icon"
+                    onClick={() => triggerVelocityFeatureToggle('refreshedSearchIcon', !draftSettings.refreshedSearchIcon)}
+                    className="settings-block-card rounded-[6px] bg-white dark:bg-[#2c3037] shadow-xs px-4 py-3 sm:py-3.5 flex items-center justify-between gap-4 cursor-pointer hover:bg-black/[0.02] dark:hover:bg-[#363b43] transition-colors border-none"
+                  >
+                    <div className="min-w-0 flex-1 pr-2">
+                      <div id="refreshed-search-icon-label" className="font-normal text-sm text-[#111827] dark:text-white flex items-center gap-2" style={{ fontWeight: 400 }}>
+                        <span>Refreshed Search Icon</span>
+                        <span className="text-[10px] px-1.5 py-0.5 rounded-[6px] uppercase tracking-wider bg-[#0078d4]/10 dark:bg-[#4cc2ff]/20 text-[#0078d4] dark:text-[#4cc2ff] font-semibold">Velocity</span>
+                      </div>
+                      <p id="refreshed-search-icon-description" className="mt-1 text-xs leading-relaxed text-[#6B7280] dark:text-[#9CA3AF]">
+                        Updates the top bar search icon for light, dark, and focused states.
+                      </p>
+                    </div>
+                    <button
+                      id="toggle-refreshed-search-icon"
+                      type="button"
+                      role="switch"
+                      aria-labelledby="refreshed-search-icon-label"
+                      aria-describedby="refreshed-search-icon-description"
+                      aria-checked={draftSettings.refreshedSearchIcon}
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        triggerVelocityFeatureToggle('refreshedSearchIcon', !draftSettings.refreshedSearchIcon);
                       }}
                       className="toggle-switch-btn focus:outline-none shrink-0 border-none"
                     >
