@@ -1812,7 +1812,17 @@ export const TopBar: React.FC<TopBarProps> = ({
                 </button>
               )}
 
-              <FluentSearchIcon className="w-[16px] h-[16px] text-black dark:text-white shrink-0 pointer-events-none select-none" />
+              {settings.refreshedSearchIcon ? (
+                <img
+                  src={isSearchFocused || isSearchFlyoutOpen ? 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Focused.png-C6h07cJuZkQ7qxr3AwmqXxINQya0tI.x-icon' : isLightMode ? 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Light.png-HoVpbl8N1AMI4rRIqBouhKXe4NoTxd.x-icon' : 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Dark.png-5e1aw6TgUECnUtZ4mPQmegFRSvNg6x.x-icon'}
+                  alt=""
+                  aria-hidden="true"
+                  draggable={false}
+                  className="w-[16px] h-[16px] object-contain shrink-0 pointer-events-none select-none"
+                />
+              ) : (
+                <FluentSearchIcon className="w-[16px] h-[16px] text-black dark:text-white shrink-0 pointer-events-none select-none" />
+              )}
 
               {isFindWordsMode ? (
                 <input
