@@ -13,7 +13,7 @@ import {
   Trash2,
   Search
 } from 'lucide-react';
-import { flyoutPanelClassName, flyoutPanelStyle } from './FlyoutDropdown';
+import { contextMenuMotionProps, flyoutPanelClassName, flyoutPanelStyle } from './FlyoutDropdown';
 import {
   FluentHomeIcon,
   FluentWatchIcon,
@@ -153,13 +153,13 @@ const TabContextMenu: React.FC<TabContextMenuProps> = ({
   return createPortal(
     <motion.div
       ref={menuRef}
-      exit={{ opacity: 1 }}
-      transition={{ duration: 0.13 }}
+      {...contextMenuMotionProps}
       style={{
         position: 'fixed',
         left: position.left,
         top: position.top,
         zIndex: 2147483647,
+        transformOrigin: `${x - position.left}px ${y - position.top}px`,
       }}
       className="fluent-context-menu-wrapper pointer-events-auto"
       onContextMenu={(e) => {
@@ -169,14 +169,10 @@ const TabContextMenu: React.FC<TabContextMenuProps> = ({
       onMouseDown={(e) => e.stopPropagation()}
       onClick={(e) => e.stopPropagation()}
     >
-      <motion.div
+      <div
         role="menu"
         aria-label="Tab actions"
-        initial={{ scaleY: 0 }}
-        animate={{ scaleY: 1 }}
-        exit={{ scaleY: 0 }}
-        transition={{ duration: 0.11, ease: 'linear' }}
-        style={{ ...flyoutPanelStyle, transformOrigin: `${x - position.left}px ${y - position.top}px` }}
+        style={flyoutPanelStyle}
         className={`w-[190px] p-1 ${flyoutPanelClassName} fluent-context-menu`}
       >
         <div className="w-full flex flex-col">
@@ -234,7 +230,7 @@ const TabContextMenu: React.FC<TabContextMenuProps> = ({
             </>
           )}
         </div>
-      </motion.div>
+      </div>
     </motion.div>,
     document.body
   );
@@ -698,10 +694,7 @@ export const SparkleTabBar: React.FC<SparkleTabBarProps> = ({
           {isOverflowOpen && (
             <motion.div
               role="menu"
-              initial={{ scaleY: 0 }}
-              animate={{ scaleY: 1 }}
-              exit={{ scaleY: 0 }}
-              transition={{ duration: 0.11, ease: 'linear' }}
+              {...contextMenuMotionProps}
               style={{ ...flyoutPanelStyle, transformOrigin: 'top right' }}
               className={`absolute right-0 top-full mt-1.5 w-[190px] p-1 z-50 ${flyoutPanelClassName} fluent-context-menu`}
             >

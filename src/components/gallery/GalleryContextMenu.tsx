@@ -2,7 +2,7 @@ import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { motion } from 'motion/react';
 import { MousePointer2, Star, Share2, Save } from 'lucide-react';
-import { flyoutPanelClassName, flyoutPanelStyle } from '../FlyoutDropdown';
+import { contextMenuMotionProps, flyoutPanelClassName, flyoutPanelStyle } from '../FlyoutDropdown';
 import { FluentRenameIcon, FluentFolderArrowLeftIcon, FluentDeleteIcon, FluentCopyIcon } from '../FluentIcons';
 
 export type GalleryContextAction = 'open' | 'favorite' | 'rename' | 'share' | 'duplicate' | 'move' | 'save' | 'delete';
@@ -123,13 +123,13 @@ export const GalleryContextMenu: React.FC<GalleryContextMenuProps> = ({ x, y, is
   return createPortal(
     <motion.div
       ref={menuRef}
-      exit={{ opacity: 1 }}
-      transition={{ duration: 0.11 }}
+      {...contextMenuMotionProps}
       style={{
         position: 'fixed',
         left: position.left,
         top: position.top,
         zIndex: 2147483647,
+        transformOrigin: `${x - position.left}px ${y - position.top}px`,
       }}
       className="fluent-context-menu-wrapper pointer-events-auto"
       onContextMenu={(e) => {
@@ -139,14 +139,10 @@ export const GalleryContextMenu: React.FC<GalleryContextMenuProps> = ({ x, y, is
       onMouseDown={(e) => e.stopPropagation()}
       onClick={(e) => e.stopPropagation()}
     >
-      <motion.div
+      <div
         role="menu"
         aria-label="File actions"
-        initial={{ scaleY: 0 }}
-        animate={{ scaleY: 1 }}
-        exit={{ scaleY: 0 }}
-        transition={{ duration: 0.11, ease: 'linear' }}
-        style={{ ...flyoutPanelStyle, transformOrigin: `${x - position.left}px ${y - position.top}px` }}
+        style={flyoutPanelStyle}
         className={`w-[232px] p-1.5 ${flyoutPanelClassName} fluent-context-menu`}
       >
         <div className="w-full flex flex-col space-y-0.5">
@@ -154,7 +150,7 @@ export const GalleryContextMenu: React.FC<GalleryContextMenuProps> = ({ x, y, is
           <div className="h-px bg-black/10 dark:bg-white/10 my-1 mx-1" />
           {secondary.map((entry) => renderEntry(entry))}
         </div>
-      </motion.div>
+      </div>
     </motion.div>,
     document.body
   );

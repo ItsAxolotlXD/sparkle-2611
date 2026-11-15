@@ -1,7 +1,7 @@
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { motion } from 'motion/react';
-import { flyoutPanelClassName, flyoutPanelStyle } from './FlyoutDropdown';
+import { contextMenuMotionProps, flyoutPanelClassName, flyoutPanelStyle } from './FlyoutDropdown';
 import { FluentEditIcon, FluentDeleteIcon } from './FluentIcons';
 import { Channel } from '../types';
 
@@ -91,22 +91,13 @@ export const WatchChannelContextMenu: React.FC<WatchChannelContextMenuProps> = (
     };
   }, [onClose]);
 
-  const renderEntry = (entry: MenuEntry, delay: number) => {
+  const renderEntry = (entry: MenuEntry) => {
     const Icon = entry.icon;
     return (
-      <motion.button
+      <button
         key={entry.action}
         type="button"
         role="menuitem"
-        initial={{ y: -8 }}
-        animate={{
-          y: 0,
-          transition: {
-            duration: 0.16,
-            delay,
-            ease: 'linear',
-          },
-        }}
         onClick={() => {
           onAction(entry.action);
           onClose();
@@ -121,7 +112,7 @@ export const WatchChannelContextMenu: React.FC<WatchChannelContextMenuProps> = (
           }`}
         />
         <span className="truncate">{entry.label}</span>
-      </motion.button>
+      </button>
     );
   };
 
@@ -129,10 +120,7 @@ export const WatchChannelContextMenu: React.FC<WatchChannelContextMenuProps> = (
     <motion.div
       ref={menuRef}
       role="menu"
-      initial={{ scaleY: 0 }}
-      animate={{ scaleY: 1 }}
-      exit={{ scaleY: 0 }}
-      transition={{ duration: 0.11, ease: 'linear' }}
+      {...contextMenuMotionProps}
       onContextMenu={(e) => e.preventDefault()}
       className={`fixed z-[2147483647] w-[232px] ${flyoutPanelClassName} fluent-context-menu`}
       style={{
@@ -142,34 +130,13 @@ export const WatchChannelContextMenu: React.FC<WatchChannelContextMenuProps> = (
         transformOrigin: `${x - position.left}px ${y - position.top}px`,
       }}
     >
-      {actions.map((entry, idx) => renderEntry(entry, idx * 0.04))}
+      {actions.map(renderEntry)}
 
-      {/* Divider */}
-      <motion.div
-        role="separator"
-        initial={{ y: -8 }}
-        animate={{
-          y: 0,
-          transition: { duration: 0.16, delay: 0.08, ease: 'linear' },
-        }}
-        className="h-px bg-black/10 dark:bg-white/10 my-1 mx-1 origin-left"
-      />
+      <div role="separator" className="h-px bg-black/10 dark:bg-white/10 my-1 mx-1" />
 
-      {/* Disabled 'More to come soon...' */}
-      <motion.div
-        initial={{ y: -8 }}
-        animate={{
-          y: 0,
-          transition: {
-            duration: 0.16,
-            delay: 0.1,
-            ease: 'linear',
-          },
-        }}
-        className="w-full h-[32px] px-3 flex items-center text-[12px] text-[#6B7280] dark:text-[#9CA3AF] select-none italic cursor-default opacity-60"
-      >
+      <div className="w-full h-[32px] px-3 flex items-center text-[12px] text-[#6B7280] dark:text-[#9CA3AF] select-none italic cursor-default opacity-60">
         More to come soon...
-      </motion.div>
+      </div>
     </motion.div>,
     document.body
   );

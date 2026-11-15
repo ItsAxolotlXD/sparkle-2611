@@ -1,7 +1,7 @@
 import React, { useState, useRef, useMemo, useEffect, useLayoutEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'motion/react';
-import { flyoutPanelClassName, flyoutPanelStyle } from './FlyoutDropdown';
+import { contextMenuMotionProps, flyoutPanelClassName, flyoutPanelStyle } from './FlyoutDropdown';
 import { 
   Sliders,
   FlaskConical,
@@ -351,13 +351,13 @@ const SidebarContextMenuOverlay: React.FC<SidebarContextMenuOverlayProps> = ({
   return createPortal(
     <motion.div
       ref={menuRef}
-      exit={{ opacity: 1 }}
-      transition={{ duration: 0.11 }}
+      {...contextMenuMotionProps}
       style={{
         position: 'fixed',
         left: position.left,
         top: position.top,
         zIndex: 2147483647,
+        transformOrigin: `${x - position.left}px ${y - position.top}px`,
       }}
       className="fluent-context-menu-wrapper pointer-events-auto"
       onContextMenu={(e) => {
@@ -367,14 +367,10 @@ const SidebarContextMenuOverlay: React.FC<SidebarContextMenuOverlayProps> = ({
       onMouseDown={(e) => e.stopPropagation()}
       onClick={(e) => e.stopPropagation()}
     >
-      <motion.div
+      <div
         role="menu"
         aria-label="Sidebar actions"
-        initial={{ scaleY: 0 }}
-        animate={{ scaleY: 1 }}
-        exit={{ scaleY: 0 }}
-        transition={{ duration: 0.11, ease: 'linear' }}
-        style={{ ...flyoutPanelStyle, transformOrigin: `${x - position.left}px ${y - position.top}px` }}
+        style={flyoutPanelStyle}
         className={`w-[232px] p-1.5 ${flyoutPanelClassName} fluent-context-menu`}
       >
         <div className="w-full flex flex-col space-y-0.5">
@@ -483,7 +479,7 @@ const SidebarContextMenuOverlay: React.FC<SidebarContextMenuOverlayProps> = ({
             <span className="truncate">Interface settings</span>
           </button>
         </div>
-      </motion.div>
+      </div>
     </motion.div>,
     document.body
   );
