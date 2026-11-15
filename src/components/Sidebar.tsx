@@ -348,12 +348,9 @@ const SidebarContextMenuOverlay: React.FC<SidebarContextMenuOverlayProps> = ({
     };
   }, [onClose]);
 
-  const menuBounds = menuRef.current?.getBoundingClientRect();
-  const menuWidth = menuBounds?.width || 232;
-  const menuHeight = menuBounds?.height || 390;
-  const clipOriginX = Math.min(100, Math.max(0, ((x - position.left) / menuWidth) * 100));
+  const menuHeight = menuRef.current?.getBoundingClientRect().height || 390;
   const clipOriginY = Math.min(100, Math.max(0, ((y - position.top) / menuHeight) * 100));
-  const closedClipPath = `inset(${clipOriginY}% ${100 - clipOriginX}% ${100 - clipOriginY}% ${clipOriginX}% round 8px)`;
+  const closedClipPath = `inset(${clipOriginY}% 0% ${100 - clipOriginY}% 0% round 8px)`;
 
   return createPortal(
     <motion.div
