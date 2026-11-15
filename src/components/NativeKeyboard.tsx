@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 import { Delete, Smile, ArrowBigUp, X, Check, Globe, Keyboard, ClipboardList, Copy, Mic, Search, Plus } from 'lucide-react';
 import { FluentDeleteIcon, FluentSearchIcon } from './FluentIcons';
 import { motion, AnimatePresence } from 'motion/react';
-import { flyoutPanelClassName, flyoutPanelStyle } from './FlyoutDropdown';
+import { contextMenuMotionProps, flyoutPanelClassName, flyoutPanelStyle } from './FlyoutDropdown';
 import { useNativeKeyboard } from '../context/NativeKeyboardContext';
 import { useSettings } from '../hooks/useSettings';
 import { useIsMobile } from '../hooks/useIsMobile';
@@ -1575,27 +1575,22 @@ export const NativeKeyboard: React.FC = () => {
                   id="native-keyboard-settings-menu"
                   role="menu"
                   aria-label="Cài đặt bàn phím"
-initial={{ opacity: 1, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 1, y: -4 }}
-                  transition={{ duration: 0.2, ease: 'linear' }}
+                  {...contextMenuMotionProps}
                   onContextMenu={(e) => e.preventDefault()}
                   className={`fixed z-[2147483647] w-[236px] max-h-[calc(100vh-80px)] overflow-y-auto ${flyoutPanelClassName} fluent-context-menu select-none`}
                   style={{
                     ...flyoutPanelStyle,
                     left: `${settingsMenuPos.left}px`,
                     top: `${settingsMenuPos.top}px`,
+                    transformOrigin: 'top left',
                   }}
                 >
                   {/* Header */}
-                  <motion.div
-                    initial={{ opacity: 1, y: -8 }}
-                    animate={{ opacity: 1, y: 0, transition: { duration: 0.2, delay: 0, ease: 'linear' } }}
-                    className="px-3 py-1.5 text-[11px] font-semibold text-[#6b7280] dark:text-[#9ca3af] uppercase tracking-wider flex items-center justify-between"
+                  <div className="px-3 py-1.5 text-[11px] font-semibold text-[#6b7280] dark:text-[#9ca3af] uppercase tracking-wider flex items-center justify-between"
                   >
                     <span>Cài đặt bàn phím</span>
                     <WindowsSettingsIcon className="w-3.5 h-3.5 text-black dark:text-white" />
-                  </motion.div>
+                  </div>
 
                   <div className="space-y-0.5 mt-0.5">
                     {/* 1. Use Flumojis toggle */}
@@ -1603,12 +1598,6 @@ initial={{ opacity: 1, y: -10 }}
                       type="button"
                       role="menuitemcheckbox"
                       aria-checked={settings.useFlumojs}
-                      initial={{ opacity: 0, y: -8 }}
-                      animate={{
-                        opacity: 1,
-                        y: 0,
-                        transition: { duration: 0.28, delay: 0.03, ease: [0.16, 1, 0.3, 1] },
-                      }}
                       onMouseDown={(e) => e.preventDefault()}
                       onPointerDown={(e) => {
                         e.preventDefault();
@@ -1643,12 +1632,6 @@ initial={{ opacity: 1, y: -10 }}
                       type="button"
                       role="menuitemcheckbox"
                       aria-checked={settings.keyboardSoundEnabled}
-                      initial={{ opacity: 0, y: -8 }}
-                      animate={{
-                        opacity: 1,
-                        y: 0,
-                        transition: { duration: 0.28, delay: 0.06, ease: [0.16, 1, 0.3, 1] },
-                      }}
                       onMouseDown={(e) => e.preventDefault()}
                       onPointerDown={(e) => {
                         e.preventDefault();
@@ -1691,7 +1674,7 @@ initial={{ opacity: 1, y: -10 }}
                       { id: 'en' as VietnameseInputMethod, label: 'ENG' },
                       { id: 'vi-telex' as VietnameseInputMethod, label: 'VIE (Telex)' },
                       { id: 'vi-vni' as VietnameseInputMethod, label: 'VIE (VNI)' },
-                    ].map((lang, idx) => {
+                    ].map((lang) => {
                       const isSelected = inputMethod === lang.id;
                       return (
                         <motion.button
@@ -1699,16 +1682,6 @@ initial={{ opacity: 1, y: -10 }}
                           type="button"
                           role="menuitemradio"
                           aria-checked={isSelected}
-                          initial={{ opacity: 0, y: -8 }}
-                          animate={{
-                            opacity: 1,
-                            y: 0,
-                            transition: {
-                              duration: 0.28,
-                              delay: 0.09 + idx * 0.03,
-                              ease: [0.16, 1, 0.3, 1],
-                            },
-                          }}
                           onMouseDown={(e) => e.preventDefault()}
                           onPointerDown={(e) => {
                             e.preventDefault();

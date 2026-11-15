@@ -25,6 +25,13 @@ export const flyoutPanelStyle: React.CSSProperties = {
   boxShadow: '0 16px 40px rgba(0,0,0,0.25), 0 2px 8px rgba(0,0,0,0.1)',
 };
 
+export const contextMenuMotionProps = {
+  initial: { scaleY: 0 },
+  animate: { scaleY: 1 },
+  exit: { opacity: 0, scaleY: 0, y: -8 },
+  transition: { duration: 0.18, ease: 'linear' as const },
+};
+
 export function FlyoutDropdown<T extends string>({ value, options, onChange, ariaLabel, id }: FlyoutDropdownProps<T>) {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);

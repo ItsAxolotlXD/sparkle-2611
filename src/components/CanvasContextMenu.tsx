@@ -2,7 +2,7 @@ import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { motion } from 'motion/react';
 import { Download, Image as GalleryIcon } from 'lucide-react';
-import { flyoutPanelClassName, flyoutPanelStyle } from './FlyoutDropdown';
+import { contextMenuMotionProps, flyoutPanelClassName, flyoutPanelStyle } from './FlyoutDropdown';
 import { FluentRenameIcon, FluentDeleteIcon } from './FluentIcons';
 
 export type CanvasContextAction = 'export' | 'gallery' | 'rename' | 'delete';
@@ -69,10 +69,7 @@ export const CanvasContextMenu: React.FC<CanvasContextMenuProps> = ({ x, y, onAc
     <motion.div
       ref={menuRef}
       role="menu"
-      initial={{ scaleY: 0 }}
-      animate={{ scaleY: 1 }}
-      exit={{ scaleY: 0 }}
-      transition={{ duration: 0.11, ease: 'linear' }}
+      {...contextMenuMotionProps}
       onContextMenu={(event) => event.preventDefault()}
       onMouseDown={(event) => event.stopPropagation()}
       className={`fixed z-[2147483647] w-[232px] ${flyoutPanelClassName} fluent-context-menu`}
@@ -83,16 +80,13 @@ export const CanvasContextMenu: React.FC<CanvasContextMenuProps> = ({ x, y, onAc
         transformOrigin: `${x - position.left}px ${y - position.top}px`,
       }}
     >
-      {entries.map((entry, index) => {
+      {entries.map((entry) => {
         const Icon = entry.icon;
         return (
-          <motion.button
+          <button
             key={entry.action}
             type="button"
             role="menuitem"
-            initial={{ y: -8 }}
-            animate={{ y: 0 }}
-            transition={{ duration: 0.16, delay: index * 0.035, ease: 'linear' }}
             onMouseDown={(e) => e.stopPropagation()}
             onClick={(e) => {
               e.preventDefault();
@@ -103,7 +97,7 @@ export const CanvasContextMenu: React.FC<CanvasContextMenuProps> = ({ x, y, onAc
           >
             <Icon className={`w-4 h-4 shrink-0 ${entry.danger ? 'text-black dark:text-[#ff99a4]' : 'text-black dark:text-neutral-300'}`} />
             <span className="truncate">{entry.label}</span>
-          </motion.button>
+          </button>
         );
       })}
     </motion.div>,

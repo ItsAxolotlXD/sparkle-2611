@@ -33,7 +33,7 @@ import { FluentNotesIcon, FluentDeleteIcon } from '../components/FluentIcons';
 import { exportDocx, exportWritePdf } from '../utils/officeExport';
 import { galleryDB, GalleryMediaItem } from '../services/galleryStorage';
 import { useNotes, STICKY_COLORS, NoteItem } from '../context/NotesContext';
-import { flyoutPanelClassName, flyoutPanelStyle } from '../components/FlyoutDropdown';
+import { contextMenuMotionProps, flyoutPanelClassName, flyoutPanelStyle } from '../components/FlyoutDropdown';
 import { PromptDialog } from '../components/gallery/GalleryDialogs';
 import { WinUI3ColorPickerModal, type ColorTarget } from '../components/WinUI3ColorPickerModal';
 
@@ -172,10 +172,7 @@ const NoteContextMenu: React.FC<NoteContextMenuProps> = ({ x, y, isPinned, onAct
     <motion.div
       ref={menuRef}
       role="menu"
-            initial={{ scaleY: 0 }}
-            animate={{ scaleY: 1 }}
-            exit={{ scaleY: 0 }}
-            transition={{ duration: 0.11, ease: 'linear' }}
+      {...contextMenuMotionProps}
       onContextMenu={(e) => e.preventDefault()}
       onMouseDown={(e) => e.stopPropagation()}
       className={`fixed z-[2147483647] w-[220px] ${flyoutPanelClassName} fluent-context-menu`}
