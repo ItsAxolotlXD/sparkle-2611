@@ -348,10 +348,6 @@ const SidebarContextMenuOverlay: React.FC<SidebarContextMenuOverlayProps> = ({
     };
   }, [onClose]);
 
-  const menuHeight = menuRef.current?.getBoundingClientRect().height || 390;
-  const clipOriginY = Math.min(100, Math.max(0, ((y - position.top) / menuHeight) * 100));
-  const closedClipPath = `inset(0% 0% ${100 - clipOriginY}% 0% round 8px)`;
-
   return createPortal(
     <motion.div
       ref={menuRef}
@@ -374,11 +370,11 @@ const SidebarContextMenuOverlay: React.FC<SidebarContextMenuOverlayProps> = ({
       <motion.div
         role="menu"
         aria-label="Sidebar actions"
-        initial={{ opacity: 0, y: -16, clipPath: closedClipPath }}
-        animate={{ opacity: 1, y: 0, clipPath: 'inset(0% 0% 0% 0% round 8px)' }}
-        exit={{ opacity: 0, y: -8, clipPath: closedClipPath }}
+        initial={{ opacity: 0, y: -16 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -8 }}
         transition={{ duration: 0.18, ease: [0, 0, 0, 1] }}
-        style={{ ...flyoutPanelStyle, transformOrigin: `${x - position.left}px ${y - position.top}px` }}
+        style={flyoutPanelStyle}
         className={`w-[232px] p-1.5 ${flyoutPanelClassName} fluent-context-menu`}
       >
         <div className="w-full flex flex-col space-y-0.5">
