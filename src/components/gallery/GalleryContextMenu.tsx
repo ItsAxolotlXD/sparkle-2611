@@ -121,15 +121,14 @@ export const GalleryContextMenu: React.FC<GalleryContextMenuProps> = ({ x, y, is
   };
 
   return createPortal(
-    <motion.div
+    <div
       ref={menuRef}
-      {...contextMenuMotionProps}
       style={{
         position: 'fixed',
         left: position.left,
         top: position.top,
         zIndex: 2147483647,
-        transformOrigin: `${x - position.left}px ${y - position.top}px`,
+        overflow: 'clip',
       }}
       className="fluent-context-menu-wrapper pointer-events-auto"
       onContextMenu={(e) => {
@@ -139,19 +138,21 @@ export const GalleryContextMenu: React.FC<GalleryContextMenuProps> = ({ x, y, is
       onMouseDown={(e) => e.stopPropagation()}
       onClick={(e) => e.stopPropagation()}
     >
-      <div
-        role="menu"
-        aria-label="File actions"
-        style={flyoutPanelStyle}
-        className={`w-[232px] p-1.5 ${flyoutPanelClassName} fluent-context-menu`}
-      >
-        <div className="w-full flex flex-col space-y-0.5">
-          {primary.map((entry) => renderEntry(entry))}
-          <div className="h-px bg-black/10 dark:bg-white/10 my-1 mx-1" />
-          {secondary.map((entry) => renderEntry(entry))}
+      <motion.div {...contextMenuMotionProps}>
+        <div
+          role="menu"
+          aria-label="File actions"
+          style={flyoutPanelStyle}
+          className={`w-[232px] p-1.5 ${flyoutPanelClassName} fluent-context-menu shadow-none`}
+        >
+          <div className="w-full flex flex-col space-y-0.5">
+            {primary.map((entry) => renderEntry(entry))}
+            <div className="h-px bg-black/10 dark:bg-white/10 my-1 mx-1" />
+            {secondary.map((entry) => renderEntry(entry))}
+          </div>
         </div>
-      </div>
-    </motion.div>,
+      </motion.div>
+    </div>,
     document.body
   );
 };

@@ -46,6 +46,7 @@ export interface SystemSettings {
   triangleExperiment: boolean;
   triangleExperimentVersion?: number;
   tabbedSparkle: boolean;
+  windowsMode: boolean;
   refreshedSearchIcon: boolean;
   newWatchTab: boolean;
   fluentIcons: boolean;
@@ -106,6 +107,7 @@ export const DEFAULT_SETTINGS: SystemSettings = {
   triangleExperiment: true,
   triangleExperimentVersion: 1,
   tabbedSparkle: false,
+  windowsMode: false,
   refreshedSearchIcon: false,
   newWatchTab: false,
   fluentIcons: false,
@@ -134,6 +136,7 @@ export const getStoredSettings = (): SystemSettings => {
     if (saved) {
       const parsed = JSON.parse(saved);
       const isTabbedSparkle = typeof parsed.tabbedSparkle === 'boolean' ? parsed.tabbedSparkle : false;
+      const isWindowsMode = typeof parsed.windowsMode === 'boolean' ? parsed.windowsMode : false;
       let fontScale = typeof parsed.fontScale === 'number' ? parsed.fontScale : DEFAULT_SETTINGS.fontScale;
       // Auto-migrate from old 4-item scheme if needed
       if (parsed.fontScaleVersion !== 2) {
@@ -206,6 +209,7 @@ export const getStoredSettings = (): SystemSettings => {
           : true,
         triangleExperimentVersion: 1,
         tabbedSparkle: isTabbedSparkle,
+        windowsMode: isWindowsMode,
         newWatchTab: typeof parsed.newWatchTab === 'boolean' ? parsed.newWatchTab : DEFAULT_SETTINGS.newWatchTab,
         fluentIcons: typeof parsed.fluentIcons === 'boolean' ? parsed.fluentIcons : DEFAULT_SETTINGS.fluentIcons,
         dynamicSidebarIcons: typeof parsed.dynamicSidebarIcons === 'boolean' ? parsed.dynamicSidebarIcons : true,
@@ -239,6 +243,15 @@ export const applySystemSettings = (settings: SystemSettings) => {
     document.documentElement.classList.add('triangle-experiment-active');
   } else {
     document.documentElement.classList.remove('triangle-experiment-active');
+  }
+
+  // Windows Mode (Velocity Feature)
+  if (settings.windowsMode) {
+    document.documentElement.classList.add('windows-mode');
+    document.body?.classList.add('windows-mode');
+  } else {
+    document.documentElement.classList.remove('windows-mode');
+    document.body?.classList.remove('windows-mode');
   }
 
   // App Theme Mode (Ban ngày / Ban đêm - Ban đêm là mặc định)

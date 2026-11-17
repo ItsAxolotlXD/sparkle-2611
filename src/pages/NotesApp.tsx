@@ -169,43 +169,50 @@ const NoteContextMenu: React.FC<NoteContextMenuProps> = ({ x, y, isPinned, onAct
   ];
 
   return createPortal(
-    <motion.div
+    <div
       ref={menuRef}
-      role="menu"
-      {...contextMenuMotionProps}
-      onContextMenu={(e) => e.preventDefault()}
-      onMouseDown={(e) => e.stopPropagation()}
-      className={`fixed z-[2147483647] w-[220px] ${flyoutPanelClassName} fluent-context-menu`}
       style={{
-        ...flyoutPanelStyle,
+        position: 'fixed',
         left: position.left,
         top: position.top,
-        transformOrigin: `${x - position.left}px ${y - position.top}px`,
+        zIndex: 2147483647,
+        overflow: 'clip',
       }}
+      className="fluent-context-menu-wrapper pointer-events-auto"
+      onContextMenu={(e) => e.preventDefault()}
+      onMouseDown={(e) => e.stopPropagation()}
     >
-      {items.map((item) => {
-        const Icon = item.icon;
-        return (
-          <button
-            key={item.action}
-            type="button"
-            role="menuitem"
-            onMouseDown={(e) => e.stopPropagation()}
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              onAction(item.action);
-            }}
-            className={`w-full h-[36px] px-3 rounded-[6px] flex items-center gap-3 text-[13px] font-medium text-left outline-none transition-colors cursor-pointer hover:bg-black/[0.05] dark:hover:bg-white/[0.08] ${
-              item.danger ? 'text-[#c42b1c] dark:text-[#ff99a4]' : 'text-[#111827] dark:text-white'
-            }`}
-          >
-            <Icon className={`w-4 h-4 shrink-0 ${item.danger ? 'text-black dark:text-[#ff99a4]' : 'text-black dark:text-neutral-300'}`} />
-            <span className="truncate">{item.label}</span>
-          </button>
-        );
-      })}
-    </motion.div>,
+      <motion.div {...contextMenuMotionProps}>
+        <div
+          role="menu"
+          className={`w-[220px] ${flyoutPanelClassName} fluent-context-menu shadow-none`}
+          style={flyoutPanelStyle}
+        >
+          {items.map((item) => {
+            const Icon = item.icon;
+            return (
+              <button
+                key={item.action}
+                type="button"
+                role="menuitem"
+                onMouseDown={(e) => e.stopPropagation()}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  onAction(item.action);
+                }}
+                className={`w-full h-[36px] px-3 rounded-[6px] flex items-center gap-3 text-[13px] font-medium text-left outline-none transition-colors cursor-pointer hover:bg-black/[0.05] dark:hover:bg-white/[0.08] ${
+                  item.danger ? 'text-[#c42b1c] dark:text-[#ff99a4]' : 'text-[#111827] dark:text-white'
+                }`}
+              >
+                <Icon className={`w-4 h-4 shrink-0 ${item.danger ? 'text-black dark:text-[#ff99a4]' : 'text-black dark:text-neutral-300'}`} />
+                <span className="truncate">{item.label}</span>
+              </button>
+            );
+          })}
+        </div>
+      </motion.div>
+    </div>,
     document.body
   );
 };

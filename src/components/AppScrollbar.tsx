@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { ChevronUp, ChevronDown } from 'lucide-react';
+import { useSettings } from '../hooks/useSettings';
 
 interface AppScrollbarProps {
   currentRoute: string;
@@ -12,6 +13,7 @@ export const AppScrollbar: React.FC<AppScrollbarProps> = ({
   isGalleryViewerOpen = false,
   isTopBarVisible = true,
 }) => {
+  const { settings } = useSettings();
   const [scrollProgress, setScrollProgress] = useState(0); // 0 to 1
   const [isScrollable, setIsScrollable] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
@@ -227,8 +229,8 @@ export const AppScrollbar: React.FC<AppScrollbarProps> = ({
   const usableTrack = Math.max(0, trackHeight - thumbHeight);
   const thumbTop = scrollProgress * usableTrack;
 
-  // If lightbox is open in Gallery or page has no scroll, don't show
-  if (isGalleryViewerOpen || !isScrollable) {
+  // If lightbox is open in Gallery, Windows Mode is active, or page has no scroll, don't show
+  if (settings.windowsMode || isGalleryViewerOpen || !isScrollable) {
     return null;
   }
 

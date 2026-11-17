@@ -117,27 +117,34 @@ export const WatchChannelContextMenu: React.FC<WatchChannelContextMenuProps> = (
   };
 
   return createPortal(
-    <motion.div
+    <div
       ref={menuRef}
-      role="menu"
-      {...contextMenuMotionProps}
-      onContextMenu={(e) => e.preventDefault()}
-      className={`fixed z-[2147483647] w-[232px] ${flyoutPanelClassName} fluent-context-menu`}
       style={{
-        ...flyoutPanelStyle,
+        position: 'fixed',
         left: position.left,
         top: position.top,
-        transformOrigin: `${x - position.left}px ${y - position.top}px`,
+        zIndex: 2147483647,
+        overflow: 'clip',
       }}
+      className="fluent-context-menu-wrapper pointer-events-auto"
+      onContextMenu={(e) => e.preventDefault()}
     >
-      {actions.map(renderEntry)}
+      <motion.div {...contextMenuMotionProps}>
+        <div
+          role="menu"
+          className={`w-[232px] ${flyoutPanelClassName} fluent-context-menu shadow-none`}
+          style={flyoutPanelStyle}
+        >
+          {actions.map(renderEntry)}
 
-      <div role="separator" className="h-px bg-black/10 dark:bg-white/10 my-1 mx-1" />
+          <div role="separator" className="h-px bg-black/10 dark:bg-white/10 my-1 mx-1" />
 
-      <div className="w-full h-[32px] px-3 flex items-center text-[12px] text-[#6B7280] dark:text-[#9CA3AF] select-none italic cursor-default opacity-60">
-        More to come soon...
-      </div>
-    </motion.div>,
+          <div className="w-full h-[32px] px-3 flex items-center text-[12px] text-[#6B7280] dark:text-[#9CA3AF] select-none italic cursor-default opacity-60">
+            More to come soon...
+          </div>
+        </div>
+      </motion.div>
+    </div>,
     document.body
   );
 };

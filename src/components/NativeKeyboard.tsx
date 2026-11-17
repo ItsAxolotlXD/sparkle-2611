@@ -1571,20 +1571,25 @@ export const NativeKeyboard: React.FC = () => {
           createPortal(
             <AnimatePresence>
               {showSettingsMenu && (
-                <motion.div
-                  id="native-keyboard-settings-menu"
-                  role="menu"
-                  aria-label="Cài đặt bàn phím"
-                  {...contextMenuMotionProps}
-                  onContextMenu={(e) => e.preventDefault()}
-                  className={`fixed z-[2147483647] w-[236px] max-h-[calc(100vh-80px)] overflow-y-auto ${flyoutPanelClassName} fluent-context-menu select-none`}
+                <div
                   style={{
-                    ...flyoutPanelStyle,
+                    position: 'fixed',
                     left: `${settingsMenuPos.left}px`,
                     top: `${settingsMenuPos.top}px`,
-                    transformOrigin: 'top left',
+                    zIndex: 2147483647,
+                    overflow: 'clip',
                   }}
+                  className="fluent-context-menu-wrapper pointer-events-auto"
                 >
+                  <motion.div {...contextMenuMotionProps}>
+                    <div
+                      id="native-keyboard-settings-menu"
+                      role="menu"
+                      aria-label="Cài đặt bàn phím"
+                      onContextMenu={(e) => e.preventDefault()}
+                      className={`w-[236px] max-h-[calc(100vh-80px)] overflow-y-auto ${flyoutPanelClassName} fluent-context-menu shadow-none select-none`}
+                      style={flyoutPanelStyle}
+                    >
                   {/* Header */}
                   <div className="px-3 py-1.5 text-[11px] font-semibold text-[#6b7280] dark:text-[#9ca3af] uppercase tracking-wider flex items-center justify-between"
                   >
@@ -1707,8 +1712,10 @@ export const NativeKeyboard: React.FC = () => {
                         </motion.button>
                       );
                     })}
-                  </div>
-                </motion.div>
+                    </div>
+                    </div>
+                  </motion.div>
+                </div>
               )}
             </AnimatePresence>,
             document.body

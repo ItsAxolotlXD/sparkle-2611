@@ -52,6 +52,7 @@ export interface AppTab {
   route: string;
   routeState?: any;
   channelId?: string;
+  history?: string[];
 }
 
 interface SparkleTabBarProps {
@@ -151,15 +152,14 @@ const TabContextMenu: React.FC<TabContextMenuProps> = ({
   if (typeof document === 'undefined') return null;
 
   return createPortal(
-    <motion.div
+    <div
       ref={menuRef}
-      {...contextMenuMotionProps}
       style={{
         position: 'fixed',
         left: position.left,
         top: position.top,
         zIndex: 2147483647,
-        transformOrigin: `${x - position.left}px ${y - position.top}px`,
+        overflow: 'clip',
       }}
       className="fluent-context-menu-wrapper pointer-events-auto"
       onContextMenu={(e) => {
@@ -169,12 +169,13 @@ const TabContextMenu: React.FC<TabContextMenuProps> = ({
       onMouseDown={(e) => e.stopPropagation()}
       onClick={(e) => e.stopPropagation()}
     >
-      <div
-        role="menu"
-        aria-label="Tab actions"
-        style={flyoutPanelStyle}
-        className={`w-[190px] p-1 ${flyoutPanelClassName} fluent-context-menu`}
-      >
+      <motion.div {...contextMenuMotionProps}>
+        <div
+          role="menu"
+          aria-label="Tab actions"
+          style={flyoutPanelStyle}
+          className={`w-[190px] p-1 ${flyoutPanelClassName} fluent-context-menu shadow-none`}
+        >
         <div className="w-full flex flex-col">
           <button
             type="button"
@@ -230,86 +231,116 @@ const TabContextMenu: React.FC<TabContextMenuProps> = ({
             </>
           )}
         </div>
-      </div>
-    </motion.div>,
+        </div>
+      </motion.div>
+    </div>,
     document.body
   );
 };
 
 // Renders the exact same icons as on the sidebar
-const TabIcon: React.FC<{ route: string; active: boolean; dynamicIcons: boolean }> = ({
+export const TabIcon: React.FC<{ route: string; active?: boolean; dynamicIcons?: boolean; className?: string }> = ({
   route,
   dynamicIcons,
+  className = 'w-4 h-4 shrink-0',
 }) => {
-  const iconClass = 'w-4 h-4 shrink-0';
+  const { settings } = useSettings();
+  const isDynamicIcons = Boolean(settings.dynamicSidebarIcons);
+  const isFluentIcons = Boolean(settings.fluentIcons);
+  const useFluent3DForContent =
+    dynamicIcons !== undefined ? dynamicIcons : (isDynamicIcons || isFluentIcons);
+  const useFluent3DForSystem =
+    dynamicIcons !== undefined ? false : (!isDynamicIcons && isFluentIcons);
+
+  const iconClass = className;
 
   if (route === '/' || route === '/home' || route === '/home-preview') {
-    return <FluentHomeIcon className={`${iconClass} text-black dark:text-white`} />;
+    return useFluent3DForSystem ? (
+      <Fluent3DHomeIcon className={iconClass} />
+    ) : (
+      <FluentHomeIcon className={`${iconClass} text-black dark:text-white`} />
+    );
   }
   if (route.startsWith('/news') || route.startsWith('/article') || route.startsWith('/updates')) {
     return <FluentNewsIcon className={`${iconClass} text-black dark:text-white`} />;
   }
   if (route.startsWith('/live-tv') || route.startsWith('/watch')) {
-    return dynamicIcons ? (
+    return useFluent3DForContent ? (
       <Fluent3DWatchPreviewIcon className={iconClass} />
     ) : (
       <FluentWatchIcon className={`${iconClass} text-black dark:text-white`} />
     );
   }
   if (route.startsWith('/gallery')) {
-    return dynamicIcons ? (
+    return useFluent3DForContent ? (
       <Fluent3DGalleryIcon className={iconClass} />
     ) : (
       <FluentGalleryIcon className={`${iconClass} text-black dark:text-white`} />
     );
   }
-  if (route.startsWith('/notes') || route.startsWith('/write')) {
-    return dynamicIcons ? (
+  if (route.startsWith('/draws')) {
+    return useFluent3DForContent ? (
+      <FluentInkCanvasIcon className={`fluent-3d-icon ${iconClass} shrink-0`} />
+    ) : (
+      <FluentInkCanvasIcon className={`${iconClass} text-black dark:text-white`} />
+    );
+  }
+  if (route.startsWith('/notes') || route.startsWith('/write') || route.startsWith('/present') || route.startsWith('/table')) {
+    return useFluent3DForContent ? (
       <Fluent3DNotesIcon className={iconClass} />
     ) : (
       <FluentNotesIcon className={`${iconClass} text-black dark:text-white`} />
     );
   }
-  if (route.startsWith('/draws')) {
-    return dynamicIcons ? (
-      <Fluent3DDrawsIcon className={iconClass} />
+  if (route.startsWith('/vlc') || route.startsWith('/screenbox') || route.startsWith('/screenbug')) {
+    return useFluent3DForContent ? (
+      <Fluent3DVlcIcon className={iconClass} />
     ) : (
-      <FluentInkCanvasIcon className={`${iconClass} text-black dark:text-white`} />
+      <FluentVlcIcon
+        white={settings.theme !== 'light'}
+        className={`${iconClass} ${settings.theme === 'light' ? 'text-black' : 'text-white'}`}
+      />
     );
   }
   if (route.startsWith('/camera')) {
-    return dynamicIcons ? (
+    return useFluent3DForContent ? (
       <Fluent3DCameraIcon className={iconClass} />
     ) : (
       <FluentCameraIcon className={`${iconClass} text-black dark:text-white`} />
     );
   }
-  if (route.startsWith('/vlc') || route.startsWith('/screenbox')) {
-    return dynamicIcons ? (
-      <Fluent3DVlcIcon className={iconClass} />
-    ) : (
-      <FluentVlcIcon className={`${iconClass} text-black dark:text-white`} />
-    );
-  }
   if (route.startsWith('/craftmine')) {
-    return dynamicIcons ? (
+    return useFluent3DForContent ? (
       <Fluent3DCraftmineIcon className={iconClass} />
     ) : (
       <FluentCraftmineIcon className={`${iconClass} text-black dark:text-white`} />
     );
   }
   if (route.startsWith('/photopea')) {
-    return dynamicIcons ? (
+    return useFluent3DForContent ? (
       <Fluent3DPhotopeaIcon className={iconClass} />
     ) : (
       <FluentPhotopeaIcon className={`${iconClass} text-black dark:text-white`} />
     );
   }
+  if (route.startsWith('/winui-3')) {
+    return (
+      <img
+        src="https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8e/WinUI.svg/120px-WinUI.svg.png?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=thumbnail&_=20241127184612"
+        alt="WinUI 3"
+        className={`${iconClass} shrink-0 object-contain winui-sidebar-icon`}
+      />
+    );
+  }
   if (route.startsWith('/settings')) {
-    return <FluentSettingsIcon className={`${iconClass} text-black dark:text-white`} />;
+    return useFluent3DForSystem ? (
+      <Fluent3DSettingsIcon className={iconClass} />
+    ) : (
+      <FluentSettingsIcon className={`${iconClass} text-[#111827] dark:text-white`} />
+    );
   }
   if (route.startsWith('/feedback')) {
-    return <FluentPersonFeedbackIcon className={`${iconClass} text-black dark:text-white`} />;
+    return <FluentPersonFeedbackIcon className={`${iconClass} text-[#111827] dark:text-white`} />;
   }
   if (route.startsWith('/search')) {
     return <FluentSearchIcon className={`${iconClass} text-black dark:text-white`} />;
@@ -319,7 +350,11 @@ const TabIcon: React.FC<{ route: string; active: boolean; dynamicIcons: boolean 
   }
 
   // Fallback
-  return <FluentHomeIcon className={`${iconClass} text-black dark:text-white`} />;
+  return useFluent3DForSystem ? (
+    <Fluent3DHomeIcon className={iconClass} />
+  ) : (
+    <FluentHomeIcon className={`${iconClass} text-black dark:text-white`} />
+  );
 };
 
 export const SparkleTabBar: React.FC<SparkleTabBarProps> = ({
@@ -692,43 +727,45 @@ export const SparkleTabBar: React.FC<SparkleTabBarProps> = ({
         </button>
         <AnimatePresence>
           {isOverflowOpen && (
-            <motion.div
-              role="menu"
-              {...contextMenuMotionProps}
-              style={{ ...flyoutPanelStyle, transformOrigin: 'top right' }}
-              className={`absolute right-0 top-full mt-1.5 w-[190px] p-1 z-50 ${flyoutPanelClassName} fluent-context-menu`}
-            >
-              <button
-                type="button"
-                role="menuitem"
-                onClick={() => { setIsOverflowOpen(false); onCreateTab(); }}
-                className="w-full h-8 px-2.5 rounded-[5px] flex items-center gap-2 text-[12px] text-[#111827] dark:text-white hover:bg-black/5 dark:hover:bg-white/10 border-none cursor-pointer text-left"
+            <div className="absolute right-0 top-full mt-1.5 z-50 overflow-clip">
+              <motion.div
+                role="menu"
+                {...contextMenuMotionProps}
+                style={flyoutPanelStyle}
+                className={`w-[190px] p-1 ${flyoutPanelClassName} fluent-context-menu shadow-none`}
               >
-                <Plus className="w-3.5 h-3.5 text-neutral-400" />
-                <span>New tab</span>
-              </button>
-              <button
-                type="button"
-                role="menuitem"
-                onClick={toggleGroupingMode}
-                className="w-full h-8 px-2.5 rounded-[5px] flex items-center gap-2 text-[12px] text-[#111827] dark:text-white hover:bg-black/5 dark:hover:bg-white/10 border-none cursor-pointer text-left"
-              >
-                <Hand className="w-3.5 h-3.5 text-neutral-400" />
-                <span>{isGrouping ? 'Cancel group tabs' : 'Group tabs'}</span>
-              </button>
-              {isGrouping && (
-                <div className="mt-1 border-t border-black/10 dark:border-white/10 pt-2 px-2 pb-1 space-y-2">
-                  <p className="text-[11px] text-neutral-500 dark:text-neutral-400">Select 2 tabs</p>
-                  <input value={groupName} onChange={(event) => setGroupName(event.target.value)} aria-label="Group name" className="w-full h-7 px-2 rounded border border-black/10 dark:border-white/10 bg-transparent text-[11px] text-black dark:text-white outline-none" />
-                  <div className="flex items-center gap-1.5">
-                    {['#8b5cf6', '#3b82f6', '#10b981', '#f59e0b', '#ef4444'].map((color) => (
-                      <button key={color} type="button" aria-label={`Use ${color} group color`} onClick={() => setGroupColor(color)} className={`w-4 h-4 rounded-full border-2 ${groupColor === color ? 'border-black dark:border-white' : 'border-transparent'}`} style={{ backgroundColor: color }} />
-                    ))}
+                <button
+                  type="button"
+                  role="menuitem"
+                  onClick={() => { setIsOverflowOpen(false); onCreateTab(); }}
+                  className="w-full h-8 px-2.5 rounded-[5px] flex items-center gap-2 text-[12px] text-[#111827] dark:text-white hover:bg-black/5 dark:hover:bg-white/10 border-none cursor-pointer text-left"
+                >
+                  <Plus className="w-3.5 h-3.5 text-neutral-400" />
+                  <span>New tab</span>
+                </button>
+                <button
+                  type="button"
+                  role="menuitem"
+                  onClick={toggleGroupingMode}
+                  className="w-full h-8 px-2.5 rounded-[5px] flex items-center gap-2 text-[12px] text-[#111827] dark:text-white hover:bg-black/5 dark:hover:bg-white/10 border-none cursor-pointer text-left"
+                >
+                  <Hand className="w-3.5 h-3.5 text-neutral-400" />
+                  <span>{isGrouping ? 'Cancel group tabs' : 'Group tabs'}</span>
+                </button>
+                {isGrouping && (
+                  <div className="mt-1 border-t border-black/10 dark:border-white/10 pt-2 px-2 pb-1 space-y-2">
+                    <p className="text-[11px] text-neutral-500 dark:text-neutral-400">Select 2 tabs</p>
+                    <input value={groupName} onChange={(event) => setGroupName(event.target.value)} aria-label="Group name" className="w-full h-7 px-2 rounded border border-black/10 dark:border-white/10 bg-transparent text-[11px] text-black dark:text-white outline-none" />
+                    <div className="flex items-center gap-1.5">
+                      {['#8b5cf6', '#3b82f6', '#10b981', '#f59e0b', '#ef4444'].map((color) => (
+                        <button key={color} type="button" aria-label={`Use ${color} group color`} onClick={() => setGroupColor(color)} className={`w-4 h-4 rounded-full border-2 ${groupColor === color ? 'border-black dark:border-white' : 'border-transparent'}`} style={{ backgroundColor: color }} />
+                      ))}
+                    </div>
+                    <button type="button" disabled={selectedTabIds.length < 2} onClick={createTabGroup} className="w-full h-7 rounded bg-violet-500 text-white text-[11px] disabled:opacity-40 disabled:cursor-not-allowed border-none cursor-pointer">Create group</button>
                   </div>
-                  <button type="button" disabled={selectedTabIds.length < 2} onClick={createTabGroup} className="w-full h-7 rounded bg-violet-500 text-white text-[11px] disabled:opacity-40 disabled:cursor-not-allowed border-none cursor-pointer">Create group</button>
-                </div>
-              )}
-            </motion.div>
+                )}
+              </motion.div>
+            </div>
           )}
         </AnimatePresence>
       </div>

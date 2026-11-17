@@ -269,6 +269,7 @@ interface SidebarContextMenuOverlayProps {
   onNavigateSettings: () => void;
   onGoBack: () => void;
   onClose: () => void;
+  isWindowsMode?: boolean;
 }
 
 const SidebarContextMenuOverlay: React.FC<SidebarContextMenuOverlayProps> = ({
@@ -285,6 +286,7 @@ const SidebarContextMenuOverlay: React.FC<SidebarContextMenuOverlayProps> = ({
   onNavigateSettings,
   onGoBack,
   onClose,
+  isWindowsMode = false,
 }) => {
   const menuRef = useRef<HTMLDivElement>(null);
   const [position, setPosition] = useState(() => {
@@ -349,15 +351,14 @@ const SidebarContextMenuOverlay: React.FC<SidebarContextMenuOverlayProps> = ({
   }, [onClose]);
 
   return createPortal(
-    <motion.div
+    <div
       ref={menuRef}
-      {...contextMenuMotionProps}
       style={{
         position: 'fixed',
         left: position.left,
         top: position.top,
         zIndex: 2147483647,
-        transformOrigin: `${x - position.left}px ${y - position.top}px`,
+        overflow: 'clip',
       }}
       className="fluent-context-menu-wrapper pointer-events-auto"
       onContextMenu={(e) => {
@@ -367,12 +368,13 @@ const SidebarContextMenuOverlay: React.FC<SidebarContextMenuOverlayProps> = ({
       onMouseDown={(e) => e.stopPropagation()}
       onClick={(e) => e.stopPropagation()}
     >
-      <div
-        role="menu"
-        aria-label="Sidebar actions"
-        style={flyoutPanelStyle}
-        className={`w-[232px] p-1.5 ${flyoutPanelClassName} fluent-context-menu`}
-      >
+      <motion.div {...contextMenuMotionProps}>
+        <div
+          role="menu"
+          aria-label="Sidebar actions"
+          style={flyoutPanelStyle}
+          className={`w-[232px] p-1.5 ${flyoutPanelClassName} fluent-context-menu shadow-none`}
+        >
         <div className="w-full flex flex-col space-y-0.5">
           <button
             type="button"
@@ -403,15 +405,21 @@ const SidebarContextMenuOverlay: React.FC<SidebarContextMenuOverlayProps> = ({
           <button
             type="button"
             role="menuitem"
+            disabled={isWindowsMode}
             onClick={() => {
+              if (isWindowsMode) return;
               onClose();
               onToggleCollapse?.();
             }}
-            className="w-full h-[36px] px-3 rounded-[6px] flex items-center gap-3 text-[13px] font-medium text-left outline-none transition-colors cursor-pointer hover:bg-black/[0.05] dark:hover:bg-white/[0.08] focus-visible:bg-black/[0.05] dark:focus-visible:bg-white/[0.08] active:bg-black/[0.08] dark:active:bg-white/[0.12]"
+            className={`w-full h-[36px] px-3 rounded-[6px] flex items-center gap-3 text-[13px] font-medium text-left outline-none transition-colors ${
+              isWindowsMode
+                ? 'opacity-45 cursor-not-allowed'
+                : 'cursor-pointer hover:bg-black/[0.05] dark:hover:bg-white/[0.08] focus-visible:bg-black/[0.05] dark:focus-visible:bg-white/[0.08] active:bg-black/[0.08] dark:active:bg-white/[0.12]'
+            }`}
           >
             <PanelLeft className="w-4 h-4 shrink-0 text-black dark:text-neutral-300" />
             <span className="truncate flex-1">Collapse sidebar</span>
-            {isCollapsed && (
+            {(isCollapsed || isWindowsMode) && (
               <Check className="w-4 h-4 shrink-0 text-black dark:text-[#4cc2ff]" />
             )}
           </button>
@@ -419,15 +427,21 @@ const SidebarContextMenuOverlay: React.FC<SidebarContextMenuOverlayProps> = ({
           <button
             type="button"
             role="menuitem"
+            disabled={isWindowsMode}
             onClick={() => {
+              if (isWindowsMode) return;
               onClose();
               onToggleHoverToExpand();
             }}
-            className="w-full h-[36px] px-3 rounded-[6px] flex items-center gap-3 text-[13px] font-medium text-left outline-none transition-colors cursor-pointer hover:bg-black/[0.05] dark:hover:bg-white/[0.08] focus-visible:bg-black/[0.05] dark:focus-visible:bg-white/[0.08] active:bg-black/[0.08] dark:active:bg-white/[0.12]"
+            className={`w-full h-[36px] px-3 rounded-[6px] flex items-center gap-3 text-[13px] font-medium text-left outline-none transition-colors ${
+              isWindowsMode
+                ? 'opacity-45 cursor-not-allowed'
+                : 'cursor-pointer hover:bg-black/[0.05] dark:hover:bg-white/[0.08] focus-visible:bg-black/[0.05] dark:focus-visible:bg-white/[0.08] active:bg-black/[0.08] dark:active:bg-white/[0.12]'
+            }`}
           >
             <PanelsTopLeft className="w-4 h-4 shrink-0 text-black dark:text-neutral-300" />
             <span className="truncate flex-1">Hover to expand</span>
-            {hoverToExpand && (
+            {hoverToExpand && !isWindowsMode && (
               <Check className="w-4 h-4 shrink-0 text-black dark:text-[#4cc2ff]" />
             )}
           </button>
@@ -479,8 +493,9 @@ const SidebarContextMenuOverlay: React.FC<SidebarContextMenuOverlayProps> = ({
             <span className="truncate">Interface settings</span>
           </button>
         </div>
-      </div>
-    </motion.div>,
+        </div>
+      </motion.div>
+    </div>,
     document.body
   );
 };
@@ -701,10 +716,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
   // - sign in, settings, winui 3: icon thường
   const useFluent3DForContent = isDynamicIcons || isFluentIcons;
   const useFluent3DForSystem = !isDynamicIcons && isFluentIcons;
+  const isWindowsMode = Boolean(settings.windowsMode);
   const shouldAnimateSidebar = !settings.reduceAllMotion && settings.animateSidebar;
-  const isHoverToExpandActive = Boolean(settings.hoverToExpand && isCollapsed);
+  const isHoverToExpandActive = !isWindowsMode && Boolean(settings.hoverToExpand && isCollapsed);
   const isExpandedOnHover = isHovered || isToolsFlyoutOpen || isSignInFlyoutOpen || Boolean(sidebarContextMenu);
-  const effectiveCollapsed = isHoverToExpandActive
+  const effectiveCollapsed = isWindowsMode
+    ? true
+    : isHoverToExpandActive
     ? !isExpandedOnHover
     : (settings.autoHideSidebar ? !isHovered : isCollapsed);
 
@@ -1206,6 +1224,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             onNavigateSettings={() => navigate('/settings')}
             onGoBack={handleGoBack}
             onClose={() => setSidebarContextMenu(null)}
+            isWindowsMode={isWindowsMode}
           />
         )}
       </AnimatePresence>
@@ -1874,7 +1893,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     <>
       {renderSidebarContextMenu()}
       {/* 1. Desktop Persistent Sidebar */}
-      {settings.dockToSidebar && (
+      {(settings.dockToSidebar || isWindowsMode) && (
         <aside 
           id="waves-desktop-sidebar"
           onMouseEnter={() => setIsHovered(true)}
@@ -1884,7 +1903,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
           onTouchEnd={clearSidebarHold}
           onTouchMove={clearSidebarHold}
           onTouchCancel={clearSidebarHold}
-          className={`hidden md:flex flex-col h-screen bg-[#f3f3f3] dark:bg-[#1b1f24] text-[#111827] dark:text-white select-none shrink-0 fixed top-0 overflow-visible border-r border-[#e5e5e5] dark:border-[#2e2e2e] ${
+          className={`hidden md:flex flex-col ${
+            isWindowsMode ? 'h-[calc(100vh-48px)]' : 'h-screen'
+          } bg-[#f3f3f3] dark:bg-[#1b1f24] text-[#111827] dark:text-white select-none shrink-0 fixed top-0 overflow-visible border-r border-[#e5e5e5] dark:border-[#2e2e2e] ${
             settings.sidebarPosition === 'right' ? 'right-0 border-l' : 'left-0 border-r'
           } ${
             shouldAnimateSidebar ? 'transition-[width,box-shadow] duration-[160ms] ease-[cubic-bezier(0.34,1.45,0.64,1)]' : 'transition-none'
@@ -1931,14 +1952,19 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   <ArrowLeft className="w-5 h-5 stroke-[1.75] text-black dark:text-white" />
                 </button>
 
-                {/* Hamburger Button to Expand */}
+                {/* Hamburger Button to Expand (locked in Windows Mode) */}
                 <button 
                   id="btn-sidebar-expand-toggle"
                   type="button"
-                  onClick={onToggleCollapse} 
-                  onMouseEnter={(e) => showTooltip('Collapse or expand', e)}
+                  disabled={isWindowsMode}
+                  onClick={isWindowsMode ? undefined : onToggleCollapse} 
+                  onMouseEnter={(e) => showTooltip(isWindowsMode ? 'Expand disabled in Windows Mode' : 'Collapse or expand', e)}
                   onMouseLeave={hideTooltip}
-                  className="w-9 h-9 rounded-[6px] shrink-0 flex items-center justify-center text-black dark:text-white/90 hover:bg-black/5 dark:hover:bg-white/10 hover:text-black dark:hover:text-white cursor-pointer transition-colors"
+                  className={`w-9 h-9 rounded-[6px] shrink-0 flex items-center justify-center text-black dark:text-white/90 transition-colors ${
+                    isWindowsMode
+                      ? 'opacity-35 cursor-not-allowed'
+                      : 'hover:bg-black/5 dark:hover:bg-white/10 hover:text-black dark:hover:text-white cursor-pointer'
+                  }`}
                   aria-label="Collapse or expand"
                 >
                   <Menu className="w-5 h-5 stroke-[1.75] text-black dark:text-white" />

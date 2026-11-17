@@ -633,6 +633,15 @@ export const TopBar: React.FC<TopBarProps> = ({
         onSelect: () => navigate('/settings'),
       },
       {
+        id: 'flag-windows-mode',
+        title: 'Windows Mode (Velocity)',
+        subtitle: 'Velocity Feature',
+        keywords: 'windows mode windows 11 taskbar start menu floating window desktop wallpaper velocity',
+        type: 'setting-toggle',
+        settingKey: 'windowsMode',
+        onSelect: () => navigate('/settings'),
+      },
+      {
         id: 'flag-dock-sidebar',
         title: 'Dock to Sidebar',
         subtitle: 'System Setting',

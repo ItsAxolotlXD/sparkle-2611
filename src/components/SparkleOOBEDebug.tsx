@@ -135,7 +135,7 @@ export const SparkleOOBEDebug: React.FC<SparkleOOBEDebugProps> = ({
     <div
       className="fixed inset-0 z-[999999] flex flex-col items-center justify-start sm:justify-center p-2 sm:p-4 md:p-6 overflow-y-auto overflow-x-hidden"
       style={{
-        backgroundImage: "url('/assets/aistudio/pink-nature-landscape-with-vegetation-flora_8a81cb83.jpg')",
+        backgroundImage: "url('/assets/aistudio/image_9bd7238e.png')",
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat',

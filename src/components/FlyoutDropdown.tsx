@@ -20,16 +20,33 @@ export const flyoutPanelClassName =
   'bg-white/70 dark:bg-[#1c1c1c]/70 border border-black/10 dark:border-white/10 rounded-[10px] p-1.5 space-y-0.5 text-[#111827] dark:text-white select-none';
 
 export const flyoutPanelStyle: React.CSSProperties = {
-  backdropFilter: 'blur(32px) saturate(180%)',
-  WebkitBackdropFilter: 'blur(32px) saturate(180%)',
-  boxShadow: '0 16px 40px rgba(0,0,0,0.25), 0 2px 8px rgba(0,0,0,0.1)',
+  backdropFilter: 'blur(40px) saturate(180%)',
+  WebkitBackdropFilter: 'blur(40px) saturate(180%)',
+  boxShadow: 'none',
 };
 
 export const contextMenuMotionProps = {
-  initial: { scaleY: 0 },
-  animate: { scaleY: 1 },
-  exit: { opacity: 0, scaleY: 0, y: -8 },
-  transition: { duration: 0.18, ease: 'linear' as const },
+  initial: { y: '-100%' },
+  animate: {
+    y: '0%',
+    transition: { duration: 0.34, ease: [0.22, 1, 0.36, 1] as const },
+  },
+  exit: {
+    y: '-100%',
+    transition: { duration: 0.26, ease: [0.4, 0, 0.2, 1] as const },
+  },
+};
+
+export const contextMenuUpMotionProps = {
+  initial: { y: '100%' },
+  animate: {
+    y: '0%',
+    transition: { duration: 0.34, ease: [0.22, 1, 0.36, 1] as const },
+  },
+  exit: {
+    y: '100%',
+    transition: { duration: 0.26, ease: [0.4, 0, 0.2, 1] as const },
+  },
 };
 
 export function FlyoutDropdown<T extends string>({ value, options, onChange, ariaLabel, id }: FlyoutDropdownProps<T>) {

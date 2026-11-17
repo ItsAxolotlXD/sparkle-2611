@@ -17,12 +17,15 @@ import {
   ArrowLeft,
   Accessibility,
   Heart,
-  X
+  X,
+  Monitor,
+  AppWindow,
 } from 'lucide-react';
 import { SPINNING_RING_GIF_URL } from './SpinningRing';
 import { SparkleRecoveryModal } from './SparkleRecoveryModal';
 import { SparkleOOBEDebug } from './SparkleOOBEDebug';
 import { FluentSearchIcon } from './FluentIcons';
+import { updateMultipleSettings } from '../hooks/useSettings';
 
 interface SparkleOOBEProps {
   isOpen: boolean;
@@ -253,12 +256,13 @@ const NativeWinUIScrollArea: React.FC<NativeWinUIScrollAreaProps> = ({
 };
 
 // Steps:
-// 1: Choose app theme preferences (Light / Dark)
-// 2: Choose what you want to do (Install / Recover)
-// 3: Who is going to use Sparkle (Enter username)
-// 4: Applicable notices and license terms (Accept / Decline)
-// 5: Thank you for choosing Sparkle!
-export type OOBEStep = 1 | 2 | 3 | 4 | 5;
+// 1: Choose your preferred mode (App experience / Windows experience)
+// 2: Choose app theme preferences (Light / Dark)
+// 3: Choose what you want to do (Install / Recover)
+// 4: Who is going to use Sparkle (Enter username)
+// 5: Applicable notices and license terms (Accept / Decline)
+// 6: Thank you for choosing Sparkle!
+export type OOBEStep = 1 | 2 | 3 | 4 | 5 | 6;
 
 // Fluent 3D Hourglass Artwork for the 2-part "Just a moment" screen
 export const FluentHourglassArtwork: React.FC<{ className?: string }> = ({ className = 'w-[155px] h-[155px]' }) => {
@@ -455,7 +459,10 @@ export const SparkleOOBE: React.FC<SparkleOOBEProps> = ({
   const [isMuted, setIsMuted] = useState(false);
   const [isDebugPageOpen, setIsDebugPageOpen] = useState(false);
 
-  // Theme selection in Step 1 ("thêm bước Choose app theme prefereneces (Light/dark) ở đầu oobe")
+  // Step 1: Preferred mode selection (App experience / Windows experience)
+  const [selectedExperienceMode, setSelectedExperienceMode] = useState<'app' | 'windows'>('app');
+
+  // Step 2: Theme selection (Light / Dark)
   const [selectedTheme, setSelectedTheme] = useState<'dark' | 'light'>('dark');
 
   // Wizard Steps: 1 to 6
@@ -498,6 +505,7 @@ export const SparkleOOBE: React.FC<SparkleOOBEProps> = ({
   if (isOpen && !prevIsOpen) {
     setPrevIsOpen(true);
     setCurrentStep(1);
+    setSelectedExperienceMode('app');
     setIsStepTransitioning(false);
     setIsFinalLoading(false);
     setGreetingPhase('idle');
@@ -512,6 +520,7 @@ export const SparkleOOBE: React.FC<SparkleOOBEProps> = ({
   useEffect(() => {
     if (isOpen) {
       setCurrentStep(1);
+      setSelectedExperienceMode('app');
       setIsStepTransitioning(false);
       setIsFinalLoading(false);
       setGreetingPhase('idle');
@@ -573,25 +582,17 @@ export const SparkleOOBE: React.FC<SparkleOOBEProps> = ({
         setIsAlmostFading(true);
         greetingTimerRef.current = setTimeout(() => {
           setGreetingPhase('finished');
-          // Persist theme choice and completion
+          // Persist mode choice, theme choice, and completion
           try {
             localStorage.setItem('sparkle_oobe_completed', 'true');
             if (username.trim()) {
               localStorage.setItem('sparkle_username', username.trim());
             }
-            const currentSettingsStr = localStorage.getItem('waves_system_settings');
-            const parsed = currentSettingsStr ? JSON.parse(currentSettingsStr) : {};
-            parsed.theme = selectedTheme;
-            parsed.themeVersion = 2;
-            localStorage.setItem('waves_system_settings', JSON.stringify(parsed));
-
-            if (selectedTheme === 'light') {
-              document.documentElement.classList.add('light-mode');
-              document.documentElement.classList.remove('dark');
-            } else {
-              document.documentElement.classList.remove('light-mode');
-              document.documentElement.classList.add('dark');
-            }
+            updateMultipleSettings({
+              theme: selectedTheme,
+              themeVersion: 2,
+              windowsMode: selectedExperienceMode === 'windows',
+            });
           } catch {}
           onComplete();
         }, 1200); // 1.2s smooth fade out
@@ -601,7 +602,7 @@ export const SparkleOOBE: React.FC<SparkleOOBEProps> = ({
     return () => {
       if (greetingTimerRef.current) clearTimeout(greetingTimerRef.current);
     };
-  }, [greetingPhase, onComplete, username, selectedTheme]);
+  }, [greetingPhase, onComplete, username, selectedTheme, selectedExperienceMode]);
 
 
   // Time for bottom right tray
@@ -909,7 +910,7 @@ export const SparkleOOBE: React.FC<SparkleOOBEProps> = ({
     <div 
       className="fixed inset-0 z-[999999] flex flex-col items-center justify-start sm:justify-center p-2 sm:p-4 md:p-6 overflow-y-auto overflow-x-hidden"
       style={{
-        backgroundImage: "url('/assets/aistudio/pink-nature-landscape-with-vegetation-flora_8a81cb83.jpg')",
+        backgroundImage: "url('/assets/aistudio/image_9bd7238e.png')",
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat',
@@ -1000,10 +1001,57 @@ export const SparkleOOBE: React.FC<SparkleOOBEProps> = ({
                 <div className="absolute inset-0 bg-radial from-blue-500/10 via-transparent to-transparent pointer-events-none" />
 
                 <AnimatePresence mode="wait">
-                  {/* STEP 1: Theme preferences artwork (Sun & Moon 3D) */}
+                  {/* STEP 1: Preferred Mode artwork (App vs Windows experience) */}
                   {currentStep === 1 && (
                     <motion.div
-                      key="left-step1-theme"
+                      key="left-step1-mode"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 0.25, ease: 'easeInOut' }}
+                      className="flex flex-col items-center justify-center text-center select-none"
+                    >
+                      <svg viewBox="0 0 240 240" fill="none" className="w-[170px] h-[170px] drop-shadow-md">
+                        <defs>
+                          <linearGradient id="oobe_mode_screen" x1="30" y1="45" x2="210" y2="175" gradientUnits="userSpaceOnUse">
+                            <stop offset="0%" stopColor="#60cdff" />
+                            <stop offset="50%" stopColor="#0078d4" />
+                            <stop offset="100%" stopColor="#005a9e" />
+                          </linearGradient>
+                          <linearGradient id="oobe_mode_stand" x1="90" y1="175" x2="150" y2="205" gradientUnits="userSpaceOnUse">
+                            <stop offset="0%" stopColor="#cbd5e1" />
+                            <stop offset="100%" stopColor="#94a3b8" />
+                          </linearGradient>
+                        </defs>
+                        {/* Monitor Stand */}
+                        <rect x="106" y="172" width="28" height="22" rx="4" fill="url(#oobe_mode_stand)" />
+                        <rect x="82" y="192" width="76" height="8" rx="4" fill="#94a3b8" />
+                        {/* Monitor Bezel */}
+                        <rect x="28" y="46" width="184" height="128" rx="14" fill="#1e293b" />
+                        {/* Wallpaper Screen */}
+                        <rect x="36" y="54" width="168" height="112" rx="8" fill="url(#oobe_mode_screen)" />
+                        {/* Floating Window inside Screen */}
+                        <rect x="54" y="68" width="132" height="72" rx="7" fill="white" fillOpacity="0.95" />
+                        <rect x="54" y="68" width="132" height="14" rx="7" fill="#f1f5f9" />
+                        <circle cx="174" cy="75" r="2.5" fill="#ef4444" />
+                        <circle cx="165" cy="75" r="2.5" fill="#f59e0b" />
+                        <circle cx="156" cy="75" r="2.5" fill="#22c55e" />
+                        <rect x="64" y="92" width="46" height="8" rx="3" fill="#0078d4" fillOpacity="0.25" />
+                        <rect x="64" y="106" width="108" height="6" rx="3" fill="#cbd5e1" />
+                        <rect x="64" y="118" width="84" height="6" rx="3" fill="#e2e8f0" />
+                        {/* Taskbar */}
+                        <rect x="44" y="148" width="152" height="13" rx="6.5" fill="white" fillOpacity="0.88" />
+                        <rect x="108" y="151.5" width="7" height="7" rx="1.5" fill="#0078d4" />
+                        <rect x="119" y="151.5" width="7" height="7" rx="1.5" fill="#38bdf8" />
+                        <rect x="130" y="151.5" width="7" height="7" rx="1.5" fill="#6366f1" />
+                      </svg>
+                    </motion.div>
+                  )}
+
+                  {/* STEP 2: Theme preferences artwork (Sun & Moon 3D) */}
+                  {currentStep === 2 && (
+                    <motion.div
+                      key="left-step2-theme"
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       exit={{ opacity: 0 }}
@@ -1023,16 +1071,13 @@ export const SparkleOOBE: React.FC<SparkleOOBEProps> = ({
                             <stop offset="100%" stopColor="#312e81" />
                           </linearGradient>
                         </defs>
-                        {/* Sun sphere */}
                         <circle cx="95" cy="95" r="46" fill="url(#oobe_theme_sun)" />
-                        {/* Sun rays */}
                         <line x1="95" y1="32" x2="95" y2="16" stroke="#f59e0b" strokeWidth="5" strokeLinecap="round" />
                         <line x1="95" y1="158" x2="95" y2="174" stroke="#f59e0b" strokeWidth="5" strokeLinecap="round" />
                         <line x1="32" y1="95" x2="16" y2="95" stroke="#f59e0b" strokeWidth="5" strokeLinecap="round" />
                         <line x1="158" y1="95" x2="174" y2="95" stroke="#f59e0b" strokeWidth="5" strokeLinecap="round" />
                         <line x1="50" y1="50" x2="38" y2="38" stroke="#f59e0b" strokeWidth="5" strokeLinecap="round" />
                         <line x1="140" y1="140" x2="152" y2="152" stroke="#f59e0b" strokeWidth="5" strokeLinecap="round" />
-                        {/* Moon crescent */}
                         <path
                           d="M145 105C125 105 110 120 110 140C110 162 128 180 150 180C168 180 182 168 186 152C178 156 168 156 160 150C148 142 144 126 150 114C148 108 147 106 145 105Z"
                           fill="url(#oobe_theme_moon)"
@@ -1043,10 +1088,10 @@ export const SparkleOOBE: React.FC<SparkleOOBEProps> = ({
                     </motion.div>
                   )}
 
-                  {/* STEP 2: Setup Box & Recovery */}
-                  {currentStep === 2 && (
+                  {/* STEP 3: Setup Box & Recovery */}
+                  {currentStep === 3 && (
                     <motion.div
-                      key="left-step2-action"
+                      key="left-step3-action"
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       exit={{ opacity: 0 }}
@@ -1087,10 +1132,10 @@ export const SparkleOOBE: React.FC<SparkleOOBEProps> = ({
                     </motion.div>
                   )}
 
-                  {/* STEP 3: User Profile Avatar */}
-                  {currentStep === 3 && (
+                  {/* STEP 4: User Profile Avatar */}
+                  {currentStep === 4 && (
                     <motion.div
-                      key="left-step3-user"
+                      key="left-step4-user"
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       exit={{ opacity: 0 }}
@@ -1119,10 +1164,10 @@ export const SparkleOOBE: React.FC<SparkleOOBEProps> = ({
                     </motion.div>
                   )}
 
-                  {/* STEP 4: Legal terms */}
-                  {currentStep === 4 && (
+                  {/* STEP 5: Legal terms */}
+                  {currentStep === 5 && (
                     <motion.div
-                      key="left-step4-terms"
+                      key="left-step5-terms"
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       exit={{ opacity: 0 }}
@@ -1151,10 +1196,10 @@ export const SparkleOOBE: React.FC<SparkleOOBEProps> = ({
                     </motion.div>
                   )}
 
-                  {/* STEP 5: Thank you for choosing Sparkle! (Fluent 3 Hearts) */}
-                  {currentStep === 5 && (
+                  {/* STEP 6: Thank you for choosing Sparkle! (Fluent 3 Hearts) */}
+                  {currentStep === 6 && (
                     <motion.div
-                      key="left-step5-thankyou"
+                      key="left-step6-thankyou"
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       exit={{ opacity: 0 }}
@@ -1180,8 +1225,138 @@ export const SparkleOOBE: React.FC<SparkleOOBEProps> = ({
                   }}
                 >
                   <AnimatePresence mode="wait">
-                    {/* STEP 1: Choose app theme preferences */}
+                    {/* STEP 1: Choose your preferred mode */}
                     {currentStep === 1 && (
+                      <motion.div
+                        key="step-preferred-mode"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.25, ease: 'easeInOut' }}
+                        className="flex flex-col min-h-full justify-between min-h-0"
+                      >
+                        <div>
+                          <h1 className="text-[19px] sm:text-[21px] font-semibold text-[#111827] leading-tight">
+                            Choose your preferred mode
+                          </h1>
+                          <p className="text-[13px] sm:text-[14px] text-neutral-600 mt-1.5 leading-normal">
+                            Select how you would like to use Sparkle. You can switch between App and Windows experiences anytime in Settings.
+                          </p>
+
+                          <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            {/* App experience Card */}
+                            <div
+                              onClick={() => setSelectedExperienceMode('app')}
+                              className={`p-4 rounded-[15px] border transition-all cursor-pointer relative ${
+                                selectedExperienceMode === 'app'
+                                  ? 'border-[#0067b8] bg-[#0067b8]/[0.04] shadow-xs ring-2 ring-[#0067b8]/40'
+                                  : 'border-black/[0.09] bg-white/90 hover:bg-[#fbfbfb] hover:border-black/20 shadow-xs'
+                              }`}
+                            >
+                              <div className="flex items-center justify-between mb-3">
+                                <div className="flex items-center gap-2">
+                                  <AppWindow className="w-4 h-4 text-[#0067b8]" />
+                                  <span className="text-sm font-semibold text-neutral-900">App experience</span>
+                                </div>
+                                {selectedExperienceMode === 'app' && (
+                                  <div className="w-5 h-5 rounded-full bg-[#0067b8] flex items-center justify-center shrink-0">
+                                    <Check className="w-3.5 h-3.5 text-white" />
+                                  </div>
+                                )}
+                              </div>
+                              {/* Mini App layout preview */}
+                              <div className="h-20 rounded-[12px] bg-[#f1f5f9] border border-neutral-200 overflow-hidden flex flex-col">
+                                <div className="h-4 bg-white border-b border-neutral-200 px-2 flex items-center gap-1">
+                                  <div className="w-6 h-1.5 rounded-full bg-neutral-300" />
+                                  <div className="flex-1" />
+                                  <div className="w-10 h-2 rounded-full bg-neutral-200" />
+                                </div>
+                                <div className="flex-1 flex">
+                                  <div className="w-8 bg-white/80 border-r border-neutral-200 p-1.5 space-y-1">
+                                    <div className="w-full h-1.5 rounded-full bg-[#0067b8]/70" />
+                                    <div className="w-full h-1.5 rounded-full bg-neutral-300" />
+                                    <div className="w-full h-1.5 rounded-full bg-neutral-300" />
+                                  </div>
+                                  <div className="flex-1 p-2 space-y-1.5">
+                                    <div className="h-3 w-20 rounded bg-white border border-neutral-200/80" />
+                                    <div className="grid grid-cols-2 gap-1">
+                                      <div className="h-6 rounded bg-white border border-neutral-200/80" />
+                                      <div className="h-6 rounded bg-white border border-neutral-200/80" />
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                              <p className="text-[11.5px] text-neutral-500 mt-2.5">
+                                Classic sidebar &amp; top bar layout designed for focused streaming and reading.
+                              </p>
+                            </div>
+
+                            {/* Windows experience Card */}
+                            <div
+                              onClick={() => setSelectedExperienceMode('windows')}
+                              className={`p-4 rounded-[15px] border transition-all cursor-pointer relative ${
+                                selectedExperienceMode === 'windows'
+                                  ? 'border-[#0067b8] bg-[#0067b8]/[0.04] shadow-xs ring-2 ring-[#0067b8]/40'
+                                  : 'border-black/[0.09] bg-white/90 hover:bg-[#fbfbfb] hover:border-black/20 shadow-xs'
+                              }`}
+                            >
+                              <div className="flex items-center justify-between mb-3">
+                                <div className="flex items-center gap-2">
+                                  <Monitor className="w-4 h-4 text-[#0078d4]" />
+                                  <span className="text-sm font-semibold text-neutral-900">Windows experience</span>
+                                </div>
+                                {selectedExperienceMode === 'windows' && (
+                                  <div className="w-5 h-5 rounded-full bg-[#0067b8] flex items-center justify-center shrink-0">
+                                    <Check className="w-3.5 h-3.5 text-white" />
+                                  </div>
+                                )}
+                              </div>
+                              {/* Mini Windows 11 Desktop preview */}
+                              <div
+                                className="h-20 rounded-[12px] border border-neutral-300/80 overflow-hidden relative flex flex-col justify-between p-1.5 bg-cover bg-center"
+                                style={{ backgroundImage: "url('/assets/aistudio/image_9bd7238e.png')" }}
+                              >
+                                <div className="w-3/4 h-11 bg-white/95 rounded-[5px] shadow-sm border border-black/10 p-1 mx-auto mt-0.5">
+                                  <div className="flex items-center justify-between border-b border-neutral-200 pb-0.5">
+                                    <div className="w-6 h-1 rounded-full bg-neutral-400" />
+                                    <div className="flex gap-0.5">
+                                      <div className="w-1 h-1 rounded-full bg-neutral-300" />
+                                      <div className="w-1 h-1 rounded-full bg-rose-400" />
+                                    </div>
+                                  </div>
+                                  <div className="mt-1 space-y-1">
+                                    <div className="w-3/4 h-1 rounded-full bg-neutral-200" />
+                                    <div className="w-1/2 h-1 rounded-full bg-neutral-200" />
+                                  </div>
+                                </div>
+                                <div className="h-3.5 rounded-[4px] bg-white/85 backdrop-blur-sm border border-black/10 flex items-center justify-center gap-1 px-2">
+                                  <div className="w-2 h-2 rounded-[1px] bg-[#0078d4]" />
+                                  <div className="w-5 h-1.5 rounded-full bg-neutral-300" />
+                                  <div className="w-1.5 h-1.5 rounded-[1px] bg-sky-500" />
+                                  <div className="w-1.5 h-1.5 rounded-[1px] bg-indigo-500" />
+                                </div>
+                              </div>
+                              <p className="text-[11.5px] text-neutral-500 mt-2.5">
+                                Desktop wallpaper, Start menu, centered taskbar, and resizable windows.
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center justify-end gap-3 mt-6 pt-4 border-t border-neutral-200">
+                          <button
+                            type="button"
+                            onClick={() => advanceStep(2)}
+                            className="h-8 px-7 rounded-[7px] font-normal text-white bg-[#0067b8] hover:bg-[#1879c7] active:bg-[#005a9e] border border-black/10 border-b-[2px] border-b-black/30 shadow-[0_1px_2px_rgba(0,0,0,0.12),inset_0_1px_0_rgba(255,255,255,0.16)] active:shadow-none transition-all text-xs sm:text-[13px] flex items-center justify-center cursor-pointer select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0067b8]"
+                          >
+                            Next
+                          </button>
+                        </div>
+                      </motion.div>
+                    )}
+
+                    {/* STEP 2: Choose app theme preferences */}
+                    {currentStep === 2 && (
                       <motion.div
                         key="step-theme-preferences"
                         initial={{ opacity: 0 }}
@@ -1272,11 +1447,17 @@ export const SparkleOOBE: React.FC<SparkleOOBEProps> = ({
                           </div>
                         </div>
 
-                        <div className="flex items-center justify-end gap-3 mt-6 pt-4 border-t border-neutral-200">
-                          {/* WinUI 3 Primary Button */}
+                        <div className="flex items-center justify-between gap-3 mt-6 pt-4 border-t border-neutral-200">
                           <button
                             type="button"
-                            onClick={() => advanceStep(2)}
+                            onClick={() => advanceStep(1)}
+                            className="h-8 px-5 rounded-[7px] font-normal text-[#1b1b1b] bg-[#fbfbfb] hover:bg-[#f5f5f5] active:bg-[#eaeaea] border border-black/10 border-b-[2px] border-b-black/20 shadow-[0_1px_2px_rgba(0,0,0,0.05),inset_0_1px_0_rgba(255,255,255,0.8)] active:shadow-none transition-all text-xs sm:text-[13px] flex items-center justify-center cursor-pointer select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0067b8]"
+                          >
+                            Back
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => advanceStep(3)}
                             className="h-8 px-7 rounded-[7px] font-normal text-white bg-[#0067b8] hover:bg-[#1879c7] active:bg-[#005a9e] border border-black/10 border-b-[2px] border-b-black/30 shadow-[0_1px_2px_rgba(0,0,0,0.12),inset_0_1px_0_rgba(255,255,255,0.16)] active:shadow-none transition-all text-xs sm:text-[13px] flex items-center justify-center cursor-pointer select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0067b8]"
                           >
                             Next
@@ -1285,8 +1466,8 @@ export const SparkleOOBE: React.FC<SparkleOOBEProps> = ({
                       </motion.div>
                     )}
 
-                    {/* STEP 2: Choose what you want to do (Install / Recover) */}
-                    {currentStep === 2 && (
+                    {/* STEP 3: Choose what you want to do (Install / Recover) */}
+                    {currentStep === 3 && (
                       <motion.div
                         key="step-action-choice"
                         initial={{ opacity: 0 }}
@@ -1304,7 +1485,6 @@ export const SparkleOOBE: React.FC<SparkleOOBEProps> = ({
                           </p>
 
                           <div className="mt-6 space-y-3">
-                            {/* WinUI 3 Radio Card 1: Install Sparkle */}
                             <label
                               onClick={() => setSelectedAction('install')}
                               className={`block p-4 rounded-[15px] border transition-all cursor-pointer ${
@@ -1324,13 +1504,12 @@ export const SparkleOOBE: React.FC<SparkleOOBEProps> = ({
                                     Install Sparkle
                                   </div>
                                   <div className="text-xs text-neutral-500 mt-0.5 leading-normal">
-                                    Set up a fresh instance of Sparkle streaming & community experience on this device.
+                                    Set up a fresh instance of Sparkle streaming &amp; community experience on this device.
                                   </div>
                                 </div>
                               </div>
                             </label>
 
-                            {/* WinUI 3 Radio Card 2: Recover Sparkle */}
                             <label
                               onClick={() => setSelectedAction('recover')}
                               className={`block p-4 rounded-[15px] border transition-all cursor-pointer ${
@@ -1359,22 +1538,20 @@ export const SparkleOOBE: React.FC<SparkleOOBEProps> = ({
                         </div>
 
                         <div className="flex items-center justify-between gap-3 mt-6 pt-4 border-t border-neutral-200">
-                          {/* WinUI 3 Secondary Button */}
                           <button
                             type="button"
-                            onClick={() => advanceStep(1)}
+                            onClick={() => advanceStep(2)}
                             className="h-8 px-5 rounded-[7px] font-normal text-[#1b1b1b] bg-[#fbfbfb] hover:bg-[#f5f5f5] active:bg-[#eaeaea] border border-black/10 border-b-[2px] border-b-black/20 shadow-[0_1px_2px_rgba(0,0,0,0.05),inset_0_1px_0_rgba(255,255,255,0.8)] active:shadow-none transition-all text-xs sm:text-[13px] flex items-center justify-center cursor-pointer select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0067b8]"
                           >
                             Back
                           </button>
-                          {/* WinUI 3 Primary Button */}
                           <button
                             type="button"
                             onClick={() => {
                               if (selectedAction === 'recover') {
                                 setIsRecoveryModalOpen(true);
                               } else {
-                                advanceStep(3);
+                                advanceStep(4);
                               }
                             }}
                             className="h-8 px-7 rounded-[7px] font-normal text-white bg-[#0067b8] hover:bg-[#1879c7] active:bg-[#005a9e] border border-black/10 border-b-[2px] border-b-black/30 shadow-[0_1px_2px_rgba(0,0,0,0.12),inset_0_1px_0_rgba(255,255,255,0.16)] active:shadow-none transition-all text-xs sm:text-[13px] flex items-center justify-center cursor-pointer select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0067b8]"
@@ -1385,8 +1562,8 @@ export const SparkleOOBE: React.FC<SparkleOOBEProps> = ({
                       </motion.div>
                     )}
 
-                    {/* STEP 3: Who is going to use Sparkle (Username) */}
-                    {currentStep === 3 && (
+                    {/* STEP 4: Who is going to use Sparkle (Username) */}
+                    {currentStep === 4 && (
                       <motion.div
                         key="step-username"
                         initial={{ opacity: 0 }}
@@ -1407,7 +1584,6 @@ export const SparkleOOBE: React.FC<SparkleOOBEProps> = ({
                             <label className="text-xs font-semibold text-neutral-800 block mb-1.5">
                               User name
                             </label>
-                            {/* WinUI 3 Gallery TextBox */}
                             <div className="fluent-input-box relative w-full h-9 bg-black/5 hover:bg-black/[0.08] focus-within:bg-black/5 flex items-center px-3.5 rounded-[6px] transition-colors border-none backdrop-blur-[50px]">
                               <input
                                 type="text"
@@ -1428,18 +1604,16 @@ export const SparkleOOBE: React.FC<SparkleOOBEProps> = ({
                         </div>
 
                         <div className="flex items-center justify-between gap-3 mt-6 pt-4 border-t border-neutral-200">
-                          {/* WinUI 3 Secondary Button */}
                           <button
                             type="button"
-                            onClick={() => advanceStep(2)}
+                            onClick={() => advanceStep(3)}
                             className="h-8 px-5 rounded-[7px] font-normal text-[#1b1b1b] bg-[#fbfbfb] hover:bg-[#f5f5f5] active:bg-[#eaeaea] border border-black/10 border-b-[2px] border-b-black/20 shadow-[0_1px_2px_rgba(0,0,0,0.05),inset_0_1px_0_rgba(255,255,255,0.8)] active:shadow-none transition-all text-xs sm:text-[13px] flex items-center justify-center cursor-pointer select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0067b8]"
                           >
                             Back
                           </button>
-                          {/* WinUI 3 Primary Button */}
                           <button
                             type="button"
-                            onClick={() => advanceStep(4)}
+                            onClick={() => advanceStep(5)}
                             className="h-8 px-7 rounded-[7px] font-normal text-white bg-[#0067b8] hover:bg-[#1879c7] active:bg-[#005a9e] border border-black/10 border-b-[2px] border-b-black/30 shadow-[0_1px_2px_rgba(0,0,0,0.12),inset_0_1px_0_rgba(255,255,255,0.16)] active:shadow-none transition-all text-xs sm:text-[13px] flex items-center justify-center cursor-pointer select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0067b8]"
                           >
                             Next
@@ -1448,8 +1622,8 @@ export const SparkleOOBE: React.FC<SparkleOOBEProps> = ({
                       </motion.div>
                     )}
 
-                    {/* STEP 4: Applicable notices and license terms (Accept / Decline) */}
-                    {currentStep === 4 && (
+                    {/* STEP 5: Applicable notices and license terms (Accept / Decline) */}
+                    {currentStep === 5 && (
                       <motion.div
                         key="step-license-terms"
                         initial={{ opacity: 0 }}
@@ -1466,22 +1640,21 @@ export const SparkleOOBE: React.FC<SparkleOOBEProps> = ({
                             Please review the terms of service and license agreement before finishing setup.
                           </p>
 
-                          {/* Native WinUI custom scrollbar */}
                           <NativeWinUIScrollArea height={150} className="mt-4" contentClassName="p-3 text-xs text-neutral-700 space-y-3 leading-relaxed">
                             <div className="font-semibold text-neutral-900 text-[13px]">
                               SPARKLE COMMUNITY SOFTWARE LICENSE TERMS
                             </div>
                             <p>
-                              <strong>1. Overview.</strong> Sparkle is a community-driven entertainment, streaming, and productivity platform built with Microsoft Fluent & WinUI standards.
+                              <strong>1. Overview.</strong> Sparkle is a community-driven entertainment, streaming, and productivity platform built with Microsoft Fluent &amp; WinUI standards.
                             </p>
                             <p>
-                              <strong>2. Media & Streaming Feeds.</strong> Streaming channels and program schedules are delivered for cultural, educational, and community viewing purposes.
+                              <strong>2. Media &amp; Streaming Feeds.</strong> Streaming channels and program schedules are delivered for cultural, educational, and community viewing purposes.
                             </p>
                             <p>
                               <strong>3. Sandboxed Local Storage.</strong> Channel bookmarks, drawings, custom layouts, and sticky notes are maintained securely inside your browser local cache.
                             </p>
                             <p>
-                              <strong>4. Insider Program & Updates.</strong> Experimental updates and feature tests may roll out periodically to enhance performance and stability.
+                              <strong>4. Insider Program &amp; Updates.</strong> Experimental updates and feature tests may roll out periodically to enhance performance and stability.
                             </p>
                           </NativeWinUIScrollArea>
 
@@ -1493,16 +1666,14 @@ export const SparkleOOBE: React.FC<SparkleOOBEProps> = ({
                         </div>
 
                         <div className="flex items-center justify-between gap-3 mt-6 pt-4 border-t border-neutral-200">
-                          {/* WinUI 3 Secondary Button */}
                           <button
                             type="button"
-                            onClick={() => advanceStep(3)}
+                            onClick={() => advanceStep(4)}
                             className="h-8 px-5 rounded-[7px] font-normal text-[#1b1b1b] bg-[#fbfbfb] hover:bg-[#f5f5f5] active:bg-[#eaeaea] border border-black/10 border-b-[2px] border-b-black/20 shadow-[0_1px_2px_rgba(0,0,0,0.05),inset_0_1px_0_rgba(255,255,255,0.8)] active:shadow-none transition-all text-xs sm:text-[13px] flex items-center justify-center cursor-pointer select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0067b8]"
                           >
                             Back
                           </button>
                           <div className="flex items-center gap-2.5">
-                            {/* WinUI 3 Secondary Button */}
                             <button
                               type="button"
                               onClick={() => setTermsDeclinePrompt(true)}
@@ -1510,12 +1681,11 @@ export const SparkleOOBE: React.FC<SparkleOOBEProps> = ({
                             >
                               Decline
                             </button>
-                            {/* WinUI 3 Primary Button */}
                             <button
                               type="button"
                               onClick={() => {
                                 setTermsDeclinePrompt(false);
-                                advanceStep(5);
+                                advanceStep(6);
                               }}
                               className="h-8 px-7 rounded-[7px] font-normal text-white bg-[#0067b8] hover:bg-[#1879c7] active:bg-[#005a9e] border border-black/10 border-b-[2px] border-b-black/30 shadow-[0_1px_2px_rgba(0,0,0,0.12),inset_0_1px_0_rgba(255,255,255,0.16)] active:shadow-none transition-all text-xs sm:text-[13px] flex items-center justify-center cursor-pointer select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0067b8]"
                             >
@@ -1526,8 +1696,8 @@ export const SparkleOOBE: React.FC<SparkleOOBEProps> = ({
                       </motion.div>
                     )}
 
-                    {/* STEP 5: Thank you for choosing Sparkle! */}
-                    {currentStep === 5 && (
+                    {/* STEP 6: Thank you for choosing Sparkle! */}
+                    {currentStep === 6 && (
                       <motion.div
                         key="step-thank-you"
                         initial={{ opacity: 0 }}
@@ -1545,7 +1715,6 @@ export const SparkleOOBE: React.FC<SparkleOOBEProps> = ({
                           </p>
 
                           <div className="mt-5 space-y-3">
-                            {/* Summary Card: Profile & Theme */}
                             <div className="p-4 rounded-[12px] bg-black/[0.03] border border-black/[0.08] flex items-center justify-between">
                               <div className="flex items-center gap-3">
                                 <div className="w-9 h-9 rounded-full bg-[#0067b8]/10 text-[#0067b8] flex items-center justify-center font-semibold text-sm">
@@ -1559,13 +1728,12 @@ export const SparkleOOBE: React.FC<SparkleOOBEProps> = ({
                                     </span>
                                   </div>
                                   <div className="text-[11.5px] text-neutral-500 mt-0.5">
-                                    {selectedTheme === 'dark' ? 'Dark theme' : 'Light theme'} · Standard edition
+                                    {selectedTheme === 'dark' ? 'Dark theme' : 'Light theme'} · {selectedExperienceMode === 'windows' ? 'Windows experience' : 'App experience'}
                                   </div>
                                 </div>
                               </div>
                             </div>
 
-                            {/* Welcome Highlights Card */}
                             <div className="p-3.5 rounded-[12px] bg-[#0067b8]/[0.04] border border-[#0067b8]/20 flex items-start gap-3">
                               <div className="w-8 h-8 rounded-full bg-[#0067b8]/10 flex items-center justify-center shrink-0 mt-0.5 shadow-xs overflow-hidden">
                                 <img
@@ -1582,15 +1750,13 @@ export const SparkleOOBE: React.FC<SparkleOOBEProps> = ({
                         </div>
 
                         <div className="flex items-center justify-between gap-3 mt-6 pt-4 border-t border-neutral-200">
-                          {/* WinUI 3 Secondary Button */}
                           <button
                             type="button"
-                            onClick={() => advanceStep(4)}
+                            onClick={() => advanceStep(5)}
                             className="h-8 px-5 rounded-[7px] font-normal text-[#1b1b1b] bg-[#fbfbfb] hover:bg-[#f5f5f5] active:bg-[#eaeaea] border border-black/10 border-b-[2px] border-b-black/20 shadow-[0_1px_2px_rgba(0,0,0,0.05),inset_0_1px_0_rgba(255,255,255,0.8)] active:shadow-none transition-all text-xs sm:text-[13px] flex items-center justify-center cursor-pointer select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0067b8]"
                           >
                             Back
                           </button>
-                          {/* WinUI 3 Primary Button */}
                           <button
                             type="button"
                             onClick={startFinalSequence}

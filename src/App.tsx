@@ -54,6 +54,11 @@ import { Channel, NewsArticle } from './types';
 import { useSettings } from './hooks/useSettings';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
 import { type AppTab } from './components/SparkleTabBar';
+import { WindowFrame, type AppWindowState } from './components/WindowFrame';
+import { WindowsStartMenu } from './components/WindowsStartMenu';
+import { WindowsTaskbar } from './components/WindowsTaskbar';
+import { WindowsContextMenu } from './components/WindowsContextMenu';
+import { Plus, RefreshCw, Monitor, Sun, Moon, Sparkles, Palette, LogOut } from 'lucide-react';
 
 export function getRouteTitle(route: string, channel?: Channel): string {
   if (route === '/' || route === '/home' || route === '/home-preview') return 'Home';
@@ -139,10 +144,76 @@ export default function App() {
         id: 'tab-1',
         title: getRouteTitle(initRoute),
         route: initRoute,
+        history: [initRoute],
       },
     ];
   });
   const [activeTabId, setActiveTabId] = useState<string>('tab-1');
+
+  // Windows Mode state & floating window geometry
+  const isWindowsMode = Boolean(settings.windowsMode);
+  const [isStartMenuOpen, setIsStartMenuOpen] = useState(false);
+  const [desktopContextMenu, setDesktopContextMenu] = useState<{ x: number; y: number } | null>(null);
+  const [windowStates, setWindowStates] = useState<Record<string, AppWindowState>>({});
+
+  const createDefaultWindowState = useCallback(
+    (index: number, zIndex: number): AppWindowState => {
+      const vw = typeof window !== 'undefined' ? window.innerWidth : 1280;
+      const vh = typeof window !== 'undefined' ? window.innerHeight : 800;
+      const isMobileVw = vw < 768;
+      if (isMobileVw) {
+        return {
+          x: 0,
+          y: 0,
+          width: vw,
+          height: Math.max(320, vh - 48),
+          isMinimized: false,
+          isMaximized: true,
+          zIndex,
+        };
+      }
+      const availW = Math.max(420, vw);
+      const availH = Math.max(320, vh - 48);
+      const width = Math.min(1040, Math.max(460, availW - 96));
+      const height = Math.min(660, Math.max(340, availH - 72));
+      const offsetIdx = index % 6;
+      const baseLeft = 36;
+      const x = Math.min(baseLeft + offsetIdx * 28, Math.max(baseLeft, vw - width - 16));
+      const y = Math.min(20 + offsetIdx * 24, Math.max(12, availH - height - 16));
+      return {
+        x,
+        y,
+        width,
+        height,
+        isMinimized: false,
+        isMaximized: false,
+        zIndex,
+      };
+    },
+    []
+  );
+
+  // Ensure every tab has a windowState when Windows Mode is active, and close Start Menu on exit
+  useEffect(() => {
+    if (!isWindowsMode) {
+      setIsStartMenuOpen(false);
+      return;
+    }
+    setWindowStates((prev) => {
+      let changed = false;
+      const next: Record<string, AppWindowState> = { ...prev };
+      const existingValues = Object.values(prev) as AppWindowState[];
+      let maxZ: number = existingValues.reduce((m: number, s: AppWindowState) => Math.max(m, s.zIndex), 20);
+      tabs.forEach((tab, idx) => {
+        if (!next[tab.id]) {
+          maxZ += 1;
+          next[tab.id] = createDefaultWindowState(idx, Math.min(180, maxZ));
+          changed = true;
+        }
+      });
+      return changed ? next : prev;
+    });
+  }, [isWindowsMode, tabs, createDefaultWindowState]);
 
   // Helper to load channels with custom channels, overrides and exclusions
   const loadInitialChannels = (): Channel[] => {
@@ -317,6 +388,7 @@ export default function App() {
   });
 
   const toggleSidebarCollapse = () => {
+    if (settings.windowsMode) return;
     setIsSidebarCollapsed((prev) => {
       const next = !prev;
       try {
@@ -440,7 +512,7 @@ export default function App() {
   }, [isSidebarCollapsed]);
 
   // Determine effective sidebar width for page adaptation
-  const isEffectiveCollapsed = settings.autoHideSidebar || isSidebarCollapsed;
+  const isEffectiveCollapsed = Boolean(settings.windowsMode) || settings.autoHideSidebar || isSidebarCollapsed;
   const isInkCanvasEditor = currentRoute.startsWith('/draws/');
 
   useEffect(() => {
@@ -543,12 +615,137 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [channels, currentChannel, currentRoute, activeTabId]);
 
-  // Tab management handlers for Tabbed Sparkle
+  // Tab management handlers for Tabbed Sparkle & Windows Mode
   const handleReorderTabs = useCallback((reorderedTabs: AppTab[]) => {
     setTabs(reorderedTabs);
   }, []);
 
+  const bringWindowToFront = useCallback(
+    (prev: Record<string, AppWindowState>, tabId: string, tabList: AppTab[], unminimize = true): Record<string, AppWindowState> => {
+      const next: Record<string, AppWindowState> = { ...prev };
+      if (!next[tabId]) {
+        next[tabId] = createDefaultWindowState(tabList.length, 40);
+      }
+      const orderedIds = tabList
+        .map((t) => t.id)
+        .filter((id) => id !== tabId && Boolean(next[id]))
+        .sort((a, b) => (next[a]?.zIndex || 20) - (next[b]?.zIndex || 20));
+      let z = 20;
+      orderedIds.forEach((id) => {
+        next[id] = { ...next[id], zIndex: z++ };
+      });
+      next[tabId] = {
+        ...next[tabId],
+        ...(unminimize ? { isMinimized: false } : {}),
+        zIndex: Math.min(180, z),
+      };
+      return next;
+    },
+    [createDefaultWindowState]
+  );
+
+  const focusWindow = useCallback(
+    (tabId: string) => {
+      setActiveTabId(tabId);
+      setTabs((prevTabs) => {
+        const targetTab = prevTabs.find((t) => t.id === tabId);
+        if (targetTab) {
+          if (targetTab.channelId) {
+            const ch = channels.find((c) => c.id === targetTab.channelId);
+            if (ch) setCurrentChannel(ch);
+          }
+          setRouteState(targetTab.routeState || null);
+          const base = targetTab.route.includes('?') ? targetTab.route.split('?')[0] : targetTab.route;
+          setCurrentRoute(base);
+          window.history.pushState(null, '', targetTab.route);
+        }
+        setWindowStates((prevWs) => bringWindowToFront(prevWs, tabId, prevTabs, true));
+        return prevTabs;
+      });
+    },
+    [channels, bringWindowToFront]
+  );
+
+  const handleMinimizeWindow = useCallback(
+    (tabId: string) => {
+      setWindowStates((prev) => {
+        const current = prev[tabId];
+        if (!current) return prev;
+        const next = { ...prev, [tabId]: { ...current, isMinimized: true } };
+        if (activeTabId === tabId) {
+          const remainingVisible = (Object.entries(next) as [string, AppWindowState][])
+            .filter(([id, ws]) => id !== tabId && !ws.isMinimized)
+            .sort((a, b) => b[1].zIndex - a[1].zIndex);
+          if (remainingVisible.length > 0) {
+            setActiveTabId(remainingVisible[0][0]);
+          }
+        }
+        return next;
+      });
+    },
+    [activeTabId]
+  );
+
+  const handleToggleMaximizeWindow = useCallback(
+    (tabId: string) => {
+      setActiveTabId(tabId);
+      setTabs((prevTabs) => {
+        setWindowStates((prevWs) => {
+          const updated = bringWindowToFront(prevWs, tabId, prevTabs, true);
+          return {
+            ...updated,
+            [tabId]: {
+              ...updated[tabId],
+              isMaximized: !updated[tabId].isMaximized,
+            },
+          };
+        });
+        return prevTabs;
+      });
+    },
+    [bringWindowToFront]
+  );
+
+  const handleUpdateWindowBounds = useCallback((tabId: string, bounds: Partial<AppWindowState>) => {
+    setWindowStates((prev) => {
+      const existing = prev[tabId];
+      if (!existing) return prev;
+      return {
+        ...prev,
+        [tabId]: { ...existing, ...bounds },
+      };
+    });
+  }, []);
+
+  const handleTaskbarWindowClick = useCallback(
+    (tabId: string) => {
+      const ws = windowStates[tabId];
+      if (tabId === activeTabId && ws && !ws.isMinimized) {
+        handleMinimizeWindow(tabId);
+      } else {
+        focusWindow(tabId);
+      }
+    },
+    [windowStates, activeTabId, handleMinimizeWindow, focusWindow]
+  );
+
+  const handleShowDesktop = useCallback(() => {
+    setWindowStates((prev) => {
+      const hasAnyVisible = tabs.some((t) => prev[t.id] && !prev[t.id].isMinimized);
+      const next: Record<string, AppWindowState> = {};
+      (Object.entries(prev) as [string, AppWindowState][]).forEach(([id, ws]) => {
+        next[id] = { ...ws, isMinimized: hasAnyVisible };
+      });
+      return next;
+    });
+    setIsStartMenuOpen(false);
+  }, [tabs]);
+
   const handleSelectTab = useCallback((tabId: string) => {
+    if (isWindowsMode) {
+      focusWindow(tabId);
+      return;
+    }
     setActiveTabId(tabId);
     setTabs((prev) => {
       const targetTab = prev.find((t) => t.id === tabId);
@@ -566,34 +763,198 @@ export default function App() {
       }
       return prev;
     });
-  }, [channels]);
+  }, [channels, isWindowsMode, focusWindow]);
 
   const handleCreateTab = useCallback((initialRoute = '/') => {
     const newId = `tab-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
+    const base = initialRoute.includes('?') ? initialRoute.split('?')[0] : initialRoute;
+    let matchedChannel: Channel | undefined;
+    if (initialRoute.includes('?')) {
+      const params = new URLSearchParams(initialRoute.split('?')[1]);
+      const chSlug = params.get('channel');
+      if (chSlug) matchedChannel = channels.find((c) => c.slug === chSlug);
+    }
     const newTab: AppTab = {
       id: newId,
-      title: getRouteTitle(initialRoute),
+      title: getRouteTitle(base, matchedChannel),
       route: initialRoute,
+      history: [initialRoute],
+      channelId: matchedChannel?.id,
     };
-    setTabs((prev) => [...prev, newTab]);
+    setTabs((prev) => {
+      const nextTabs = [...prev, newTab];
+      if (isWindowsMode) {
+        setWindowStates((prevWs) => {
+          const ws = createDefaultWindowState(prev.length, 40);
+          return bringWindowToFront({ ...prevWs, [newId]: ws }, newId, nextTabs, true);
+        });
+      }
+      return nextTabs;
+    });
     setActiveTabId(newId);
-    setCurrentRoute(initialRoute);
+    if (matchedChannel) setCurrentChannel(matchedChannel);
+    setCurrentRoute(base);
     setRouteState(null);
     window.history.pushState(null, '', initialRoute);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }, []);
+    if (!isWindowsMode) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }, [channels, isWindowsMode, createDefaultWindowState, bringWindowToFront]);
+
+  const navigateInWindow = useCallback(
+    (tabId: string, path: string, state?: any) => {
+      const base = path.includes('?') ? path.split('?')[0] : path;
+      let matchedChannel: Channel | undefined;
+      if (path.includes('?')) {
+        const params = new URLSearchParams(path.split('?')[1]);
+        const chSlug = params.get('channel');
+        if (chSlug) {
+          matchedChannel = channels.find((c) => c.slug === chSlug);
+          if (matchedChannel) setCurrentChannel(matchedChannel);
+        }
+      }
+      const nextTitle = getRouteTitle(base, matchedChannel || currentChannel);
+      setTabs((prev) =>
+        prev.map((t) => {
+          if (t.id !== tabId) return t;
+          const prevHist = t.history && t.history.length > 0 ? t.history : [t.route];
+          const nextHist = prevHist[prevHist.length - 1] === path ? prevHist : [...prevHist, path];
+          return {
+            ...t,
+            route: path,
+            title: nextTitle,
+            routeState: state,
+            history: nextHist,
+            channelId: matchedChannel ? matchedChannel.id : t.channelId,
+          };
+        })
+      );
+      setActiveTabId(tabId);
+      setCurrentRoute(base);
+      setRouteState(state || null);
+      window.history.pushState(null, '', path);
+      setTabs((prev) => {
+        setWindowStates((prevWs) => bringWindowToFront(prevWs, tabId, prev, true));
+        return prev;
+      });
+    },
+    [channels, currentChannel, bringWindowToFront]
+  );
+
+  const handleWindowGoBack = useCallback(
+    (tabId: string) => {
+      setTabs((prev) =>
+        prev.map((t) => {
+          if (t.id !== tabId || !t.history || t.history.length <= 1) return t;
+          const nextHistory = t.history.slice(0, -1);
+          const prevPath = nextHistory[nextHistory.length - 1];
+          const base = prevPath.includes('?') ? prevPath.split('?')[0] : prevPath;
+          let matchedChannel: Channel | undefined;
+          if (prevPath.includes('?')) {
+            const chSlug = new URLSearchParams(prevPath.split('?')[1]).get('channel');
+            if (chSlug) matchedChannel = channels.find((c) => c.slug === chSlug);
+          }
+          if (matchedChannel) setCurrentChannel(matchedChannel);
+          setCurrentRoute(base);
+          window.history.pushState(null, '', prevPath);
+          return {
+            ...t,
+            route: prevPath,
+            title: getRouteTitle(base, matchedChannel),
+            history: nextHistory,
+            channelId: matchedChannel ? matchedChannel.id : t.channelId,
+          };
+        })
+      );
+    },
+    [channels]
+  );
+
+  const openOrFocusAppWindow = useCallback(
+    (path: string, state?: any) => {
+      const base = path.includes('?') ? path.split('?')[0] : path;
+      const getGroup = (r: string) => {
+        const b = r.includes('?') ? r.split('?')[0] : r;
+        if (b === '/' || b === '/home' || b === '/home-preview') return 'home';
+        if (b === '/live-tv' || b === '/watch-preview' || b.startsWith('/watch')) return 'watch';
+        if (b === '/news' || b === '/updates' || b.startsWith('/news/') || b.startsWith('/article')) return 'news';
+        if (b === '/notes' || b.startsWith('/notes/') || b === '/write' || b === '/present' || b === '/table') return 'notes';
+        if (b === '/vlc' || b === '/screenbox' || b === '/screenbug') return 'screenbox';
+        if (b === '/draws' || b.startsWith('/draws/')) return 'draws';
+        if (b === '/settings' || b.startsWith('/settings')) return 'settings';
+        return b;
+      };
+
+      const targetGroup = getGroup(base);
+      let matchedChannel: Channel | undefined;
+      if (path.includes('?')) {
+        const chSlug = new URLSearchParams(path.split('?')[1]).get('channel');
+        if (chSlug) {
+          matchedChannel = channels.find((c) => c.slug === chSlug);
+          if (matchedChannel) setCurrentChannel(matchedChannel);
+        }
+      }
+
+      const existing = tabs.find((t) => getGroup(t.route) === targetGroup);
+      if (existing) {
+        if (path !== existing.route || state !== undefined) {
+          navigateInWindow(existing.id, path, state);
+        } else {
+          focusWindow(existing.id);
+        }
+        return;
+      }
+
+      const newId = `tab-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
+      const newTab: AppTab = {
+        id: newId,
+        title: getRouteTitle(base, matchedChannel || currentChannel),
+        route: path,
+        routeState: state,
+        history: [path],
+        channelId: matchedChannel?.id,
+      };
+      setTabs((prev) => {
+        const nextTabs = [...prev, newTab];
+        setWindowStates((prevWs) => {
+          const ws = createDefaultWindowState(prev.length, 40);
+          return bringWindowToFront({ ...prevWs, [newId]: ws }, newId, nextTabs, true);
+        });
+        return nextTabs;
+      });
+      setActiveTabId(newId);
+      setCurrentRoute(base);
+      setRouteState(state || null);
+      window.history.pushState(null, '', path);
+    },
+    [tabs, channels, currentChannel, navigateInWindow, focusWindow, createDefaultWindowState, bringWindowToFront]
+  );
 
   const handleCloseTab = useCallback((tabId: string) => {
     setTabs((prev) => {
       if (prev.length <= 1) {
+        if (isWindowsMode) {
+          setActiveTabId('');
+          setWindowStates((prevWs) => {
+            const nextWs = { ...prevWs };
+            delete nextWs[tabId];
+            return nextWs;
+          });
+          return [];
+        }
         // Reset single tab to Home
         setCurrentRoute('/');
         setRouteState(null);
         window.history.pushState(null, '', '/');
-        return [{ id: prev[0].id, title: 'Home', route: '/' }];
+        return [{ id: prev[0].id, title: 'Home', route: '/', history: ['/'] }];
       }
       const closeIdx = prev.findIndex((t) => t.id === tabId);
       const remaining = prev.filter((t) => t.id !== tabId);
+      setWindowStates((prevWs) => {
+        const nextWs = { ...prevWs };
+        delete nextWs[tabId];
+        return nextWs;
+      });
       if (activeTabId === tabId) {
         const nextIdx = Math.min(closeIdx, remaining.length - 1);
         const nextTab = remaining[nextIdx];
@@ -609,7 +970,7 @@ export default function App() {
       }
       return remaining;
     });
-  }, [activeTabId, channels]);
+  }, [activeTabId, channels, isWindowsMode]);
 
   const handleDuplicateTab = useCallback((tabId: string) => {
     setTabs((prev) => {
@@ -619,14 +980,21 @@ export default function App() {
       const newTab: AppTab = {
         ...sourceTab,
         id: newId,
+        history: sourceTab.history ? [...sourceTab.history] : [sourceTab.route],
       };
       const idx = prev.findIndex((t) => t.id === tabId);
       const next = [...prev];
       next.splice(idx + 1, 0, newTab);
+      if (isWindowsMode) {
+        setWindowStates((prevWs) => {
+          const ws = createDefaultWindowState(next.length, 40);
+          return bringWindowToFront({ ...prevWs, [newId]: ws }, newId, next, true);
+        });
+      }
       setActiveTabId(newId);
       return next;
     });
-  }, []);
+  }, [isWindowsMode, createDefaultWindowState, bringWindowToFront]);
 
   const handleCloseOtherTabs = useCallback((tabId: string) => {
     setTabs((prev) => {
@@ -636,9 +1004,9 @@ export default function App() {
     setActiveTabId(tabId);
   }, []);
 
-  // Keyboard shortcuts for Tabbed Sparkle (Ctrl+T, Ctrl+W, Ctrl+Tab)
+  // Keyboard shortcuts for Tabbed Sparkle & Windows Mode (Ctrl+T, Ctrl+W, Ctrl+Tab)
   useEffect(() => {
-    if (!settings.tabbedSparkle) return;
+    if (!settings.tabbedSparkle && !settings.windowsMode) return;
     const handleTabKeys = (e: KeyboardEvent) => {
       const target = e.target as HTMLElement;
       const isInput = target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable);
@@ -667,10 +1035,14 @@ export default function App() {
     };
     window.addEventListener('keydown', handleTabKeys);
     return () => window.removeEventListener('keydown', handleTabKeys);
-  }, [settings.tabbedSparkle, activeTabId, tabs, handleCreateTab, handleCloseTab, handleSelectTab]);
+  }, [settings.tabbedSparkle, settings.windowsMode, activeTabId, tabs, handleCreateTab, handleCloseTab, handleSelectTab]);
 
   // Navigation handler
   const navigate = useCallback((path: string, state?: any) => {
+    if (isWindowsMode) {
+      openOrFocusAppWindow(path, state);
+      return;
+    }
     // If "Open Settings in new tab" is enabled, navigate to settings creates/switches to settings in another tab
     const isSettingsTarget = path === '/settings' || path.startsWith('/settings?') || path.startsWith('/settings#') || path.startsWith('/settings/');
     if (settings.openSettingsInNewTab && isSettingsTarget) {
@@ -708,7 +1080,7 @@ export default function App() {
     }
 
     executeNavigation(path, state);
-  }, [currentRoute, hasChanges, unsavedNoteState, executeNavigation, settings.openSettingsInNewTab, settings.tabbedSparkle, tabs, handleSelectTab, handleCreateTab, updateSetting]);
+  }, [isWindowsMode, openOrFocusAppWindow, currentRoute, hasChanges, unsavedNoteState, executeNavigation, settings.openSettingsInNewTab, settings.tabbedSparkle, tabs, handleSelectTab, handleCreateTab, updateSetting]);
 
   const handleSaveAndNavigate = () => {
     applyDraftSettings();
@@ -896,13 +1268,30 @@ export default function App() {
     }
   };
 
-  // Render Page Content based on currentRoute
-  const renderContent = () => {
-    if (currentRoute.startsWith('/draws/')) return <Draws navigate={navigate} />;
-    if (currentRoute.startsWith('/notes/')) {
+  // Render Page Content based on route (supports both single-page mode and multi-window mode)
+  const renderContent = (
+    routeOverride?: string,
+    stateOverride?: any,
+    navigateOverride?: (path: string, state?: any) => void,
+    channelOverride?: Channel
+  ) => {
+    const activeRoute = routeOverride ?? currentRoute;
+    const activeState = stateOverride !== undefined ? stateOverride : routeState;
+    const activeNav = navigateOverride ?? navigate;
+    const activeChannel = channelOverride ?? currentChannel;
+    const activeSearchQuery = tabSearchQueries[activeRoute] || '';
+    const onActiveSearchChange = (query: string) => {
+      setTabSearchQueries((prev) => ({
+        ...prev,
+        [activeRoute]: query,
+      }));
+    };
+
+    if (activeRoute.startsWith('/draws/')) return <Draws navigate={activeNav} />;
+    if (activeRoute.startsWith('/notes/')) {
       return (
         <NotesApp
-          navigate={navigate}
+          navigate={activeNav}
           onEnterEditor={() => setIsSidebarCollapsed(true)}
           onRegisterUnsavedNote={setUnsavedNoteState}
         />
@@ -910,30 +1299,30 @@ export default function App() {
     }
 
     // Route matching for news detail: /news/:slug
-    if (currentRoute.startsWith('/news/')) {
-      const slug = currentRoute.replace('/news/', '');
-      return <Article slug={slug} navigate={navigate} fontSize={articleFontSize} />;
+    if (activeRoute.startsWith('/news/')) {
+      const slug = activeRoute.replace('/news/', '');
+      return <Article slug={slug} navigate={activeNav} fontSize={articleFontSize} />;
     }
 
-    switch (currentRoute) {
+    switch (activeRoute) {
       case '/':
       case '/home':
       case '/home-preview':
-        return <HomePreview channels={channels} onSelectChannel={setCurrentChannel} navigate={navigate} />;
+        return <HomePreview channels={channels} onSelectChannel={setCurrentChannel} navigate={activeNav} />;
 
       case '/live-tv':
       case '/watch-preview':
         return (
           <LiveTV
-            currentChannel={currentChannel}
+            currentChannel={activeChannel}
             onSelectChannel={(ch) => {
               setCurrentChannel(ch);
             }}
             channels={channels}
             onOpenCustomStreamModal={() => setIsCustomStreamModalOpen(true)}
-            searchQuery={currentTabSearchQuery}
-            onSearchChange={handleTabSearchChange}
-            navigate={navigate}
+            searchQuery={activeSearchQuery}
+            onSearchChange={onActiveSearchChange}
+            navigate={activeNav}
             onUpdateChannel={handleUpdateChannel}
             onRemoveChannel={handleRemoveChannel}
             onAddChannel={handleAddCustomChannel}
@@ -943,12 +1332,12 @@ export default function App() {
       case '/test':
         return (
           <TestChannels
-            currentChannel={currentChannel}
+            currentChannel={activeChannel}
             onSelectChannel={setCurrentChannel}
             channels={channels}
             onOpenCustomStreamModal={() => setIsCustomStreamModalOpen(true)}
-            searchQuery={currentTabSearchQuery}
-            onSearchChange={handleTabSearchChange}
+            searchQuery={activeSearchQuery}
+            onSearchChange={onActiveSearchChange}
           />
         );
 
@@ -956,9 +1345,9 @@ export default function App() {
       case '/updates':
         return (
           <News
-            navigate={navigate}
-            searchQuery={currentTabSearchQuery}
-            onSearchChange={handleTabSearchChange}
+            navigate={activeNav}
+            searchQuery={activeSearchQuery}
+            onSearchChange={onActiveSearchChange}
             onOpenUpdate={() => setIsUpdating(true)}
           />
         );
@@ -968,10 +1357,10 @@ export default function App() {
           <Channels
             channels={channels}
             onSelectChannel={setCurrentChannel}
-            navigate={navigate}
+            navigate={activeNav}
             onOpenCustomStreamModal={() => setIsCustomStreamModalOpen(true)}
-            searchQuery={currentTabSearchQuery}
-            onSearchChange={handleTabSearchChange}
+            searchQuery={activeSearchQuery}
+            onSearchChange={onActiveSearchChange}
           />
         );
 
@@ -980,9 +1369,9 @@ export default function App() {
           <Favorites
             channels={channels}
             onSelectChannel={setCurrentChannel}
-            navigate={navigate}
-            searchQuery={currentTabSearchQuery}
-            onSearchChange={handleTabSearchChange}
+            navigate={activeNav}
+            searchQuery={activeSearchQuery}
+            onSearchChange={onActiveSearchChange}
           />
         );
 
@@ -990,10 +1379,10 @@ export default function App() {
         return <About />;
 
       case '/auth':
-        return <Auth navigate={navigate} />;
+        return <Auth navigate={activeNav} />;
 
       case '/feedback':
-        return <Feedback navigate={navigate} />;
+        return <Feedback navigate={activeNav} />;
 
       case '/winui-3':
         return <WinUI3 />;
@@ -1001,11 +1390,11 @@ export default function App() {
       case '/settings':
         return (
           <Settings
-            searchQuery={currentTabSearchQuery}
-            onSearchChange={handleTabSearchChange}
+            searchQuery={activeSearchQuery}
+            onSearchChange={onActiveSearchChange}
             onOpenUpdate={() => setIsUpdating(true)}
             onOpenOfficeTool={handleOpenOfficeTool}
-            navigate={navigate}
+            navigate={activeNav}
             onRestartOobe={handleRestartOobe}
           />
         );
@@ -1013,11 +1402,11 @@ export default function App() {
       case '/search':
         return (
           <ImmersiveSearch
-            navigate={navigate}
+            navigate={activeNav}
             onSelectChannel={setCurrentChannel}
             onClose={() => {
               const target = previousRouteRef.current && previousRouteRef.current !== '/search' ? previousRouteRef.current : '/';
-              navigate(target);
+              activeNav(target);
             }}
           />
         );
@@ -1028,25 +1417,25 @@ export default function App() {
       case '/table':
         return (
           <NotesApp
-            navigate={navigate}
+            navigate={activeNav}
             onEnterEditor={() => setIsSidebarCollapsed(true)}
             onRegisterUnsavedNote={setUnsavedNoteState}
           />
         );
 
       case '/gallery':
-        return <Gallery navigate={navigate} searchQuery={currentTabSearchQuery} routeState={routeState} />;
+        return <Gallery navigate={activeNav} searchQuery={activeSearchQuery} routeState={activeState} />;
 
       case '/draws':
-        return <Draws navigate={navigate} />;
+        return <Draws navigate={activeNav} />;
 
       case '/screenbug':
       case '/screenbox':
       case '/vlc':
-        return <VLC navigate={navigate} />;
+        return <VLC navigate={activeNav} />;
 
       case '/camera':
-        return <Camera navigate={navigate} />;
+        return <Camera navigate={activeNav} />;
 
       case '/craftmine':
         return <Craftmine />;
@@ -1055,7 +1444,7 @@ export default function App() {
         return <Photopea />;
 
       default:
-        return <HomePreview channels={channels} onSelectChannel={setCurrentChannel} navigate={navigate} />;
+        return <HomePreview channels={channels} onSelectChannel={setCurrentChannel} navigate={activeNav} />;
     }
   };
 
@@ -1064,25 +1453,44 @@ export default function App() {
   return (
     <NativeKeyboardProvider>
       <NotesProvider>
-        <div
+      <div
         data-immersive-sidebar={settings.immersiveSidebar}
-      data-sidebar-position={settings.sidebarPosition}
-      className={`min-h-screen ${settings.superDarkMode ? 'bg-black' : 'bg-[#f9f9f9] dark:bg-[#1b1f24]'} text-[#111827] dark:text-[#E0E0E6] flex font-sans selection:bg-[#d946ef] selection:text-white dark:selection:bg-[#ff2d92] dark:selection:text-white relative`}
-    >
-      {/* Fixed atmospheric cosmic background matching custom nebula gradient */}
+        data-sidebar-position={settings.sidebarPosition}
+        className={`min-h-screen ${
+          isWindowsMode
+            ? 'bg-transparent'
+            : settings.superDarkMode
+            ? 'bg-black'
+            : 'bg-[#f9f9f9] dark:bg-[#1b1f24]'
+        } text-[#111827] dark:text-[#E0E0E6] flex font-sans selection:bg-[#d946ef] selection:text-white dark:selection:bg-[#ff2d92] dark:selection:text-white relative`}
+      >
+      {/* Fixed atmospheric cosmic / Windows Mode OOBE wallpaper background */}
       <div 
         id="fixed-app-background-solid" 
-        className={`fixed inset-0 pointer-events-none -z-50 ${settings.superDarkMode ? '!bg-black' : ''}`} 
+        className={`fixed inset-0 pointer-events-none ${
+          isWindowsMode ? 'z-0' : '-z-50'
+        } ${settings.superDarkMode && !isWindowsMode ? '!bg-black' : ''}`}
+        style={
+          isWindowsMode
+            ? {
+                backgroundImage: "url('/assets/aistudio/image_9bd7238e.png')",
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                backgroundRepeat: 'no-repeat',
+                backgroundColor: '#16161a',
+              }
+            : undefined
+        }
         aria-hidden="true" 
       />
 
-      {isInkCanvasEditor && !isInkCanvasChromeVisible && <><div onMouseEnter={() => setIsInkCanvasChromeVisible(true)} className="fixed left-0 top-0 bottom-0 w-3 z-[200]" /><div onMouseEnter={() => setIsInkCanvasChromeVisible(true)} className="fixed left-0 top-0 right-0 h-3 z-[200]" /><div onMouseEnter={() => setIsInkCanvasChromeVisible(true)} className="fixed left-0 bottom-0 right-0 h-3 z-[200]" /></>}
+      {!isWindowsMode && isInkCanvasEditor && !isInkCanvasChromeVisible && <><div onMouseEnter={() => setIsInkCanvasChromeVisible(true)} className="fixed left-0 top-0 bottom-0 w-3 z-[200]" /><div onMouseEnter={() => setIsInkCanvasChromeVisible(true)} className="fixed left-0 top-0 right-0 h-3 z-[200]" /><div onMouseEnter={() => setIsInkCanvasChromeVisible(true)} className="fixed left-0 bottom-0 right-0 h-3 z-[200]" /></>}
 
-      {/* Sidebar Navigation (Desktop + Mobile Drawer) */}
-      {(settings.navigationMode === 'sidebar' || isMobileSidebarOpen || mobileDragOffset !== null) && (!isInkCanvasEditor || isInkCanvasChromeVisible) && !isGalleryViewerOpen && (
+      {/* Sidebar Navigation (Desktop + Mobile Drawer) - completely hidden in Windows Mode */}
+      {!isWindowsMode && (settings.navigationMode === 'sidebar' || isMobileSidebarOpen || mobileDragOffset !== null) && (!isInkCanvasEditor || isInkCanvasChromeVisible) && !isGalleryViewerOpen && (
         <Sidebar
           currentRoute={currentRoute}
-          navigate={navigate}
+          navigate={isWindowsMode ? openOrFocusAppWindow : navigate}
           onOpenSearch={handleOpenSearch}
           onSelectChannel={setCurrentChannel}
           isCollapsed={isSidebarCollapsed}
@@ -1117,8 +1525,12 @@ export default function App() {
       )}
 
       {/* Main App Container */}
-      <div className={`flex-1 flex flex-col min-w-0 min-h-screen transition-[padding] duration-[160ms] ease-[cubic-bezier(0.34,1.45,0.64,1)] bg-[#f3f3f3] dark:bg-[#1b1f24] ${
-        isInkCanvasEditor || isGalleryViewerOpen
+      <div className={`flex-1 flex flex-col min-w-0 min-h-screen transition-[padding] duration-[160ms] ease-[cubic-bezier(0.34,1.45,0.64,1)] ${
+        isWindowsMode ? 'relative z-[1] !bg-transparent' : 'bg-[#f3f3f3] dark:bg-[#1b1f24]'
+      } ${
+        isWindowsMode
+          ? 'md:pl-0 md:pr-0 pb-[48px]'
+          : isInkCanvasEditor || isGalleryViewerOpen
           ? 'md:pl-0 md:pr-0 pb-0'
           : settings.navigationMode === 'topbar'
           ? 'md:pl-0 md:pr-0 pb-10'
@@ -1132,75 +1544,221 @@ export default function App() {
                 ? 'md:pl-[48px]'
                 : 'md:pl-[260px]'
       }`}>
-        {/* TopBar Header - hidden on an Ink Canvas sheet until the top edge is hovered or when Gallery media viewer is open */}
-        {(!isInkCanvasEditor || isInkCanvasChromeVisible) && !isGalleryViewerOpen && <TopBar
-          currentRoute={currentRoute}
-          navigate={navigate}
-          tabSearchQuery={currentTabSearchQuery}
-          onTabSearchChange={handleTabSearchChange}
-          onOpenSearch={handleOpenSearch}
-          onOpenMobileMenu={() => setIsMobileSidebarOpen(true)}
-          currentChannel={currentChannel}
-          channels={channels}
-          onSelectChannel={setCurrentChannel}
-          onOpenHelp={() => setIsHelpModalOpen(true)}
-          onOpenDiscord={() => setIsWelcomeModalOpen(true)}
-          onOpenSummarize={(art) => {
-            setSummarizeArticle(art);
-            setIsNewsSummaryOpen(true);
-          }}
-          onOpenTextToSpeech={(art) => {
-            setTtsArticle(art);
-            setIsTtsOpen(true);
-          }}
-          onOpenFindWords={() => {
-            setIsFindWordsOpen(true);
-          }}
-          onOpenAddStream={() => setIsAddStreamOpen(true)}
-          onImportChannels={handleImportPlaylist}
-          onOpenNotifications={() => setIsUnderConstructionOpen(true)}
-          fontSize={articleFontSize}
-          onChangeFontSize={handleFontSizeChange}
-          showUnsavedTooltip={showUnsavedTooltip}
-          onDismissUnsavedTooltip={() => setShowUnsavedTooltip(false)}
-          tabs={tabs}
-          activeTabId={activeTabId}
-          onSelectTab={handleSelectTab}
-          onCreateTab={() => handleCreateTab('/')}
-          onCloseTab={handleCloseTab}
-          onDuplicateTab={handleDuplicateTab}
-          onCloseOtherTabs={handleCloseOtherTabs}
-          onReorderTabs={handleReorderTabs}
-        />}
+        {isWindowsMode ? (
+          /* Windows Mode Desktop Workspace with Floating / Resizable Windows */
+          <main
+            onMouseDown={() => {
+              setIsStartMenuOpen(false);
+              setDesktopContextMenu(null);
+            }}
+            onContextMenu={(e) => {
+              if ((e.target as HTMLElement).closest('[data-window-frame]')) return;
+              e.preventDefault();
+              e.stopPropagation();
+              setIsStartMenuOpen(false);
+              setDesktopContextMenu({ x: e.clientX, y: e.clientY });
+            }}
+            className="windows-desktop-workspace relative z-[1] flex-1 w-full h-[calc(100vh-48px)] overflow-hidden !bg-transparent"
+          >
+            <AnimatePresence>
+              {tabs.map((tab) => {
+                const ws = windowStates[tab.id];
+                if (!ws) return null;
+                const winBaseRoute = tab.route.includes('?') ? tab.route.split('?')[0] : tab.route;
+                const winChannel = tab.channelId
+                  ? channels.find((c) => c.id === tab.channelId) || currentChannel
+                  : currentChannel;
+                return (
+                  <WindowFrame
+                    key={tab.id}
+                    tab={tab}
+                    windowState={ws}
+                    isActive={tab.id === activeTabId && !ws.isMinimized}
+                    sidebarOffset={0}
+                    isRightSidebar={false}
+                    canGoBack={(tab.history?.length || 0) > 1}
+                    onGoBack={() => handleWindowGoBack(tab.id)}
+                    onFocus={() => focusWindow(tab.id)}
+                    onClose={() => handleCloseTab(tab.id)}
+                    onMinimize={() => handleMinimizeWindow(tab.id)}
+                    onToggleMaximize={() => handleToggleMaximizeWindow(tab.id)}
+                    onUpdateBounds={(bounds) => handleUpdateWindowBounds(tab.id, bounds)}
+                  >
+                    {renderContent(
+                      winBaseRoute,
+                      tab.routeState,
+                      (p, s) => navigateInWindow(tab.id, p, s),
+                      winChannel
+                    )}
+                  </WindowFrame>
+                );
+              })}
+            </AnimatePresence>
+          </main>
+        ) : (
+          <>
+            {/* TopBar Header - hidden on an Ink Canvas sheet until the top edge is hovered or when Gallery media viewer is open */}
+            {(!isInkCanvasEditor || isInkCanvasChromeVisible) && !isGalleryViewerOpen && <TopBar
+              currentRoute={currentRoute}
+              navigate={navigate}
+              tabSearchQuery={currentTabSearchQuery}
+              onTabSearchChange={handleTabSearchChange}
+              onOpenSearch={handleOpenSearch}
+              onOpenMobileMenu={() => setIsMobileSidebarOpen(true)}
+              currentChannel={currentChannel}
+              channels={channels}
+              onSelectChannel={setCurrentChannel}
+              onOpenHelp={() => setIsHelpModalOpen(true)}
+              onOpenDiscord={() => setIsWelcomeModalOpen(true)}
+              onOpenSummarize={(art) => {
+                setSummarizeArticle(art);
+                setIsNewsSummaryOpen(true);
+              }}
+              onOpenTextToSpeech={(art) => {
+                setTtsArticle(art);
+                setIsTtsOpen(true);
+              }}
+              onOpenFindWords={() => {
+                setIsFindWordsOpen(true);
+              }}
+              onOpenAddStream={() => setIsAddStreamOpen(true)}
+              onImportChannels={handleImportPlaylist}
+              onOpenNotifications={() => setIsUnderConstructionOpen(true)}
+              fontSize={articleFontSize}
+              onChangeFontSize={handleFontSizeChange}
+              showUnsavedTooltip={showUnsavedTooltip}
+              onDismissUnsavedTooltip={() => setShowUnsavedTooltip(false)}
+              tabs={tabs}
+              activeTabId={activeTabId}
+              onSelectTab={handleSelectTab}
+              onCreateTab={() => handleCreateTab('/')}
+              onCloseTab={handleCloseTab}
+              onDuplicateTab={handleDuplicateTab}
+              onCloseOtherTabs={handleCloseOtherTabs}
+              onReorderTabs={handleReorderTabs}
+            />}
 
-        {/* Dynamic Page Content with slide transition between tab pages like touch keyboard (no splash screen) */}
-        <main className={`main-tab-page relative flex-1 w-full mx-auto rounded-tl-none md:rounded-tl-[10px] rounded-tr-none rounded-br-none rounded-bl-none overflow-hidden bg-[#f9f9f9] dark:bg-[#282c31] ${
-          currentRoute === '/' || currentRoute === '/home' || currentRoute === '/news' || currentRoute === '/updates' || isOfficeRoute || currentRoute === '/craftmine' || currentRoute === '/photopea' || currentRoute === '/vlc' || currentRoute === '/screenbox' || currentRoute === '/screenbug' || currentRoute === '/gallery' || currentRoute === '/draws' || currentRoute.startsWith('/draws/') || currentRoute === '/camera'
-            ? 'p-0 max-w-none pt-0' 
-            : 'px-4 sm:px-6 md:px-8 py-5 max-w-7xl'
-        } ${
-          settings.navigationMode === 'floaty' && !isOfficeRoute
-            ? 'pb-28 sm:pb-32'
-            : ''
-        }`}>
-          <AnimatePresence mode="wait" initial={false}>
-            <motion.div
-              key={currentRoute}
-              initial={{ opacity: 0, x: 40 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -40 }}
-              transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-              className="tab-page-slide-wrapper w-full h-full rounded-tl-none md:rounded-tl-[10px] rounded-tr-none rounded-br-none rounded-bl-none overflow-hidden"
-            >
-              {renderContent()}
-            </motion.div>
-          </AnimatePresence>
-        </main>
+            {/* Dynamic Page Content with slide transition between tab pages like touch keyboard (no splash screen) */}
+            <main className={`main-tab-page relative flex-1 w-full mx-auto rounded-tl-none md:rounded-tl-[10px] rounded-tr-none rounded-br-none rounded-bl-none overflow-hidden bg-[#f9f9f9] dark:bg-[#282c31] ${
+              currentRoute === '/' || currentRoute === '/home' || currentRoute === '/news' || currentRoute === '/updates' || isOfficeRoute || currentRoute === '/craftmine' || currentRoute === '/photopea' || currentRoute === '/vlc' || currentRoute === '/screenbox' || currentRoute === '/screenbug' || currentRoute === '/gallery' || currentRoute === '/draws' || currentRoute.startsWith('/draws/') || currentRoute === '/camera'
+                ? 'p-0 max-w-none pt-0' 
+                : 'px-4 sm:px-6 md:px-8 py-5 max-w-7xl'
+            } ${
+              settings.navigationMode === 'floaty' && !isOfficeRoute
+                ? 'pb-28 sm:pb-32'
+                : ''
+            }`}>
+              <AnimatePresence mode="wait" initial={false}>
+                <motion.div
+                  key={currentRoute}
+                  initial={{ opacity: 0, x: 40 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -40 }}
+                  transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+                  className="tab-page-slide-wrapper w-full h-full rounded-tl-none md:rounded-tl-[10px] rounded-tr-none rounded-br-none rounded-bl-none overflow-hidden"
+                >
+                  {renderContent()}
+                </motion.div>
+              </AnimatePresence>
+            </main>
+          </>
+        )}
 
       </div>
 
+      {/* Windows 11 Start Menu & Bottom Taskbar when Windows Mode is active */}
+      {isWindowsMode && (
+        <>
+          <WindowsStartMenu
+            isOpen={isStartMenuOpen}
+            onClose={() => setIsStartMenuOpen(false)}
+            onLaunchRoute={(r, st) => openOrFocusAppWindow(r, st)}
+            channels={channels}
+            onSelectChannel={setCurrentChannel}
+            onRestartOobe={handleRestartOobe}
+          />
+          <WindowsTaskbar
+            tabs={tabs}
+            activeTabId={activeTabId}
+            windowStates={windowStates}
+            isStartMenuOpen={isStartMenuOpen}
+            onToggleStartMenu={() => setIsStartMenuOpen((prev) => !prev)}
+            onCloseStartMenu={() => setIsStartMenuOpen(false)}
+            onTaskbarWindowClick={handleTaskbarWindowClick}
+            onLaunchRoute={(r, st) => openOrFocusAppWindow(r, st)}
+            onCreateNewWindow={(r) => handleCreateTab(r || '/')}
+            onCloseWindow={handleCloseTab}
+            onMinimizeWindow={handleMinimizeWindow}
+            onToggleMaximizeWindow={handleToggleMaximizeWindow}
+            onDuplicateWindow={handleDuplicateTab}
+            onShowDesktop={handleShowDesktop}
+            channels={channels}
+            onSelectChannel={setCurrentChannel}
+          />
+          <AnimatePresence>
+            {desktopContextMenu && (
+              <WindowsContextMenu
+                key={`desktop-ctx-${desktopContextMenu.x}-${desktopContextMenu.y}`}
+                x={desktopContextMenu.x}
+                y={desktopContextMenu.y}
+                ariaLabel="Desktop actions"
+                onClose={() => setDesktopContextMenu(null)}
+                items={[
+                  {
+                    id: 'desk-new-window',
+                    label: 'New window',
+                    icon: <Plus className="w-4 h-4" />,
+                    onSelect: () => handleCreateTab('/'),
+                  },
+                  {
+                    id: 'desk-refresh',
+                    label: 'Refresh',
+                    icon: <RefreshCw className="w-4 h-4" />,
+                    onSelect: () => window.location.reload(),
+                  },
+                  {
+                    id: 'desk-show-desktop',
+                    label: 'Show desktop',
+                    icon: <Monitor className="w-4 h-4" />,
+                    onSelect: handleShowDesktop,
+                  },
+                  { id: 'desk-div-1', divider: true },
+                  {
+                    id: 'desk-theme',
+                    label: settings.theme === 'light' ? 'Switch to Dark mode' : 'Switch to Light mode',
+                    icon: settings.theme === 'light' ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />,
+                    onSelect: () => updateSetting('theme', settings.theme === 'light' ? 'dark' : 'light'),
+                  },
+                  {
+                    id: 'desk-acrylic',
+                    label: 'Acrylic glass',
+                    icon: <Sparkles className="w-4 h-4" />,
+                    checked: Boolean(settings.spatialGlass),
+                    onSelect: () => updateSetting('spatialGlass', !settings.spatialGlass),
+                  },
+                  { id: 'desk-div-2', divider: true },
+                  {
+                    id: 'desk-personalize',
+                    label: 'Personalize',
+                    icon: <Palette className="w-4 h-4" />,
+                    onSelect: () => openOrFocusAppWindow('/settings'),
+                  },
+                  {
+                    id: 'desk-exit-win',
+                    label: 'Exit Windows Mode',
+                    icon: <LogOut className="w-4 h-4" />,
+                    danger: true,
+                    onSelect: () => updateSetting('windowsMode', false),
+                  },
+                ]}
+              />
+            )}
+          </AnimatePresence>
+        </>
+      )}
+
       {/* Floaty bar navigation (Tab View) */}
-      {settings.navigationMode === 'floaty' && !isGalleryViewerOpen && (
+      {!isWindowsMode && settings.navigationMode === 'floaty' && !isGalleryViewerOpen && (
         <BottomDock
           currentRoute={currentRoute}
           navigate={navigate}

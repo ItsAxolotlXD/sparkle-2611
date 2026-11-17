@@ -48,6 +48,7 @@ const SETTING_LABELS: Partial<Record<keyof SystemSettings, string>> = {
   streamAspectRatio: 'Stream aspect ratio',
   immersiveSearch: 'Immersive search',
   refreshedSearchIcon: 'Refreshed Search Icon',
+  windowsMode: 'Windows Mode',
   developerMode: 'Developer mode',
   animatedBootScreen: 'Animated boot screen',
   triangleExperiment: 'Loading experiment',
@@ -209,7 +210,7 @@ export const Settings: React.FC<SettingsProps> = ({
   };
 
   const matchesExperimental =
-    matchesSearch(['Velocity Features', 'Velocity', 'vivetool', 'tabbed sparkle', 'tabbed', 'Insider experiments', 'Insider Flags', 'thử nghiệm', 'touch keyboard', 'native keyboard', 'bàn phím cảm ứng', 'bàn phím ảo', 'refreshed search icon', 'search icon', 'immersive search', 'fluent icons', 'flumojs', 'fluent emojis', 'emoji', '3d icons', 'animated boot screen', 'boot screen', 'khởi động', 'video khởi động']);
+    matchesSearch(['Velocity Features', 'Velocity', 'vivetool', 'tabbed sparkle', 'tabbed', 'windows mode', 'windows 11', 'taskbar', 'start menu', 'windowed', 'desktop', 'Insider experiments', 'Insider Flags', 'thử nghiệm', 'touch keyboard', 'native keyboard', 'bàn phím cảm ứng', 'bàn phím ảo', 'refreshed search icon', 'search icon', 'immersive search', 'fluent icons', 'flumojs', 'fluent emojis', 'emoji', '3d icons', 'animated boot screen', 'boot screen', 'khởi động', 'video khởi động']);
   const matchesInterface = 
     matchesSearch(['Appearance', 'Interface', 'giao diện', 'chế độ ứng dụng', 'ban ngày', 'ban đêm', 'light', 'dark', 'thanh điều hướng', 'navigation', 'side view', 'top view', 'tab view', 'thu phóng giao diện', 'font', 'vị trí thanh bên', 'siêu chế độ tối', 'super dark', 'Open Settings in new tab', 'open settings', 'tab mới', 'new tab']);
   const matchesAccessibility = matchesSearch(['Accessibility', 'trợ năng', 'hover to expand']);
@@ -362,6 +363,69 @@ export const Settings: React.FC<SettingsProps> = ({
                       onClick={(e) => {
                         e.stopPropagation();
                         triggerVelocityFeatureToggle('tabbedSparkle', !draftSettings.tabbedSparkle);
+                      }}
+                      className="toggle-switch-btn focus:outline-none shrink-0 border-none"
+                    >
+                      <span className="toggle-switch-thumb" />
+                    </button>
+                  </motion.div>
+                )}
+
+                {/* 1b. Windows Mode (Velocity Feature) */}
+                {matchesSearch(['Windows Mode', 'Windows 11', 'Velocity Features', 'Velocity', 'taskbar', 'start menu', 'windowed', 'desktop', 'wallpaper', 'vivetool']) && (
+                  <motion.div
+                    variants={slideUpVariant}
+                    initial="hidden"
+                    animate="visible"
+                    custom={elementIndex++}
+                    id="setting-velocity-windows-mode"
+                    onClick={() => triggerVelocityFeatureToggle('windowsMode', !draftSettings.windowsMode)}
+                    className="settings-block-card rounded-[6px] bg-white dark:bg-[#2c3037] shadow-xs px-4 py-3 sm:py-3.5 flex items-center justify-between gap-4 cursor-pointer hover:bg-black/[0.02] dark:hover:bg-[#363b43] transition-colors border-none"
+                  >
+                    <div className="flex items-center gap-3 min-w-0 flex-1 pr-2">
+                      <div className="w-9 h-9 flex items-center justify-center shrink-0">
+                        <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none">
+                          <defs>
+                            <linearGradient id="settings_win_mode_grad" x1="2" y1="2" x2="22" y2="22" gradientUnits="userSpaceOnUse">
+                              <stop offset="0%" stopColor="#60CDFF" />
+                              <stop offset="100%" stopColor="#0078D4" />
+                            </linearGradient>
+                          </defs>
+                          <rect x="2.5" y="2.5" width="8.7" height="8.7" rx="1.2" fill="url(#settings_win_mode_grad)" />
+                          <rect x="12.8" y="2.5" width="8.7" height="8.7" rx="1.2" fill="url(#settings_win_mode_grad)" />
+                          <rect x="2.5" y="12.8" width="8.7" height="8.7" rx="1.2" fill="url(#settings_win_mode_grad)" />
+                          <rect x="12.8" y="12.8" width="8.7" height="8.7" rx="1.2" fill="url(#settings_win_mode_grad)" />
+                        </svg>
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div
+                          id="windows-mode-label"
+                          className="font-normal text-sm text-[#111827] dark:text-white flex items-center gap-2"
+                          style={{ fontWeight: 400 }}
+                        >
+                          <span>Windows Mode</span>
+                          <span className="text-[10px] px-1.5 py-0.5 rounded-[6px] uppercase tracking-wider bg-[#0078d4]/10 dark:bg-[#4cc2ff]/20 text-[#0078d4] dark:text-[#4cc2ff] font-semibold">
+                            Velocity
+                          </span>
+                        </div>
+                        <p
+                          id="windows-mode-description"
+                          className="mt-1 text-xs leading-relaxed text-[#6B7280] dark:text-[#9CA3AF]"
+                        >
+                          Turns Sparkle into a Windows 11 desktop with a bottom taskbar, Start menu, OOBE wallpaper, locked collapsed sidebar, and resizable app windows.
+                        </p>
+                      </div>
+                    </div>
+                    <button
+                      id="toggle-windows-mode"
+                      type="button"
+                      role="switch"
+                      aria-labelledby="windows-mode-label"
+                      aria-describedby="windows-mode-description"
+                      aria-checked={draftSettings.windowsMode}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        triggerVelocityFeatureToggle('windowsMode', !draftSettings.windowsMode);
                       }}
                       className="toggle-switch-btn focus:outline-none shrink-0 border-none"
                     >

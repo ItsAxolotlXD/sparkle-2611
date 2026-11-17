@@ -66,41 +66,48 @@ export const CanvasContextMenu: React.FC<CanvasContextMenuProps> = ({ x, y, onAc
   }, [onClose]);
 
   return createPortal(
-    <motion.div
+    <div
       ref={menuRef}
-      role="menu"
-      {...contextMenuMotionProps}
-      onContextMenu={(event) => event.preventDefault()}
-      onMouseDown={(event) => event.stopPropagation()}
-      className={`fixed z-[2147483647] w-[232px] ${flyoutPanelClassName} fluent-context-menu`}
       style={{
-        ...flyoutPanelStyle,
+        position: 'fixed',
         left: position.left,
         top: position.top,
-        transformOrigin: `${x - position.left}px ${y - position.top}px`,
+        zIndex: 2147483647,
+        overflow: 'clip',
       }}
+      className="fluent-context-menu-wrapper pointer-events-auto"
+      onContextMenu={(event) => event.preventDefault()}
+      onMouseDown={(event) => event.stopPropagation()}
     >
-      {entries.map((entry) => {
-        const Icon = entry.icon;
-        return (
-          <button
-            key={entry.action}
-            type="button"
-            role="menuitem"
-            onMouseDown={(e) => e.stopPropagation()}
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              onAction(entry.action);
-            }}
-            className={`w-full h-[36px] px-3 rounded-[6px] flex items-center gap-3 text-[13px] font-medium text-left outline-none transition-colors cursor-pointer hover:bg-black/[0.05] dark:hover:bg-white/[0.08] focus-visible:bg-black/[0.05] dark:focus-visible:bg-white/[0.08] active:bg-black/[0.08] dark:active:bg-white/[0.12] ${entry.danger ? 'text-[#c42b1c] dark:text-[#ff99a4]' : 'text-[#111827] dark:text-white'}`}
-          >
-            <Icon className={`w-4 h-4 shrink-0 ${entry.danger ? 'text-black dark:text-[#ff99a4]' : 'text-black dark:text-neutral-300'}`} />
-            <span className="truncate">{entry.label}</span>
-          </button>
-        );
-      })}
-    </motion.div>,
+      <motion.div {...contextMenuMotionProps}>
+        <div
+          role="menu"
+          className={`w-[232px] ${flyoutPanelClassName} fluent-context-menu shadow-none`}
+          style={flyoutPanelStyle}
+        >
+          {entries.map((entry) => {
+            const Icon = entry.icon;
+            return (
+              <button
+                key={entry.action}
+                type="button"
+                role="menuitem"
+                onMouseDown={(e) => e.stopPropagation()}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  onAction(entry.action);
+                }}
+                className={`w-full h-[36px] px-3 rounded-[6px] flex items-center gap-3 text-[13px] font-medium text-left outline-none transition-colors cursor-pointer hover:bg-black/[0.05] dark:hover:bg-white/[0.08] focus-visible:bg-black/[0.05] dark:focus-visible:bg-white/[0.08] active:bg-black/[0.08] dark:active:bg-white/[0.12] ${entry.danger ? 'text-[#c42b1c] dark:text-[#ff99a4]' : 'text-[#111827] dark:text-white'}`}
+              >
+                <Icon className={`w-4 h-4 shrink-0 ${entry.danger ? 'text-black dark:text-[#ff99a4]' : 'text-black dark:text-neutral-300'}`} />
+                <span className="truncate">{entry.label}</span>
+              </button>
+            );
+          })}
+        </div>
+      </motion.div>
+    </div>,
     document.body
   );
 };
