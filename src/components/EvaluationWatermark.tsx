@@ -24,8 +24,8 @@ export const EvaluationWatermark: React.FC<EvaluationWatermarkProps> = ({ classN
       id="in-app-evaluation-watermark"
       aria-hidden="true"
       className={`fixed ${
-        settings.windowsMode ? 'right-4 sm:right-5' : 'bottom-3 right-4 sm:bottom-4 sm:right-6'
-      } z-[9990] pointer-events-none select-none text-right transition-opacity duration-1000 ease-in-out ${
+        settings.windowsMode ? 'hidden md:block right-4 sm:right-5' : 'bottom-3 right-4 sm:bottom-4 sm:right-6'
+      } ${settings.windowsMode ? 'z-[2]' : 'z-[9990]'} pointer-events-none select-none text-right transition-opacity duration-1000 ease-in-out ${
         isVisible ? 'opacity-100' : 'opacity-0'
       } text-white text-[11px] sm:text-[12px] leading-[1.35] font-normal tracking-normal ${className}`}
       style={{

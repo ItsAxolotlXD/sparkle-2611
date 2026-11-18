@@ -325,6 +325,7 @@ export const WindowsTaskbar: React.FC<WindowsTaskbarProps> = ({
   const [isTaskViewOpen, setIsTaskViewOpen] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [volume, setVolume] = useState(72);
+  const [brightness, setBrightness] = useState(100);
 
   // Hover tooltip
   const [hoverTooltip, setHoverTooltip] = useState<{ label: string; left: number } | null>(null);
@@ -1239,6 +1240,13 @@ export const WindowsTaskbar: React.FC<WindowsTaskbarProps> = ({
 
   return (
     <>
+      {brightness < 100 && (
+        <div
+          aria-hidden="true"
+          className="pointer-events-none fixed inset-0 z-[8000] bg-black"
+          style={{ opacity: ((100 - brightness) / 100) * 0.72 }}
+        />
+      )}
       <footer
         id="windows-taskbar"
         role="region"
@@ -2069,7 +2077,7 @@ export const WindowsTaskbar: React.FC<WindowsTaskbarProps> = ({
         </div>
 
         {/* 3. Right System Tray: ^ Overflow, Wi-Fi + Volume (Control Center), Clock + Date, Direct Command, Show Desktop */}
-        <div className="flex items-center gap-0.5 sm:gap-1 shrink-0 h-full">
+          <div className="flex items-center gap-0 shrink-0 h-full">
           {isLeftAligned && (
             <button
               id="btn-taskbar-weather"
@@ -2222,7 +2230,7 @@ export const WindowsTaskbar: React.FC<WindowsTaskbarProps> = ({
                       onClick={() => updateSetting('theme', settings.theme === 'light' ? 'dark' : 'light')}
                       className={`h-[56px] rounded-[8px] flex flex-col items-center justify-center gap-1 text-[11px] font-medium transition-colors cursor-pointer border ${
                         settings.theme === 'light'
-                          ? 'bg-[#0078d4] text-white border-[#0078d4]'
+                          ? `bg-[#0078d4] ${isLightMode ? 'text-white' : 'text-black'} border-[#0078d4]`
                           : 'bg-black/[0.05] dark:bg-white/[0.08] border-black/[0.06] dark:border-white/[0.08] hover:bg-black/10 dark:hover:bg-white/[0.12]'
                       }`}
                     >
@@ -2235,7 +2243,7 @@ export const WindowsTaskbar: React.FC<WindowsTaskbarProps> = ({
                       onClick={() => updateSetting('spatialGlass', !settings.spatialGlass)}
                       className={`h-[56px] rounded-[8px] flex flex-col items-center justify-center gap-1 text-[11px] font-medium transition-colors cursor-pointer border ${
                         settings.spatialGlass
-                          ? 'bg-[#0078d4] text-white border-[#0078d4]'
+                          ? `bg-[#0078d4] ${isLightMode ? 'text-white' : 'text-black'} border-[#0078d4]`
                           : 'bg-black/[0.05] dark:bg-white/[0.08] border-black/[0.06] dark:border-white/[0.08]'
                       }`}
                     >
@@ -2251,6 +2259,20 @@ export const WindowsTaskbar: React.FC<WindowsTaskbarProps> = ({
                       <LogOut className="w-4 h-4" />
                       <span>Exit Win</span>
                     </button>
+                  </div>
+
+                  <div className="flex items-center gap-2.5 pt-1">
+                    <Sun className="h-4 w-4 shrink-0" />
+                    <input
+                      type="range"
+                      min={20}
+                      max={100}
+                      value={brightness}
+                      onChange={(event) => setBrightness(Number(event.target.value))}
+                      aria-label="Brightness"
+                      className="flex-1 accent-[#0078d4] dark:accent-[#4cc2ff] cursor-pointer"
+                    />
+                    <span className="w-8 text-right text-[11px] tabular-nums">{brightness}%</span>
                   </div>
 
                   <div className="flex items-center gap-2.5 pt-1">
@@ -2290,7 +2312,7 @@ export const WindowsTaskbar: React.FC<WindowsTaskbarProps> = ({
                 onCloseDirectCommand();
                 setIsQuickSettingsOpen((prev) => !prev);
               }}
-              className="h-[36px] pl-2 pr-1 rounded-[5px] flex flex-col items-end justify-center leading-[1.2] hover:bg-black/[0.06] dark:hover:bg-white/[0.08] transition-colors cursor-pointer border-none text-right shrink-0"
+              className="h-[36px] pl-1 pr-0 rounded-[5px] flex flex-col items-end justify-center leading-[1.2] hover:bg-black/[0.06] dark:hover:bg-white/[0.08] transition-colors cursor-pointer border-none text-right shrink-0"
             >
               <span className={`${clockTextSizeClass} font-normal tabular-nums`}>{clockText.time}</span>
               <span className={`${clockTextSizeClass} font-normal tabular-nums`}>{clockText.date}</span>

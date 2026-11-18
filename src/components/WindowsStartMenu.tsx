@@ -189,6 +189,13 @@ export const WindowsStartMenu: React.FC<WindowsStartMenuProps> = ({
         renderIcon: (cls = 'w-8 h-8') => <Fluent3DArticlesIcon className={cls} />,
       },
       {
+        id: 'app-explorer',
+        label: 'File Explorer',
+        route: '/explorer',
+        keywords: 'file explorer folders files documents',
+        renderIcon: (cls = 'w-8 h-8') => <FolderOpen className={`${cls} text-amber-400`} />,
+      },
+      {
         id: 'app-gallery',
         label: 'Gallery',
         route: '/gallery',

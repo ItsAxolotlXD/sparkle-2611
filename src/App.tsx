@@ -50,6 +50,7 @@ import { Feedback } from './pages/Feedback';
 import { WinUI3 } from './pages/WinUI3';
 import { HtmlWriter } from './pages/HtmlWriter';
 import { PcSettings } from './pages/PcSettings';
+import { Explorer } from './pages/Explorer';
 import { CHANNELS_DATA } from './data/channels';
 import { NEWS_DATA } from './data/news';
 import { Channel, NewsArticle } from './types';
@@ -74,6 +75,7 @@ export function getRouteTitle(route: string, channel?: Channel): string {
     const found = NEWS_DATA.find((n) => n.slug === slug);
     return found ? found.title.replace(/^#\s*/, '') : 'Article';
   }
+  if (route.startsWith('/explorer')) return 'File Explorer';
   if (route.startsWith('/gallery')) return 'Gallery';
   if (route.startsWith('/notes') || route.startsWith('/write')) return 'Notes';
   if (route.startsWith('/craftmine')) return 'Craftmine';
@@ -1447,6 +1449,9 @@ export default function App() {
           />
         );
 
+      case '/explorer':
+        return <Explorer />;
+
       case '/gallery':
         return <Gallery navigate={activeNav} searchQuery={activeSearchQuery} routeState={activeState} />;
 
@@ -1673,7 +1678,7 @@ export default function App() {
 
             {/* Dynamic Page Content with slide transition between tab pages like touch keyboard (no splash screen) */}
             <main className={`main-tab-page relative flex-1 w-full mx-auto rounded-tl-none md:rounded-tl-[10px] rounded-tr-none rounded-br-none rounded-bl-none overflow-hidden bg-[#f9f9f9] dark:bg-[#282c31] ${
-              currentRoute === '/' || currentRoute === '/home' || currentRoute === '/news' || currentRoute === '/updates' || isOfficeRoute || currentRoute === '/craftmine' || currentRoute === '/photopea' || currentRoute === '/vlc' || currentRoute === '/screenbox' || currentRoute === '/screenbug' || currentRoute === '/gallery' || currentRoute === '/draws' || currentRoute.startsWith('/draws/') || currentRoute === '/camera' || currentRoute === '/html-writer' || currentRoute.startsWith('/html-writer/') || currentRoute === '/pc-settings' || currentRoute.startsWith('/pc-settings/')
+              currentRoute === '/' || currentRoute === '/home' || currentRoute === '/news' || currentRoute === '/updates' || isOfficeRoute || currentRoute === '/craftmine' || currentRoute === '/photopea' || currentRoute === '/vlc' || currentRoute === '/screenbox' || currentRoute === '/screenbug' || currentRoute === '/gallery' || currentRoute === '/explorer' || currentRoute === '/draws' || currentRoute.startsWith('/draws/') || currentRoute === '/camera' || currentRoute === '/html-writer' || currentRoute.startsWith('/html-writer/') || currentRoute === '/pc-settings' || currentRoute.startsWith('/pc-settings/')
                 ? 'p-0 max-w-none pt-0' 
                 : 'px-4 sm:px-6 md:px-8 py-5 max-w-7xl'
             } ${
@@ -1931,7 +1936,10 @@ export default function App() {
       <GlobalToast />
 
       {/* In-App Insider Evaluation Watermark (30s on / 30s off cycle) */}
-      {isSplashFinished && <EvaluationWatermark />}
+      {isSplashFinished &&
+        (!isWindowsMode || (Object.values(windowStates as Record<string, AppWindowState>).length > 0 && Object.values(windowStates as Record<string, AppWindowState>).every((windowState) => windowState.isMinimized))) && (
+          <EvaluationWatermark />
+        )}
 
       {/* Animated Boot Screen (if enabled via Insider experiments) */}
       {!isBootVideoFinished && settings.animatedBootScreen && (
