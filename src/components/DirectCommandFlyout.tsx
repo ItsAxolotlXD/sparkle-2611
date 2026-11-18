@@ -485,7 +485,7 @@ export const DirectCommandFlyout: React.FC<DirectCommandFlyoutProps> = ({ isOpen
                   </div>
                 ) : (
                   entries.map((entry) => (
-                    <div key={entry.id} className="space-y-0.5">
+                    <div key={entry.id} className="space-y-0.5 rounded-md border border-black/[0.05] dark:border-white/[0.06] bg-black/[0.035] dark:bg-white/[0.035] px-2 py-1.5">
                       {entry.command && (
                         <div className="flex items-start gap-1.5 font-semibold text-[#111827] dark:text-white">
                           <span className="text-[#005fb8] dark:text-[#4cc2ff] shrink-0">C:\Sparkle&gt;</span>
