@@ -488,6 +488,8 @@ export const WindowsTaskbar: React.FC<WindowsTaskbarProps> = ({
       { id: 'page-notes', title: 'Notes', subtitle: 'Switch page', keywords: 'ghi chú soạn thảo notes office', type: 'page', onSelect: () => onLaunchRoute('/notes') },
       { id: 'page-screenbox', title: 'Screenbox', subtitle: 'Switch page', keywords: 'screenbox screenbug vlc media player phát video âm thanh stream disc network equalizer open url', type: 'page', onSelect: () => onLaunchRoute('/screenbox') },
       { id: 'page-camera', title: 'Camera', subtitle: 'Switch page', keywords: 'camera máy ảnh chụp ảnh camera rolls webcam snapshot photo insider', type: 'page', onSelect: () => onLaunchRoute('/camera') },
+      { id: 'page-html-writer', title: 'HTML Writer', subtitle: 'Switch page', keywords: 'html writer code editor css js preview winui 3 viet chay html', type: 'page', onSelect: () => onLaunchRoute('/html-writer') },
+      { id: 'page-pc-settings', title: 'PC Settings', subtitle: 'Switch page', keywords: 'pc settings windows 11 system bluetooth network personalization windows update', type: 'page', onSelect: () => onLaunchRoute('/pc-settings') },
       { id: 'page-settings', title: 'Settings', subtitle: 'Switch page', keywords: 'cài đặt hệ thống settings preferences', type: 'page', onSelect: () => onLaunchRoute('/settings') },
       {
         id: 'flag-theme-toggle',
@@ -1252,18 +1254,12 @@ export const WindowsTaskbar: React.FC<WindowsTaskbarProps> = ({
                 : 'hover:bg-black/[0.06] dark:hover:bg-white/[0.08]'
             }`}
           >
-            <svg className="w-[21px] h-[21px]" viewBox="0 0 24 24" fill="none">
-              <defs>
-                <linearGradient id="win11_start_grad" x1="2" y1="2" x2="22" y2="22" gradientUnits="userSpaceOnUse">
-                  <stop offset="0%" stopColor="#60CDFF" />
-                  <stop offset="100%" stopColor="#0078D4" />
-                </linearGradient>
-              </defs>
-              <rect x="2.5" y="2.5" width="8.7" height="8.7" rx="1.2" fill="url(#win11_start_grad)" />
-              <rect x="12.8" y="2.5" width="8.7" height="8.7" rx="1.2" fill="url(#win11_start_grad)" />
-              <rect x="2.5" y="12.8" width="8.7" height="8.7" rx="1.2" fill="url(#win11_start_grad)" />
-              <rect x="12.8" y="12.8" width="8.7" height="8.7" rx="1.2" fill="url(#win11_start_grad)" />
-            </svg>
+            <img
+              src="/assets/aistudio/image_24e205f4.png"
+              alt="Start"
+              draggable={false}
+              className="w-[24px] h-[24px] object-contain select-none pointer-events-none"
+            />
           </button>
 
           {/* Search Pill ("Search here" - no outline, 80% opacity background, opens Always-on-Top Trending Search UI) */}

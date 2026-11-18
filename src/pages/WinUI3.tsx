@@ -243,7 +243,7 @@ export const FullscreenDialog: React.FC<DialogProps> = ({
   };
 
   const primaryAccent = isDarkMode ? '#4cc2ff' : '#005fb8';
-  const progressAccent = isDarkMode ? '#ff82ff' : '#ff01ff';
+  const progressAccent = isDarkMode ? '#4cc2ff' : '#0067b8';
 
   const copyToken = async () => {
     await navigator.clipboard?.writeText(`--winui-accent: ${primaryAccent}`);
@@ -702,7 +702,7 @@ export const FullscreenDialog: React.FC<DialogProps> = ({
               </p>
             </div>
             <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-[6px] text-[11px] font-semibold ${
-              isDarkMode ? 'bg-[#ff82ff]/20 text-[#ff82ff]' : 'bg-[#ff01ff]/15 text-[#ff01ff]'
+              isDarkMode ? 'bg-[#4cc2ff]/20 text-[#4cc2ff]' : 'bg-[#0067b8]/15 text-[#0067b8]'
             }`}>
               <span className="size-2 rounded-full" style={{ backgroundColor: progressAccent }} />
               ProgressRing

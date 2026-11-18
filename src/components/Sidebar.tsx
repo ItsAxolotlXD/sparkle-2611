@@ -53,7 +53,9 @@ import {
   FluentPhotopeaIcon,
   FluentPersonFeedbackIcon,
   FluentArrowUploadIcon,
-  FluentCameraIcon
+  FluentCameraIcon,
+  FluentHtmlWriterIcon,
+  FluentPcSettingsIcon
 } from './FluentIcons';
 import {
   Fluent3DHomeIcon,
@@ -71,7 +73,9 @@ import {
   Fluent3DDiscordIcon,
   Fluent3DUserIcon,
   Fluent3DSettingsIcon,
-  Fluent3DCameraIcon
+  Fluent3DCameraIcon,
+  Fluent3DHtmlWriterIcon,
+  Fluent3DPcSettingsIcon
 } from './Fluent3DIcons';
 import { useFavorites } from '../hooks/useFavorites';
 import { useSettings } from '../hooks/useSettings';
@@ -823,6 +827,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
     if (route === '/draws' && (currentRoute === '/draws' || currentRoute.startsWith('/draws'))) return true;
     if (route === '/vlc' && (currentRoute === '/vlc' || currentRoute.startsWith('/vlc'))) return true;
     if (route === '/camera' && (currentRoute === '/camera' || currentRoute.startsWith('/camera'))) return true;
+    if (route === '/html-writer' && (currentRoute === '/html-writer' || currentRoute.startsWith('/html-writer'))) return true;
+    if (route === '/pc-settings' && (currentRoute === '/pc-settings' || currentRoute.startsWith('/pc-settings'))) return true;
     if (route === '/craftmine' && currentRoute === '/craftmine') return true;
     if (route === '/photopea' && currentRoute === '/photopea') return true;
     if (route === '/settings' && (currentRoute === '/settings' || currentRoute.startsWith('/settings'))) return true;
@@ -1046,6 +1052,23 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <span>Photopea</span>
           </div>
           <span className="text-[10px] px-1.5 py-0.5 rounded bg-black/5 dark:bg-white/10 text-neutral-600 dark:text-neutral-300 font-medium">Photo editor</span>
+        </button>
+
+        {/* HTML Writer Tool */}
+        <button
+          type="button"
+          id="tool-sidebar-html-writer"
+          onClick={() => {
+            setIsToolsFlyoutOpen(false);
+            handleNavClick('/html-writer');
+          }}
+          className="w-full h-[36px] px-3 rounded-[4px] flex items-center justify-between text-[13px] text-[#111827] dark:text-white hover:bg-black/5 dark:hover:bg-white/10 active:bg-black/10 dark:active:bg-white/15 transition-colors cursor-pointer text-left"
+        >
+          <div className="flex items-center gap-2.5">
+            <FluentHtmlWriterIcon className="w-4 h-4 shrink-0 text-black dark:text-white" />
+            <span>HTML Writer</span>
+          </div>
+          <span className="text-[10px] px-1.5 py-0.5 rounded bg-black/5 dark:bg-white/10 text-neutral-600 dark:text-neutral-300 font-medium">WinUI 3</span>
         </button>
 
         {/* Article contextual tools */}
@@ -1728,6 +1751,32 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </button>
           </div>
 
+          {/* 10. HTML Writer */}
+          <div className="w-full">
+            <button
+              type="button"
+              id={isMobile ? 'mobile-nav-html-writer' : 'sidebar-nav-html-writer'}
+              data-nav-active={(currentRoute === '/html-writer' || currentRoute.startsWith('/html-writer')) ? 'true' : undefined}
+              onClick={() => handleNavClick('/html-writer')}
+              aria-label="HTML Writer"
+              className={`sidebar-nav-item w-full h-[38px] flex items-center justify-between px-3 cursor-pointer relative text-left rounded-[6px] transition-colors ${
+                (currentRoute === '/html-writer' || currentRoute.startsWith('/html-writer'))
+                  ? 'bg-black/5 dark:bg-white/[0.08] text-black dark:text-white font-medium shadow-xs'
+                  : 'text-black dark:text-[#cccccc] hover:bg-black/5 dark:hover:bg-white/[0.05] hover:text-black dark:hover:text-white'
+              }`}
+            >
+              <div className="flex items-center gap-3.5 truncate">
+                {useFluent3DForContent ? (
+                  <Fluent3DHtmlWriterIcon className="w-5 h-5 shrink-0" />
+                ) : (
+                  <FluentHtmlWriterIcon className="w-5 h-5 shrink-0 text-black dark:text-white" />
+                )}
+                <span className="truncate text-[13.5px]">HTML Writer</span>
+              </div>
+              <span className="text-[10px] px-1.5 py-0.5 rounded bg-black/5 dark:bg-white/10 text-neutral-600 dark:text-neutral-300 font-medium">WinUI 3</span>
+            </button>
+          </div>
+
           {/* Divider & Category Heading: LAC's project */}
           <div className="my-2 mx-1 h-[1px] bg-black/10 dark:bg-white/10" />
           <div className="px-1.5 pt-0.5 pb-1 shrink-0">
@@ -1856,6 +1905,33 @@ export const Sidebar: React.FC<SidebarProps> = ({
             )}
             <FluentPersonFeedbackIcon className="w-5 h-5 shrink-0 text-black dark:text-white" />
             <span className="truncate text-[13.5px]">Feedback</span>
+          </button>
+
+          {/* PC Settings (Separate Windows 11 PC Settings App) */}
+          <button
+            type="button"
+            id={isMobile ? 'mobile-nav-pc-settings' : 'sidebar-nav-pc-settings'}
+            data-nav-active={isCurrentActive('/pc-settings') ? 'true' : undefined}
+            onClick={() => handleNavClick('/pc-settings')}
+            aria-label="PC Settings"
+            className={`sidebar-nav-item w-full h-[38px] flex items-center gap-3.5 px-3 cursor-pointer relative text-left rounded-[6px] transition-colors ${
+              isCurrentActive('/pc-settings')
+                ? 'bg-black/5 dark:bg-white/[0.08] text-black dark:text-white font-medium shadow-xs'
+                : 'text-black dark:text-[#cccccc] hover:bg-black/5 dark:hover:bg-white/[0.05] hover:text-black dark:hover:text-white'
+            }`}
+          >
+            {isCurrentActive('/pc-settings') && (
+              <span
+                aria-hidden="true"
+                className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-[16px] bg-[#4cc2ff] rounded-full z-30 pointer-events-none"
+              />
+            )}
+            {useFluent3DForSystem ? (
+              <Fluent3DPcSettingsIcon className="w-5 h-5 shrink-0" />
+            ) : (
+              <FluentPcSettingsIcon className="w-5 h-5 shrink-0 text-black dark:text-white" />
+            )}
+            <span className="truncate text-[13.5px]">PC Settings</span>
           </button>
 
           {/* Bottom Settings Tab Item - icon thường khi dynamic */}
@@ -2156,6 +2232,28 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   )}
                 </button>
 
+                {/* 9. HTML Writer Icon */}
+                <button
+                  type="button"
+                  id="sidebar-collapsed-html-writer"
+                  data-nav-active={(currentRoute === '/html-writer' || currentRoute.startsWith('/html-writer')) ? 'true' : undefined}
+                  onClick={() => handleNavClick('/html-writer')}
+                  onMouseEnter={(e) => showTooltip('HTML Writer', e)}
+                  onMouseLeave={hideTooltip}
+                  aria-label="HTML Writer"
+                  className={`sidebar-nav-item w-10 h-[38px] rounded-[6px] shrink-0 flex items-center justify-center relative transition-colors cursor-pointer ${
+                    (currentRoute === '/html-writer' || currentRoute.startsWith('/html-writer'))
+                      ? 'bg-black/5 dark:bg-white/[0.08] text-black dark:text-white shadow-xs'
+                      : 'text-black dark:text-[#cccccc] hover:bg-black/5 dark:hover:bg-white/[0.05] hover:text-black dark:hover:text-white'
+                  }`}
+                >
+                  {useFluent3DForContent ? (
+                    <Fluent3DHtmlWriterIcon className="w-5 h-5 shrink-0" />
+                  ) : (
+                    <FluentHtmlWriterIcon className="w-5 h-5 text-black dark:text-white" />
+                  )}
+                </button>
+
                 {/* Divider: LAC's project */}
                 <div className="w-6 h-[1px] bg-black/10 dark:bg-white/10 my-2 shrink-0" />
 
@@ -2273,6 +2371,34 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     />
                   )}
                   <FluentPersonFeedbackIcon className="w-5 h-5 text-[#111827] dark:text-white shrink-0" />
+                </button>
+
+                {/* PC Settings Collapsed Button */}
+                <button
+                  type="button"
+                  id="sidebar-collapsed-pc-settings"
+                  data-nav-active={isCurrentActive('/pc-settings') ? 'true' : undefined}
+                  onClick={() => handleNavClick('/pc-settings')}
+                  onMouseEnter={(e) => showTooltip('PC Settings', e)}
+                  onMouseLeave={hideTooltip}
+                  aria-label="PC Settings"
+                  className={`sidebar-nav-item w-10 h-[38px] rounded-[6px] shrink-0 flex items-center justify-center relative transition-colors cursor-pointer ${
+                    isCurrentActive('/pc-settings')
+                      ? 'bg-black/5 dark:bg-white/[0.08] text-[#111827] dark:text-white shadow-xs'
+                      : 'text-[#4b5563] dark:text-[#cccccc] hover:bg-black/5 dark:hover:bg-white/[0.05] hover:text-[#111827] dark:hover:text-white'
+                  }`}
+                >
+                  {isCurrentActive('/pc-settings') && (
+                    <span
+                      aria-hidden="true"
+                      className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-[16px] bg-[#4cc2ff] rounded-full z-30 pointer-events-none"
+                    />
+                  )}
+                  {useFluent3DForSystem ? (
+                    <Fluent3DPcSettingsIcon className="w-5 h-5 shrink-0" />
+                  ) : (
+                    <FluentPcSettingsIcon className="w-5 h-5 text-[#111827] dark:text-white" />
+                  )}
                 </button>
 
                 {/* Bottom Settings Icon */}

@@ -29,6 +29,8 @@ import {
   FluentVlcIcon,
   FluentPersonFeedbackIcon,
   FluentInkCanvasIcon,
+  FluentHtmlWriterIcon,
+  FluentPcSettingsIcon,
 } from './FluentIcons';
 import {
   Fluent3DHomeIcon,
@@ -43,6 +45,8 @@ import {
   Fluent3DCameraIcon,
   Fluent3DSettingsIcon,
   Fluent3DFolderSearchIcon,
+  Fluent3DHtmlWriterIcon,
+  Fluent3DPcSettingsIcon,
 } from './Fluent3DIcons';
 import { useSettings } from '../hooks/useSettings';
 
@@ -323,6 +327,13 @@ export const TabIcon: React.FC<{ route: string; active?: boolean; dynamicIcons?:
       <FluentPhotopeaIcon className={`${iconClass} text-black dark:text-white`} />
     );
   }
+  if (route.startsWith('/html-writer')) {
+    return useFluent3DForContent ? (
+      <Fluent3DHtmlWriterIcon className={iconClass} />
+    ) : (
+      <FluentHtmlWriterIcon className={`${iconClass} text-black dark:text-white`} />
+    );
+  }
   if (route.startsWith('/winui-3')) {
     return (
       <img
@@ -330,6 +341,13 @@ export const TabIcon: React.FC<{ route: string; active?: boolean; dynamicIcons?:
         alt="WinUI 3"
         className={`${iconClass} shrink-0 object-contain winui-sidebar-icon`}
       />
+    );
+  }
+  if (route.startsWith('/pc-settings')) {
+    return useFluent3DForSystem ? (
+      <Fluent3DPcSettingsIcon className={iconClass} />
+    ) : (
+      <FluentPcSettingsIcon className={`${iconClass} text-[#111827] dark:text-white`} />
     );
   }
   if (route.startsWith('/settings')) {

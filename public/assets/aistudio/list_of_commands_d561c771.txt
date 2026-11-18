@@ -1,0 +1,10 @@
+/help: Get help of all commands available
+/ui /si /small|default|large: Modifies the UI scale of Windows Mode to fit your screen
+/theme /light|dark: Change the overall theme for your comfort
+/search /appearance /box|button: Change the search style on taskbar to be a box or a button
+/taskbar /si /small|default|large: Modifies the taskbar scale to fit your screen
+/taskbar /alignment /center|left: Adjust the taskbar alignment to the left or center
+/vivetool /enable|disable /id:<ID number>: Force enable or disable Vive features (đồng thời velocity features -> Vive Features, mỗi vivetool features sẽ gán với dãy ID gồm 8 ký tự số random để bật/tắt thông qua lệnh)
+/vivetool /list: Shows list of available Vive features
+/session /end: Exit Windows Mode
+/session /start: Start Windows Mode

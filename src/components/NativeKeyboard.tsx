@@ -795,7 +795,7 @@ export const NativeKeyboard: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => setClipboardSearchQuery('')}
-                      className="text-[11px] text-[#ff01ff] font-semibold hover:underline cursor-pointer"
+                      className="text-[11px] text-[#0067b8] dark:text-[#4cc2ff] font-semibold hover:underline cursor-pointer"
                     >
                       Xóa bộ lọc tìm kiếm
                     </button>
@@ -863,7 +863,7 @@ export const NativeKeyboard: React.FC = () => {
                     }}
                     className={`absolute left-1/2 -translate-x-1/2 w-full rounded-full cursor-grab active:cursor-grabbing transition-colors shadow-xs ${
                       isClipboardDragging
-                        ? 'bg-[#ff01ff]'
+                        ? 'bg-[#0067b8] dark:bg-[#4cc2ff]'
                         : 'bg-neutral-600/70 hover:bg-neutral-800'
                     }`}
                   />

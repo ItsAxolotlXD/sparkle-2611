@@ -48,6 +48,8 @@ import { Camera } from './pages/Camera';
 import { Auth } from './pages/Auth';
 import { Feedback } from './pages/Feedback';
 import { WinUI3 } from './pages/WinUI3';
+import { HtmlWriter } from './pages/HtmlWriter';
+import { PcSettings } from './pages/PcSettings';
 import { CHANNELS_DATA } from './data/channels';
 import { NEWS_DATA } from './data/news';
 import { Channel, NewsArticle } from './types';
@@ -80,6 +82,8 @@ export function getRouteTitle(route: string, channel?: Channel): string {
   if (route.startsWith('/camera')) return 'Camera';
   if (route.startsWith('/settings')) return 'Settings';
   if (route.startsWith('/winui-3') || route.startsWith('/winui')) return 'WinUI 3';
+  if (route.startsWith('/html-writer')) return 'HTML Writer';
+  if (route.startsWith('/pc-settings')) return 'PC Settings';
   if (route.startsWith('/feedback')) return 'Feedback';
   if (route.startsWith('/channels')) return 'Channels';
   if (route.startsWith('/favorites')) return 'Favorites';
@@ -149,6 +153,8 @@ export default function App() {
     ];
   });
   const [activeTabId, setActiveTabId] = useState<string>('tab-1');
+  const tabsRef = useRef<AppTab[]>(tabs);
+  tabsRef.current = tabs;
 
   // Windows Mode state & floating window geometry
   const isWindowsMode = Boolean(settings.windowsMode);
@@ -646,28 +652,27 @@ export default function App() {
 
   const focusWindow = useCallback(
     (tabId: string) => {
+      const currentTabs = tabsRef.current;
+      const targetTab = currentTabs.find((t) => t.id === tabId);
       setActiveTabId(tabId);
-      setTabs((prevTabs) => {
-        const targetTab = prevTabs.find((t) => t.id === tabId);
-        if (targetTab) {
-          if (targetTab.channelId) {
-            const ch = channels.find((c) => c.id === targetTab.channelId);
-            if (ch) setCurrentChannel(ch);
-          }
-          setRouteState(targetTab.routeState || null);
-          const base = targetTab.route.includes('?') ? targetTab.route.split('?')[0] : targetTab.route;
-          setCurrentRoute(base);
-          window.history.pushState(null, '', targetTab.route);
+      if (targetTab) {
+        if (targetTab.channelId) {
+          const ch = channels.find((c) => c.id === targetTab.channelId);
+          if (ch) setCurrentChannel(ch);
         }
-        setWindowStates((prevWs) => bringWindowToFront(prevWs, tabId, prevTabs, true));
-        return prevTabs;
-      });
+        setRouteState(targetTab.routeState || null);
+        const base = targetTab.route.includes('?') ? targetTab.route.split('?')[0] : targetTab.route;
+        setCurrentRoute(base);
+        window.history.pushState(null, '', targetTab.route);
+      }
+      setWindowStates((prevWs) => bringWindowToFront(prevWs, tabId, currentTabs, true));
     },
     [channels, bringWindowToFront]
   );
 
   const handleMinimizeWindow = useCallback(
     (tabId: string) => {
+      let nextFocusId: string | null = null;
       setWindowStates((prev) => {
         const current = prev[tabId];
         if (!current) return prev;
@@ -677,30 +682,33 @@ export default function App() {
             .filter(([id, ws]) => id !== tabId && !ws.isMinimized)
             .sort((a, b) => b[1].zIndex - a[1].zIndex);
           if (remainingVisible.length > 0) {
-            setActiveTabId(remainingVisible[0][0]);
+            nextFocusId = remainingVisible[0][0];
           }
         }
         return next;
       });
+      if (nextFocusId) {
+        setActiveTabId(nextFocusId);
+      }
     },
     [activeTabId]
   );
 
   const handleToggleMaximizeWindow = useCallback(
     (tabId: string) => {
+      const currentTabs = tabsRef.current;
       setActiveTabId(tabId);
-      setTabs((prevTabs) => {
-        setWindowStates((prevWs) => {
-          const updated = bringWindowToFront(prevWs, tabId, prevTabs, true);
-          return {
-            ...updated,
-            [tabId]: {
-              ...updated[tabId],
-              isMaximized: !updated[tabId].isMaximized,
-            },
-          };
-        });
-        return prevTabs;
+      setWindowStates((prevWs) => {
+        const updated = bringWindowToFront(prevWs, tabId, currentTabs, true);
+        const target = updated[tabId];
+        if (!target) return updated;
+        return {
+          ...updated,
+          [tabId]: {
+            ...target,
+            isMaximized: !target.isMaximized,
+          },
+        };
       });
     },
     [bringWindowToFront]
@@ -781,16 +789,15 @@ export default function App() {
       history: [initialRoute],
       channelId: matchedChannel?.id,
     };
-    setTabs((prev) => {
-      const nextTabs = [...prev, newTab];
-      if (isWindowsMode) {
-        setWindowStates((prevWs) => {
-          const ws = createDefaultWindowState(prev.length, 40);
-          return bringWindowToFront({ ...prevWs, [newId]: ws }, newId, nextTabs, true);
-        });
-      }
-      return nextTabs;
-    });
+    const currentTabs = tabsRef.current;
+    const nextTabs = [...currentTabs, newTab];
+    setTabs(nextTabs);
+    if (isWindowsMode) {
+      setWindowStates((prevWs) => {
+        const ws = createDefaultWindowState(currentTabs.length, 40);
+        return bringWindowToFront({ ...prevWs, [newId]: ws }, newId, nextTabs, true);
+      });
+    }
     setActiveTabId(newId);
     if (matchedChannel) setCurrentChannel(matchedChannel);
     setCurrentRoute(base);
@@ -814,29 +821,25 @@ export default function App() {
         }
       }
       const nextTitle = getRouteTitle(base, matchedChannel || currentChannel);
-      setTabs((prev) =>
-        prev.map((t) => {
-          if (t.id !== tabId) return t;
-          const prevHist = t.history && t.history.length > 0 ? t.history : [t.route];
-          const nextHist = prevHist[prevHist.length - 1] === path ? prevHist : [...prevHist, path];
-          return {
-            ...t,
-            route: path,
-            title: nextTitle,
-            routeState: state,
-            history: nextHist,
-            channelId: matchedChannel ? matchedChannel.id : t.channelId,
-          };
-        })
-      );
+      const nextTabs = tabsRef.current.map((t) => {
+        if (t.id !== tabId) return t;
+        const prevHist = t.history && t.history.length > 0 ? t.history : [t.route];
+        const nextHist = prevHist[prevHist.length - 1] === path ? prevHist : [...prevHist, path];
+        return {
+          ...t,
+          route: path,
+          title: nextTitle,
+          routeState: state,
+          history: nextHist,
+          channelId: matchedChannel ? matchedChannel.id : t.channelId,
+        };
+      });
+      setTabs(nextTabs);
       setActiveTabId(tabId);
       setCurrentRoute(base);
       setRouteState(state || null);
       window.history.pushState(null, '', path);
-      setTabs((prev) => {
-        setWindowStates((prevWs) => bringWindowToFront(prevWs, tabId, prev, true));
-        return prev;
-      });
+      setWindowStates((prevWs) => bringWindowToFront(prevWs, tabId, nextTabs, true));
     },
     [channels, currentChannel, bringWindowToFront]
   );
@@ -881,6 +884,8 @@ export default function App() {
         if (b === '/notes' || b.startsWith('/notes/') || b === '/write' || b === '/present' || b === '/table') return 'notes';
         if (b === '/vlc' || b === '/screenbox' || b === '/screenbug') return 'screenbox';
         if (b === '/draws' || b.startsWith('/draws/')) return 'draws';
+        if (b === '/html-writer' || b.startsWith('/html-writer/')) return 'html-writer';
+        if (b === '/pc-settings' || b.startsWith('/pc-settings/')) return 'pc-settings';
         if (b === '/settings' || b.startsWith('/settings')) return 'settings';
         return b;
       };
@@ -895,7 +900,8 @@ export default function App() {
         }
       }
 
-      const existing = tabs.find((t) => getGroup(t.route) === targetGroup);
+      const currentTabs = tabsRef.current;
+      const existing = currentTabs.find((t) => getGroup(t.route) === targetGroup);
       if (existing) {
         if (path !== existing.route || state !== undefined) {
           navigateInWindow(existing.id, path, state);
@@ -914,86 +920,84 @@ export default function App() {
         history: [path],
         channelId: matchedChannel?.id,
       };
-      setTabs((prev) => {
-        const nextTabs = [...prev, newTab];
-        setWindowStates((prevWs) => {
-          const ws = createDefaultWindowState(prev.length, 40);
-          return bringWindowToFront({ ...prevWs, [newId]: ws }, newId, nextTabs, true);
-        });
-        return nextTabs;
+      const nextTabs = [...currentTabs, newTab];
+      setTabs(nextTabs);
+      setWindowStates((prevWs) => {
+        const ws = createDefaultWindowState(currentTabs.length, 40);
+        return bringWindowToFront({ ...prevWs, [newId]: ws }, newId, nextTabs, true);
       });
       setActiveTabId(newId);
       setCurrentRoute(base);
       setRouteState(state || null);
       window.history.pushState(null, '', path);
     },
-    [tabs, channels, currentChannel, navigateInWindow, focusWindow, createDefaultWindowState, bringWindowToFront]
+    [channels, currentChannel, navigateInWindow, focusWindow, createDefaultWindowState, bringWindowToFront]
   );
 
   const handleCloseTab = useCallback((tabId: string) => {
-    setTabs((prev) => {
-      if (prev.length <= 1) {
-        if (isWindowsMode) {
-          setActiveTabId('');
-          setWindowStates((prevWs) => {
-            const nextWs = { ...prevWs };
-            delete nextWs[tabId];
-            return nextWs;
-          });
-          return [];
-        }
-        // Reset single tab to Home
-        setCurrentRoute('/');
-        setRouteState(null);
-        window.history.pushState(null, '', '/');
-        return [{ id: prev[0].id, title: 'Home', route: '/', history: ['/'] }];
+    const prev = tabsRef.current;
+    if (prev.length <= 1) {
+      if (isWindowsMode) {
+        setTabs([]);
+        setActiveTabId('');
+        setWindowStates((prevWs) => {
+          const nextWs = { ...prevWs };
+          delete nextWs[tabId];
+          return nextWs;
+        });
+        return;
       }
-      const closeIdx = prev.findIndex((t) => t.id === tabId);
-      const remaining = prev.filter((t) => t.id !== tabId);
-      setWindowStates((prevWs) => {
-        const nextWs = { ...prevWs };
-        delete nextWs[tabId];
-        return nextWs;
-      });
-      if (activeTabId === tabId) {
-        const nextIdx = Math.min(closeIdx, remaining.length - 1);
-        const nextTab = remaining[nextIdx];
-        setActiveTabId(nextTab.id);
-        const base = nextTab.route.includes('?') ? nextTab.route.split('?')[0] : nextTab.route;
-        setCurrentRoute(base);
-        setRouteState(nextTab.routeState || null);
-        if (nextTab.channelId) {
-          const ch = channels.find((c) => c.id === nextTab.channelId);
-          if (ch) setCurrentChannel(ch);
-        }
-        window.history.pushState(null, '', nextTab.route);
-      }
-      return remaining;
+      // Reset single tab to Home
+      setTabs([{ id: prev[0]?.id || 'tab-1', title: 'Home', route: '/', history: ['/'] }]);
+      setCurrentRoute('/');
+      setRouteState(null);
+      window.history.pushState(null, '', '/');
+      return;
+    }
+    const closeIdx = prev.findIndex((t) => t.id === tabId);
+    const remaining = prev.filter((t) => t.id !== tabId);
+    setTabs(remaining);
+    setWindowStates((prevWs) => {
+      const nextWs = { ...prevWs };
+      delete nextWs[tabId];
+      return nextWs;
     });
+    if (activeTabId === tabId) {
+      const nextIdx = Math.min(closeIdx, remaining.length - 1);
+      const nextTab = remaining[nextIdx];
+      setActiveTabId(nextTab.id);
+      const base = nextTab.route.includes('?') ? nextTab.route.split('?')[0] : nextTab.route;
+      setCurrentRoute(base);
+      setRouteState(nextTab.routeState || null);
+      if (nextTab.channelId) {
+        const ch = channels.find((c) => c.id === nextTab.channelId);
+        if (ch) setCurrentChannel(ch);
+      }
+      window.history.pushState(null, '', nextTab.route);
+    }
   }, [activeTabId, channels, isWindowsMode]);
 
   const handleDuplicateTab = useCallback((tabId: string) => {
-    setTabs((prev) => {
-      const sourceTab = prev.find((t) => t.id === tabId);
-      if (!sourceTab) return prev;
-      const newId = `tab-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
-      const newTab: AppTab = {
-        ...sourceTab,
-        id: newId,
-        history: sourceTab.history ? [...sourceTab.history] : [sourceTab.route],
-      };
-      const idx = prev.findIndex((t) => t.id === tabId);
-      const next = [...prev];
-      next.splice(idx + 1, 0, newTab);
-      if (isWindowsMode) {
-        setWindowStates((prevWs) => {
-          const ws = createDefaultWindowState(next.length, 40);
-          return bringWindowToFront({ ...prevWs, [newId]: ws }, newId, next, true);
-        });
-      }
-      setActiveTabId(newId);
-      return next;
-    });
+    const prev = tabsRef.current;
+    const sourceTab = prev.find((t) => t.id === tabId);
+    if (!sourceTab) return;
+    const newId = `tab-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
+    const newTab: AppTab = {
+      ...sourceTab,
+      id: newId,
+      history: sourceTab.history ? [...sourceTab.history] : [sourceTab.route],
+    };
+    const idx = prev.findIndex((t) => t.id === tabId);
+    const next = [...prev];
+    next.splice(idx + 1, 0, newTab);
+    setTabs(next);
+    if (isWindowsMode) {
+      setWindowStates((prevWs) => {
+        const ws = createDefaultWindowState(next.length, 40);
+        return bringWindowToFront({ ...prevWs, [newId]: ws }, newId, next, true);
+      });
+    }
+    setActiveTabId(newId);
   }, [isWindowsMode, createDefaultWindowState, bringWindowToFront]);
 
   const handleCloseOtherTabs = useCallback((tabId: string) => {
@@ -1443,6 +1447,12 @@ export default function App() {
       case '/photopea':
         return <Photopea />;
 
+      case '/html-writer':
+        return <HtmlWriter />;
+
+      case '/pc-settings':
+        return <PcSettings navigate={activeNav} />;
+
       default:
         return <HomePreview channels={channels} onSelectChannel={setCurrentChannel} navigate={activeNav} />;
     }
@@ -1640,7 +1650,7 @@ export default function App() {
 
             {/* Dynamic Page Content with slide transition between tab pages like touch keyboard (no splash screen) */}
             <main className={`main-tab-page relative flex-1 w-full mx-auto rounded-tl-none md:rounded-tl-[10px] rounded-tr-none rounded-br-none rounded-bl-none overflow-hidden bg-[#f9f9f9] dark:bg-[#282c31] ${
-              currentRoute === '/' || currentRoute === '/home' || currentRoute === '/news' || currentRoute === '/updates' || isOfficeRoute || currentRoute === '/craftmine' || currentRoute === '/photopea' || currentRoute === '/vlc' || currentRoute === '/screenbox' || currentRoute === '/screenbug' || currentRoute === '/gallery' || currentRoute === '/draws' || currentRoute.startsWith('/draws/') || currentRoute === '/camera'
+              currentRoute === '/' || currentRoute === '/home' || currentRoute === '/news' || currentRoute === '/updates' || isOfficeRoute || currentRoute === '/craftmine' || currentRoute === '/photopea' || currentRoute === '/vlc' || currentRoute === '/screenbox' || currentRoute === '/screenbug' || currentRoute === '/gallery' || currentRoute === '/draws' || currentRoute.startsWith('/draws/') || currentRoute === '/camera' || currentRoute === '/html-writer' || currentRoute.startsWith('/html-writer/') || currentRoute === '/pc-settings' || currentRoute.startsWith('/pc-settings/')
                 ? 'p-0 max-w-none pt-0' 
                 : 'px-4 sm:px-6 md:px-8 py-5 max-w-7xl'
             } ${

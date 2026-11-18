@@ -532,6 +532,8 @@ export const TopBar: React.FC<TopBarProps> = ({
       { id: 'page-notes', title: 'Notes', subtitle: 'Switch page', keywords: 'ghi chú soạn thảo notes office', type: 'page', onSelect: () => navigate('/notes') },
       { id: 'page-screenbox', title: 'Screenbox', subtitle: 'Switch page', keywords: 'screenbox screenbug vlc media player phát video âm thanh stream disc network equalizer open url', type: 'page', onSelect: () => navigate('/screenbox') },
       { id: 'page-camera', title: 'Camera', subtitle: 'Switch page', keywords: 'camera máy ảnh chụp ảnh camera rolls webcam snapshot photo insider', type: 'page', onSelect: () => navigate('/camera') },
+      { id: 'page-html-writer', title: 'HTML Writer', subtitle: 'Switch page', keywords: 'html writer code editor css js preview winui 3 lập trình web chạy thử html', type: 'page', onSelect: () => navigate('/html-writer') },
+      { id: 'page-pc-settings', title: 'PC Settings', subtitle: 'Switch page', keywords: 'pc settings windows 11 system bluetooth network personalization windows update', type: 'page', onSelect: () => navigate('/pc-settings') },
       { id: 'page-settings', title: 'Settings', subtitle: 'Switch page', keywords: 'cài đặt hệ thống settings preferences', type: 'page', onSelect: () => navigate('/settings') },
       // All Interactive System Settings & Action Toggles (Search & execute right on Search UI)
       {
@@ -1901,6 +1903,8 @@ export const TopBar: React.FC<TopBarProps> = ({
                     if (currentRoute.startsWith('/vlc') || currentRoute.startsWith('/screenbox')) return 'Search Screenbox';
                     if (currentRoute.startsWith('/craftmine')) return 'Search Craftmine';
                     if (currentRoute.startsWith('/photopea')) return 'Search Photopea';
+                    if (currentRoute.startsWith('/html-writer')) return 'Search HTML Writer';
+                    if (currentRoute.startsWith('/pc-settings')) return 'Search PC Settings';
                     if (currentRoute.startsWith('/settings')) return 'Search settings';
                     if (currentRoute.startsWith('/winui-3') || currentRoute.startsWith('/winui')) return 'Search WinUI 3 Gallery';
                     if (currentRoute.startsWith('/channels')) return 'Search Channels';

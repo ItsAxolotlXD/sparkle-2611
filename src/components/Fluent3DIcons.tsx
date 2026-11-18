@@ -698,4 +698,75 @@ export const Fluent3DCameraIcon: React.FC<Fluent3DIconProps> = ({ className = 'w
   </div>
 );
 
+// 18. HTML Writer - 3D Fluent Code & Web Preview Document Icon
+export const Fluent3DHtmlWriterIcon: React.FC<Fluent3DIconProps> = ({ className = 'w-5 h-5', style }) => (
+  <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" className={`fluent-3d-icon ${className} shrink-0`} style={style}>
+    <defs>
+      <linearGradient id="fl3d_html_card" x1="4" y1="4" x2="28" y2="28" gradientUnits="userSpaceOnUse">
+        <stop offset="0%" stopColor="#4CC2FF" />
+        <stop offset="55%" stopColor="#0078D4" />
+        <stop offset="100%" stopColor="#005FB8" />
+      </linearGradient>
+      <linearGradient id="fl3d_html_header" x1="4" y1="4" x2="28" y2="10" gradientUnits="userSpaceOnUse">
+        <stop offset="0%" stopColor="#93E2FF" />
+        <stop offset="100%" stopColor="#4CC2FF" />
+      </linearGradient>
+      <filter id="fl3d_html_shadow" x="-15%" y="-15%" width="130%" height="130%">
+        <feDropShadow dx="0" dy="1.5" stdDeviation="1.2" floodColor="#000" floodOpacity="0.28" />
+      </filter>
+    </defs>
+    <g filter="url(#fl3d_html_shadow)">
+      <rect x="4" y="5" width="24" height="22" rx="4" fill="url(#fl3d_html_card)" />
+      <path d="M4 9C4 6.79086 5.79086 5 8 5H24C26.2091 5 28 6.79086 28 9V10.5H4V9Z" fill="url(#fl3d_html_header)" opacity="0.95" />
+      <circle cx="8" cy="7.75" r="1" fill="#005FB8" />
+      <circle cx="11" cy="7.75" r="1" fill="#005FB8" opacity="0.65" />
+      <path d="M12 15.5L8.5 19L12 22.5" stroke="#FFFFFF" strokeWidth="2.1" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M20 15.5L23.5 19L20 22.5" stroke="#FFFFFF" strokeWidth="2.1" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M17.4 14.5L14.6 23.5" stroke="#BAE6FD" strokeWidth="2" strokeLinecap="round" />
+    </g>
+  </svg>
+);
+
+// 19. PC Settings - 3D Windows 11 Desktop & Control Gear Icon
+export const Fluent3DPcSettingsIcon: React.FC<Fluent3DIconProps> = ({ className = 'w-5 h-5', style }) => (
+  <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" className={`fluent-3d-icon ${className} shrink-0`} style={style}>
+    <defs>
+      <linearGradient id="fl3d_pcset_screen" x1="3" y1="5" x2="27" y2="22" gradientUnits="userSpaceOnUse">
+        <stop offset="0%" stopColor="#60CDFF" />
+        <stop offset="55%" stopColor="#0078D4" />
+        <stop offset="100%" stopColor="#00529B" />
+      </linearGradient>
+      <linearGradient id="fl3d_pcset_stand" x1="11" y1="22" x2="21" y2="28" gradientUnits="userSpaceOnUse">
+        <stop offset="0%" stopColor="#CBD5E1" />
+        <stop offset="100%" stopColor="#64748B" />
+      </linearGradient>
+      <linearGradient id="fl3d_pcset_gear" x1="18" y1="16" x2="29" y2="28" gradientUnits="userSpaceOnUse">
+        <stop offset="0%" stopColor="#F8FAFC" />
+        <stop offset="100%" stopColor="#94A3B8" />
+      </linearGradient>
+      <filter id="fl3d_pcset_shadow" x="-15%" y="-15%" width="130%" height="130%">
+        <feDropShadow dx="0" dy="1.4" stdDeviation="1.1" floodColor="#000" floodOpacity="0.28" />
+      </filter>
+    </defs>
+    <g filter="url(#fl3d_pcset_shadow)">
+      <path d="M13 22H19V25.5H21.5C22.0523 25.5 22.5 25.9477 22.5 26.5C22.5 27.0523 22.0523 27.5 21.5 27.5H10.5C9.94772 27.5 9.5 27.0523 9.5 26.5C9.5 25.9477 9.94772 25.5 10.5 25.5H13V22Z" fill="url(#fl3d_pcset_stand)" />
+      <rect x="3" y="5" width="24" height="17.5" rx="3.2" fill="#1E293B" />
+      <rect x="4.5" y="6.5" width="21" height="14.5" rx="2" fill="url(#fl3d_pcset_screen)" />
+      <circle cx="9.5" cy="11.5" r="2.2" fill="#FFFFFF" opacity="0.28" />
+      <path d="M6 19.5C8.5 15 12.5 14 16 17.5C18.5 20 21.5 18 24 14.5V19.5C24 20.05 23.55 20.5 23 20.5H7C6.45 20.5 6 20.05 6 19.5Z" fill="#93E2FF" opacity="0.45" />
+      <g transform="translate(17.5, 16.5)">
+        <path
+          d="M6.2 1.2L7.3 1.4L7.7 2.7C8.1 2.9 8.5 3.1 8.8 3.4L10.1 3L10.8 4L10 5.1C10.2 5.5 10.3 6 10.3 6.5C10.3 7 10.2 7.5 10 7.9L10.8 9L10.1 10L8.8 9.6C8.5 9.9 8.1 10.1 7.7 10.3L7.3 11.6L6.2 11.8L5.6 10.6C5.1 10.6 4.7 10.5 4.3 10.3L3.1 11L2.2 10.2L2.8 8.9C2.5 8.5 2.3 8.1 2.2 7.6L1 7.1V5.9L2.2 5.4C2.3 4.9 2.5 4.5 2.8 4.1L2.2 2.8L3.1 2L4.3 2.7C4.7 2.5 5.1 2.4 5.6 2.4L6.2 1.2Z"
+          fill="url(#fl3d_pcset_gear)"
+          stroke="#475569"
+          strokeWidth="0.6"
+        />
+        <circle cx="6.2" cy="6.5" r="2" fill="#0067B8" />
+      </g>
+    </g>
+  </svg>
+);
+
+
+
 

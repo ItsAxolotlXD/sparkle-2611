@@ -18,7 +18,7 @@ import {
   Wrench,
   FileText
 } from 'lucide-react';
-import { FluentNotesIcon, FluentSearchIcon, FluentGalleryIcon, FluentInkCanvasIcon, FluentScreenbugIcon, FluentVlcIcon, FluentPhotopeaIcon, FluentArrowUploadIcon, FluentCameraIcon } from './FluentIcons';
+import { FluentNotesIcon, FluentSearchIcon, FluentGalleryIcon, FluentInkCanvasIcon, FluentScreenbugIcon, FluentVlcIcon, FluentPhotopeaIcon, FluentArrowUploadIcon, FluentCameraIcon, FluentHtmlWriterIcon, FluentPcSettingsIcon } from './FluentIcons';
 import { Channel, NewsArticle } from '../types';
 import { useFavorites } from '../hooks/useFavorites';
 import { useSettings } from '../hooks/useSettings';
@@ -774,6 +774,42 @@ export const ToolsMenu: React.FC<ToolsMenuProps> = ({
                   <span className="truncate">Photopea</span>
                 </div>
                 <span className="text-[10px] px-1.5 py-0.5 rounded-[2px] bg-black/5 dark:bg-white/10 text-neutral-600 dark:text-neutral-300 font-medium">Photo editor</span>
+              </button>
+
+              {/* HTML Writer */}
+              <button
+                id="tool-html-writer"
+                type="button"
+                onClick={() => {
+                  setIsOpen(false);
+                  onNavigate('/html-writer');
+                }}
+                className="fluent-reveal-item w-full h-[34px] px-2.5 rounded-[4px] flex items-center justify-between text-[13px] font-normal transition-colors text-left cursor-default text-[#1b1b1b] dark:text-[#f3f3f3] hover:bg-black/5 dark:hover:bg-white/[0.08] active:bg-black/10 dark:active:bg-white/[0.05]"
+                {...revealProps}
+              >
+                <div className="flex items-center gap-2.5 truncate">
+                  <FluentHtmlWriterIcon className="w-4 h-4 shrink-0 text-[#111827] dark:text-white" />
+                  <span className="truncate">HTML Writer</span>
+                </div>
+                <span className="text-[10px] px-1.5 py-0.5 rounded-[2px] bg-black/5 dark:bg-white/10 text-neutral-600 dark:text-neutral-300 font-medium">WinUI 3</span>
+              </button>
+
+              {/* PC Settings */}
+              <button
+                id="tool-pc-settings"
+                type="button"
+                onClick={() => {
+                  setIsOpen(false);
+                  onNavigate('/pc-settings');
+                }}
+                className="fluent-reveal-item w-full h-[34px] px-2.5 rounded-[4px] flex items-center justify-between text-[13px] font-normal transition-colors text-left cursor-default text-[#1b1b1b] dark:text-[#f3f3f3] hover:bg-black/5 dark:hover:bg-white/[0.08] active:bg-black/10 dark:active:bg-white/[0.05]"
+                {...revealProps}
+              >
+                <div className="flex items-center gap-2.5 truncate">
+                  <FluentPcSettingsIcon className="w-4 h-4 shrink-0 text-[#111827] dark:text-white" />
+                  <span className="truncate">PC Settings</span>
+                </div>
+                <span className="text-[10px] px-1.5 py-0.5 rounded-[2px] bg-black/5 dark:bg-white/10 text-neutral-600 dark:text-neutral-300 font-medium">System</span>
               </button>
             </div>
 

@@ -271,7 +271,13 @@ export const WindowFrame: React.FC<WindowFrameProps> = ({
   ];
 
   const isCustomRouteFull =
-    tab.route === '/craftmine' || tab.route === '/photopea' || tab.route.startsWith('/draws/');
+    tab.route === '/craftmine' ||
+    tab.route === '/photopea' ||
+    tab.route.startsWith('/draws/') ||
+    tab.route === '/html-writer' ||
+    tab.route.startsWith('/html-writer/') ||
+    tab.route === '/pc-settings' ||
+    tab.route.startsWith('/pc-settings/');
 
   return (
     <motion.section
@@ -280,29 +286,63 @@ export const WindowFrame: React.FC<WindowFrameProps> = ({
       aria-hidden={windowState.isMinimized}
       data-window-id={tab.id}
       data-window-frame="true"
+      data-window-active={isActive ? 'true' : 'false'}
       onPointerDownCapture={onFocus}
-      initial={reduceMotion ? false : { opacity: 0, scale: 0.96, y: 18 }}
+      initial={
+        reduceMotion
+          ? false
+          : {
+              opacity: 0,
+              scale: 0.86,
+              y: 16,
+              left: computedLeft,
+              top: computedTop,
+              width: computedWidth,
+              height: computedHeight,
+            }
+      }
       animate={
         windowState.isMinimized
-          ? { opacity: 0, scale: 0.92, y: 40 }
-          : { opacity: 1, scale: 1, y: 0 }
+          ? {
+              opacity: 0,
+              scale: 0.72,
+              y: 110,
+              left: computedLeft,
+              top: computedTop,
+              width: computedWidth,
+              height: computedHeight,
+            }
+          : {
+              opacity: 1,
+              scale: 1,
+              y: 0,
+              left: computedLeft,
+              top: computedTop,
+              width: computedWidth,
+              height: computedHeight,
+            }
       }
-      exit={reduceMotion ? undefined : { opacity: 0, scale: 0.95, y: 14 }}
-      transition={
+      exit={
         reduceMotion
+          ? undefined
+          : {
+              opacity: 0,
+              scale: 0.84,
+              y: 14,
+              transition: { duration: 0.18, ease: [0.4, 0, 1, 1] },
+            }
+      }
+      transition={
+        reduceMotion || isInteracting
           ? { duration: 0 }
-          : { duration: 0.22, ease: [0.16, 1, 0.3, 1] }
+          : { duration: 0.25, ease: [0.16, 1, 0.3, 1] }
       }
       style={{
         position: 'fixed',
-        left: computedLeft,
-        top: computedTop,
-        width: computedWidth,
-        height: computedHeight,
         zIndex: windowState.zIndex,
-        transform: 'none',
+        transformOrigin: 'center center',
       }}
-      className={`flex flex-col overflow-hidden select-text ${
+      className={`windows-mica-frame flex flex-col overflow-hidden select-text ${
         windowState.isMinimized ? 'pointer-events-none' : 'pointer-events-auto'
       } ${
         windowState.isMaximized
@@ -312,8 +352,8 @@ export const WindowFrame: React.FC<WindowFrameProps> = ({
         isActive
           ? 'shadow-[0_24px_64px_rgba(0,0,0,0.48),0_4px_16px_rgba(0,0,0,0.22)] ring-1 ring-black/5 dark:ring-white/[0.08]'
           : 'shadow-[0_12px_36px_rgba(0,0,0,0.28)]'
-      } bg-[#f9f9f9] dark:bg-[#202328] ${
-        isInteracting ? 'select-none' : 'transition-[border-radius,box-shadow] duration-150'
+      } ${
+        isInteracting ? 'select-none' : 'transition-[border-radius,box-shadow] duration-200'
       }`}
     >
       {/* 8-Direction Resize Handles when restored */}
@@ -339,10 +379,10 @@ export const WindowFrame: React.FC<WindowFrameProps> = ({
           if ((e.target as HTMLElement).closest('button')) return;
           onToggleMaximize();
         }}
-        className={`h-[36px] shrink-0 flex items-center justify-between pl-2.5 pr-0 select-none border-b border-black/[0.06] dark:border-white/[0.07] cursor-default ${
+        className={`h-[36px] shrink-0 flex items-center justify-between pl-2.5 pr-0 select-none border-b border-black/[0.06] dark:border-white/[0.07] cursor-default bg-transparent ${
           isActive
-            ? 'bg-[#f3f3f3] dark:bg-[#1b1f24] text-[#111827] dark:text-white'
-            : 'bg-[#eaeaea] dark:bg-[#181b20] text-[#6b7280] dark:text-[#9ca3af]'
+            ? 'text-[#111827] dark:text-white'
+            : 'text-[#6b7280] dark:text-[#9ca3af]'
         }`}
       >
         {/* Left: optional Back + App Icon + Title */}
@@ -417,7 +457,7 @@ export const WindowFrame: React.FC<WindowFrameProps> = ({
 
       {/* Scrollable Window Body */}
       <div
-        className={`window-content-area flex-1 min-h-0 overflow-y-auto overflow-x-hidden relative bg-[#f9f9f9] dark:bg-[#282c31] ${
+        className={`window-content-area flex-1 min-h-0 overflow-y-auto overflow-x-hidden relative bg-transparent ${
           isCustomRouteFull ? 'p-0' : ''
         }`}
       >
@@ -437,7 +477,11 @@ export const WindowFrame: React.FC<WindowFrameProps> = ({
             tab.route === '/gallery' ||
             tab.route === '/draws' ||
             tab.route.startsWith('/draws/') ||
-            tab.route === '/camera'
+            tab.route === '/camera' ||
+            tab.route === '/html-writer' ||
+            tab.route.startsWith('/html-writer/') ||
+            tab.route === '/pc-settings' ||
+            tab.route.startsWith('/pc-settings/')
               ? 'p-0 h-full'
               : 'px-4 sm:px-6 py-5 max-w-7xl mx-auto'
           }`}

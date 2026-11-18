@@ -14,6 +14,8 @@ import {
   FluentPhotopeaIcon,
   FluentSettingsIcon,
   FluentPersonFeedbackIcon,
+  FluentHtmlWriterIcon,
+  FluentPcSettingsIcon,
 } from './FluentIcons';
 import {
   Fluent3DHomeIcon,
@@ -25,6 +27,8 @@ import {
   Fluent3DSettingsIcon,
   Fluent3DCraftmineIcon,
   Fluent3DPhotopeaIcon,
+  Fluent3DHtmlWriterIcon,
+  Fluent3DPcSettingsIcon,
 } from './Fluent3DIcons';
 
 interface TabLoadingScreenProps {
@@ -111,6 +115,22 @@ export const TabLoadingScreen: React.FC<TabLoadingScreenProps> = ({
         <Fluent3DPhotopeaIcon className={largeIconClass} />
       ) : (
         <FluentPhotopeaIcon className={standardIconClass} />
+      );
+    }
+
+    if (cleanRoute.startsWith('/html-writer')) {
+      return useFluent3DForContent ? (
+        <Fluent3DHtmlWriterIcon className={largeIconClass} />
+      ) : (
+        <FluentHtmlWriterIcon className={standardIconClass} />
+      );
+    }
+
+    if (cleanRoute.startsWith('/pc-settings')) {
+      return useFluent3DForSystem ? (
+        <Fluent3DPcSettingsIcon className={largeIconClass} />
+      ) : (
+        <FluentPcSettingsIcon className={standardIconClass} />
       );
     }
 

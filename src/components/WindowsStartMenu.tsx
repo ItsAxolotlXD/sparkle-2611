@@ -36,6 +36,8 @@ import {
   Fluent3DSettingsIcon,
   Fluent3DFolderSearchIcon,
   Fluent3DDiscordIcon,
+  Fluent3DHtmlWriterIcon,
+  Fluent3DPcSettingsIcon,
 } from './Fluent3DIcons';
 import { FluentPersonFeedbackIcon, FluentSearchIcon } from './FluentIcons';
 import { useSettings } from '../hooks/useSettings';
@@ -233,6 +235,13 @@ export const WindowsStartMenu: React.FC<WindowsStartMenuProps> = ({
         renderIcon: (cls = 'w-8 h-8') => <Fluent3DPhotopeaIcon className={cls} />,
       },
       {
+        id: 'app-html-writer',
+        label: 'HTML Writer',
+        route: '/html-writer',
+        keywords: 'html writer code editor css js preview winui 3 viet chay html',
+        renderIcon: (cls = 'w-8 h-8') => <Fluent3DHtmlWriterIcon className={cls} />,
+      },
+      {
         id: 'app-channels',
         label: 'Channels',
         route: '/channels',
@@ -291,6 +300,13 @@ export const WindowsStartMenu: React.FC<WindowsStartMenuProps> = ({
         externalUrl: 'https://discord.gg/wcdjaDDayK',
         keywords: 'discord community',
         renderIcon: (cls = 'w-8 h-8') => <Fluent3DDiscordIcon className={cls} />,
+      },
+      {
+        id: 'app-pc-settings',
+        label: 'PC Settings',
+        route: '/pc-settings',
+        keywords: 'pc settings windows 11 system bluetooth network personalization update',
+        renderIcon: (cls = 'w-8 h-8') => <Fluent3DPcSettingsIcon className={cls} />,
       },
       {
         id: 'app-settings',

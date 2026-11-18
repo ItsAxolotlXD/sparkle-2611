@@ -207,7 +207,7 @@ export const LiveTV: React.FC<LiveTVProps> = ({
               id="btn-livetv-add-custom-channel"
               type="button"
               onClick={() => setIsAddCustomModalOpen(true)}
-              className="fluent-btn-primary shrink-0 mr-1 sm:mr-1.5 px-3 py-1.5 sm:py-2 rounded-[5px] text-xs sm:text-[13px] font-semibold whitespace-nowrap cursor-pointer select-none flex items-center gap-1.5 bg-[#b4009e] dark:bg-[#ff82ff] hover:bg-[#9b0088] dark:hover:bg-[#ff9eff] active:bg-[#820072] dark:active:bg-[#e56fe5] text-white dark:text-black shadow-xs hover:shadow-sm active:scale-95 transition-all border border-black/15 dark:border-white/20"
+              className="fluent-btn-primary shrink-0 mr-1 sm:mr-1.5 px-3 py-1.5 sm:py-2 rounded-[5px] text-xs sm:text-[13px] font-semibold whitespace-nowrap cursor-pointer select-none flex items-center gap-1.5 bg-[#0067b8] dark:bg-[#4cc2ff] hover:bg-[#005aa3] dark:hover:bg-[#6bd0ff] active:bg-[#004c8c] dark:active:bg-[#3bb2ef] text-white dark:text-black shadow-xs hover:shadow-sm active:scale-95 transition-all border border-black/15 dark:border-white/20"
               title="Add custom channel"
             >
               <Plus className="w-3.5 h-3.5 stroke-[2.5]" />

@@ -153,7 +153,7 @@ export const OnAirSlider: React.FC<OnAirSliderProps> = ({
               }}
               className={`fluent-reveal-item onair-card banner-card channel-card min-w-[84px] sm:min-w-[96px] md:min-w-[108px] h-[46px] sm:h-[50px] md:h-[54px] shrink-0 rounded-[6px] sm:rounded-[8px] p-2 flex items-center justify-center cursor-default group select-none transition-all shadow-xs bg-white dark:bg-[#2c3037] hover:bg-black/[0.02] dark:hover:bg-[#363b43] ${
                 isSelected
-                  ? 'is-selected border-[3px] border-[#d91a9c] dark:border-[#ff82ff]'
+                  ? 'is-selected border-[3px] border-[#d91a9c] dark:border-[#4cc2ff]'
                   : 'border-[3px] border-black/[0.08] dark:border-white/[0.08]'
               } ${!isLoading ? 'slide-up-refresh' : ''}`}
               title={!isMobile ? `${ch.name} — Nhấp để chọn, nhấp đúp để mở` : ch.name}

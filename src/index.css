@@ -174,7 +174,7 @@ html.light-mode ::-moz-selection,
   }
 
   :root {
-    --ui-accent: #ff82ff;
+    --ui-accent: #4cc2ff;
     --primary-red: var(--ui-accent);
     --solid-red: var(--ui-accent);
     --accent-red: var(--ui-accent);
@@ -193,7 +193,7 @@ html.light-mode ::-moz-selection,
   }
 
   html.light-mode {
-    --ui-accent: #ff01ff;
+    --ui-accent: #0067b8;
     --primary-red: var(--ui-accent);
     --solid-red: var(--ui-accent);
     --accent-red: var(--ui-accent);
@@ -201,7 +201,7 @@ html.light-mode ::-moz-selection,
     --fluent-accent: var(--ui-accent);
     --fluent-accent-hover: var(--ui-accent);
     --fluent-accent-active: var(--ui-accent);
-    --fluent-accent-text: #000000;
+    --fluent-accent-text: #ffffff;
   }
 
   html, body, *, *::before, *::after {
@@ -704,7 +704,7 @@ html:not(.light-mode) [id^="news-card-"]:hover {
 
 
 /* Light mode: toàn bộ chữ trên toàn bộ các tab đổi hết sang màu đen (#000000) */
-html.light-mode :is(h1, h2, h3, h4, h5, h6, p, label, li, dt, dd, blockquote, div, span, b, strong, i, em, td, th, time, small, caption, button, a):not(.fluent-btn-primary):not(.fluent-btn-primary *):not(#btn-discord-join):not(#btn-discord-join *):not(#btn-home-join-discord):not(#btn-home-join-discord *):not([class*="bg-[#5865F2]"]):not([class*="bg-[#0078d4]"]):not([class*="bg-[#4cc2ff]"]):not([class*="bg-[#E6005A]"]):not([class*="bg-[#E50914]"]):not([class*="bg-emerald"]):not([class*="bg-rose"]):not([class*="bg-red"]):not([class*="bg-amber"]):not([class*="bg-blue"]):not([class*="text-[#0078d4]"]):not([class*="text-[#4cc2ff]"]):not([class*="text-[#E6005A]"]):not([class*="text-emerald"]):not([class*="text-rose"]):not([class*="text-red"]):not([class*="text-amber"]):not([class*="text-blue"]) {
+html.light-mode :is(h1, h2, h3, h4, h5, h6, p, label, li, dt, dd, blockquote, div, span, b, strong, i, em, td, th, time, small, caption, button, a):not(.fluent-btn-primary):not(.fluent-btn-primary *):not(#btn-discord-join):not(#btn-discord-join *):not(#btn-home-join-discord):not(#btn-home-join-discord *):not([class*="bg-[#5865F2]"]):not([class*="bg-[#0078d4]"]):not([class*="bg-[#0067b8]"]):not([class*="bg-[#0067B8]"]):not([class*="bg-[#4cc2ff]"]):not([class*="bg-[#E6005A]"]):not([class*="bg-[#E50914]"]):not([class*="bg-emerald"]):not([class*="bg-rose"]):not([class*="bg-red"]):not([class*="bg-amber"]):not([class*="bg-blue"]):not([class*="text-[#0078d4]"]):not([class*="text-[#0067b8]"]):not([class*="text-[#0067B8]"]):not([class*="text-[#4cc2ff]"]):not([class*="text-[#E6005A]"]):not([class*="text-emerald"]):not([class*="text-rose"]):not([class*="text-red"]):not([class*="text-amber"]):not([class*="text-blue"]) {
   color: #000000 !important;
 }
 
@@ -1063,7 +1063,7 @@ html:not(.light-mode) #vplay-splash-screen {
   display: block;
   width: 100%;
   height: 100%;
-  background-color: var(--ui-accent, #ff82ff);
+  background-color: var(--ui-accent, #4cc2ff);
   -webkit-mask-position: center;
   -webkit-mask-repeat: no-repeat;
   -webkit-mask-size: contain;
@@ -2066,6 +2066,46 @@ html.windows-mode.light-mode main.windows-desktop-workspace {
 
 .windows-mode .window-content-area .min-h-screen {
   min-height: 100%;
+}
+
+/* Windows Mode: Windows 11 Mica Effect (90% opacity) on floating windows */
+.windows-mica-frame,
+html.dark .windows-mica-frame,
+html:not(.light-mode) .windows-mica-frame {
+  background-color: rgba(32, 35, 40, 0.90) !important;
+  background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.045) 0%, rgba(255, 255, 255, 0) 45%) !important;
+  backdrop-filter: blur(60px) saturate(160%) !important;
+  -webkit-backdrop-filter: blur(60px) saturate(160%) !important;
+}
+
+.windows-mica-frame[data-window-active="false"],
+html.dark .windows-mica-frame[data-window-active="false"],
+html:not(.light-mode) .windows-mica-frame[data-window-active="false"] {
+  background-color: rgba(24, 27, 32, 0.90) !important;
+  background-image: none !important;
+}
+
+html.light-mode .windows-mica-frame {
+  background-color: rgba(243, 243, 243, 0.90) !important;
+  background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.28) 0%, rgba(255, 255, 255, 0) 45%) !important;
+  backdrop-filter: blur(60px) saturate(160%) !important;
+  -webkit-backdrop-filter: blur(60px) saturate(160%) !important;
+}
+
+html.light-mode .windows-mica-frame[data-window-active="false"] {
+  background-color: rgba(234, 234, 234, 0.90) !important;
+  background-image: none !important;
+}
+
+html.windows-mode .window-content-area,
+html.windows-mode .window-content-area > div,
+html.windows-mode .window-content-area main,
+html.windows-mode.light-mode .window-content-area main,
+html.windows-mode.dark .window-content-area main,
+html.windows-mode .window-content-area .vlc-applet,
+html.windows-mode .window-content-area #camera-page {
+  background-color: transparent !important;
+  background-image: none !important;
 }
 
 #in-app-evaluation-watermark,
@@ -3280,7 +3320,7 @@ img[src*="imgur.com"],
 [id^="recommended-card-"].is-selected,
 [data-recommended-card].is-selected {
   box-sizing: border-box !important;
-  border: 3.2px solid #ff82ff !important;
+  border: 3.2px solid #4cc2ff !important;
   box-shadow: none !important;
   outline: none !important;
 }
@@ -8902,11 +8942,11 @@ html.light-mode input[type="url"]:focus:not(#floating-search-input):not(.fluent-
 
 /* Normalize blue UI accents to the requested theme accent. */
 :root {
-  --ui-accent: #ff82ff;
+  --ui-accent: #4cc2ff;
 }
 
 html.light-mode {
-  --ui-accent: #ff01ff;
+  --ui-accent: #0067b8;
 }
 
 :is([class*="bg-[#4cc2ff]"], [class*="bg-[#6bd0ff]"], [class*="bg-[#3bb2ef]"], [class*="bg-[#75d5ff]"], [class*="bg-[#005fb8]"], [class*="bg-[#0067c0]"], [class*="bg-[#00458b]"], [class*="bg-[#0051a2]"], [class*="bg-[#0078d4]"], [class*="bg-[#106ebe]"], [class*="bg-[#5865F2]"], [class*="bg-[#4752C4]"], [class*="bg-blue-"], [class*="bg-sky-"], [class*="bg-cyan-"], [class*="bg-indigo-"]) {
@@ -9012,11 +9052,15 @@ html.light-mode .btn-fd932f,
 html.light-mode .btn-fd932f *,
 html.light-mode button[class*="bg-[#4cc2ff]"],
 html.light-mode button[class*="bg-[#4cc2ff]"] *,
+html.light-mode button[class*="bg-[#0067b8]"],
+html.light-mode button[class*="bg-[#0067b8]"] *,
+html.light-mode button[class*="bg-[#0067B8]"],
+html.light-mode button[class*="bg-[#0067B8]"] *,
 html.light-mode button[class*="bg-[#005fb8]"],
 html.light-mode button[class*="bg-[#005fb8]"] *,
 html.light-mode button[class*="bg-[#0078d4]"],
 html.light-mode button[class*="bg-[#0078d4]"] * {
-  color: #000000 !important;
+  color: #ffffff !important;
 }
 
 html.light-mode .gallery-toolbar button,
@@ -9068,9 +9112,9 @@ html.no-shiny-outline #livetv-category-tabs button:not(#btn-livetv-open-epg-side
   content: none !important;
 }
 
-/* WinUI 3 Magenta Colored Accent Button for Add Custom Channel in Watch tab */
+/* WinUI 3 Blue Colored Accent Button for Add Custom Channel in Watch tab */
 #btn-livetv-add-custom-channel {
-  background-color: #b4009e !important; /* WinUI 3 Magenta Light Mode */
+  background-color: #0067b8 !important; /* WinUI 3 Blue Light Mode */
   color: #ffffff !important;
   border: 1px solid rgba(0, 0, 0, 0.14) !important;
   border-bottom: 1px solid rgba(0, 0, 0, 0.28) !important;
@@ -9091,19 +9135,19 @@ html.no-shiny-outline #livetv-category-tabs button:not(#btn-livetv-open-epg-side
 }
 
 #btn-livetv-add-custom-channel:hover {
-  background-color: #9b0088 !important;
+  background-color: #005aa3 !important;
   color: #ffffff !important;
 }
 
 #btn-livetv-add-custom-channel:active {
-  background-color: #820072 !important;
+  background-color: #004c8c !important;
   color: #ffffff !important;
   transform: scale(0.96) !important;
 }
 
-/* Light mode specific: WinUI 3 Magenta (#b4009e) */
+/* Light mode specific: WinUI 3 Blue (#0067b8) */
 html.light-mode #btn-livetv-add-custom-channel {
-  background-color: #b4009e !important;
+  background-color: #0067b8 !important;
   color: #ffffff !important;
   border: 1px solid rgba(0, 0, 0, 0.15) !important;
   border-bottom: 1px solid rgba(0, 0, 0, 0.3) !important;
@@ -9117,19 +9161,19 @@ html.light-mode #btn-livetv-add-custom-channel * {
 }
 
 html.light-mode #btn-livetv-add-custom-channel:hover {
-  background-color: #9b0088 !important;
+  background-color: #005aa3 !important;
   color: #ffffff !important;
 }
 
 html.light-mode #btn-livetv-add-custom-channel:active {
-  background-color: #820072 !important;
+  background-color: #004c8c !important;
   color: #ffffff !important;
 }
 
-/* Dark mode: WinUI 3 Fluent Magenta Accent (#ff82ff) */
+/* Dark mode: WinUI 3 Fluent Blue Accent (#4cc2ff) */
 html:not(.light-mode) #btn-livetv-add-custom-channel,
 html.dark #btn-livetv-add-custom-channel {
-  background-color: #ff82ff !important;
+  background-color: #4cc2ff !important;
   color: #000000 !important;
   border: 1px solid rgba(255, 255, 255, 0.20) !important;
   border-bottom: 1px solid rgba(0, 0, 0, 0.30) !important;
@@ -9148,13 +9192,13 @@ html.dark #btn-livetv-add-custom-channel * {
 
 html:not(.light-mode) #btn-livetv-add-custom-channel:hover,
 html.dark #btn-livetv-add-custom-channel:hover {
-  background-color: #ff9eff !important;
+  background-color: #6bd0ff !important;
   color: #000000 !important;
 }
 
 html:not(.light-mode) #btn-livetv-add-custom-channel:active,
 html.dark #btn-livetv-add-custom-channel:active {
-  background-color: #e56fe5 !important;
+  background-color: #3bb2ef !important;
   color: #000000 !important;
   transform: scale(0.96) !important;
 }

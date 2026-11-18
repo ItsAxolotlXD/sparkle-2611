@@ -160,7 +160,7 @@ const EditChannelModalBody: React.FC<{
                   {channel.category} {channel.quality ? `• ${channel.quality}` : ''}
                 </div>
                 {logo !== defaultLogo && (
-                  <div className="text-[10px] text-[#ff01ff] font-medium mt-0.5">
+                  <div className="text-[10px] text-[#0067b8] dark:text-[#4cc2ff] font-medium mt-0.5">
                     Custom logo active
                   </div>
                 )}
@@ -172,7 +172,7 @@ const EditChannelModalBody: React.FC<{
               <label className="text-[12px] font-medium text-[#4B5563] dark:text-[#9CA3AF] flex items-center justify-between">
                 <span>Channel logo</span>
                 {logo !== defaultLogo && (
-                  <span className="text-[11px] text-[#ff01ff] font-medium">Customized</span>
+                  <span className="text-[11px] text-[#0067b8] dark:text-[#4cc2ff] font-medium">Customized</span>
                 )}
               </label>
 

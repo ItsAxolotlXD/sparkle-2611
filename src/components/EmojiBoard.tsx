@@ -315,7 +315,7 @@ export const EmojiBoard: React.FC<EmojiBoardProps> = ({
                 }}
                 className={`absolute top-0 bottom-0 rounded-full cursor-grab active:cursor-grabbing transition-colors shadow-xs ${
                   isDragging
-                    ? 'bg-[#ff01ff]'
+                    ? 'bg-[#0067b8] dark:bg-[#4cc2ff]'
                     : 'bg-neutral-600/70 hover:bg-neutral-800'
                 }`}
               />
@@ -349,7 +349,7 @@ export const EmojiBoard: React.FC<EmojiBoardProps> = ({
                 {isActive && (
                   <motion.div
                     layoutId="emoji-category-active-underline"
-                    className="absolute -bottom-[1px] left-1/2 -translate-x-1/2 w-5 h-[3px] rounded-full bg-[#ff01ff]"
+                    className="absolute -bottom-[1px] left-1/2 -translate-x-1/2 w-5 h-[3px] rounded-full bg-[#0067b8] dark:bg-[#4cc2ff]"
                     initial={false}
                     animate={{
                       scaleX: [1, 1.38, 0.94, 1],

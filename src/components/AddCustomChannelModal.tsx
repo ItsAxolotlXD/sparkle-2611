@@ -202,7 +202,7 @@ const AddCustomChannelModalBody: React.FC<{
                   {resolvedCategory || 'Chưa chọn danh mục'} • HD
                 </div>
                 {logo !== DEFAULT_CHANNEL_LOGO && (
-                  <div className="text-[10px] text-[#ff01ff] font-medium mt-0.5">
+                  <div className="text-[10px] text-[#0067b8] dark:text-[#4cc2ff] font-medium mt-0.5">
                     Custom logo active
                   </div>
                 )}
@@ -214,7 +214,7 @@ const AddCustomChannelModalBody: React.FC<{
               <label className="text-[12px] font-medium text-[#4B5563] dark:text-[#9CA3AF] flex items-center justify-between">
                 <span>Channel logo</span>
                 {logo !== DEFAULT_CHANNEL_LOGO && (
-                  <span className="text-[11px] text-[#ff01ff] font-medium">Customized</span>
+                  <span className="text-[11px] text-[#0067b8] dark:text-[#4cc2ff] font-medium">Customized</span>
                 )}
               </label>
 
