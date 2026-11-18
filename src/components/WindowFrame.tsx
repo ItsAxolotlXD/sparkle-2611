@@ -2,7 +2,7 @@ import React, { useRef, useState, useEffect, useCallback } from 'react';
 import { motion } from 'motion/react';
 import { Minus, Square, X, ArrowLeft } from 'lucide-react';
 import { TabIcon, type AppTab } from './SparkleTabBar';
-import { useSettings } from '../hooks/useSettings';
+import { useSettings, getTaskbarHeightPx, getWindowsUiScaleMultiplier } from '../hooks/useSettings';
 
 export interface AppWindowState {
   x: number;
@@ -34,7 +34,6 @@ interface WindowFrameProps {
 
 const MIN_WIDTH = 360;
 const MIN_HEIGHT = 260;
-const TASKBAR_HEIGHT = 48;
 
 export const WindowFrame: React.FC<WindowFrameProps> = ({
   tab,
@@ -54,6 +53,9 @@ export const WindowFrame: React.FC<WindowFrameProps> = ({
   const { settings } = useSettings();
   const dynamicIcons = settings.dynamicSidebarIcons !== false;
   const reduceMotion = settings.reduceAllMotion;
+  const taskbarHeight = getTaskbarHeightPx(settings.taskbarScale);
+  const uiScaleMult = getWindowsUiScaleMultiplier(settings.windowsUiScale);
+  const titleBarHeight = settings.windowsUiScale === 'small' ? 32 : settings.windowsUiScale === 'large' ? 42 : 36;
 
   const [viewport, setViewport] = useState(() => ({
     width: typeof window !== 'undefined' ? window.innerWidth : 1280,
@@ -71,7 +73,7 @@ export const WindowFrame: React.FC<WindowFrameProps> = ({
   const isDesktop = viewport.width >= 768;
   const desktopMinX = isDesktop && !isRightSidebar ? sidebarOffset : 0;
   const desktopMaxX = isDesktop && isRightSidebar ? viewport.width - sidebarOffset : viewport.width;
-  const desktopMaxY = viewport.height - TASKBAR_HEIGHT;
+  const desktopMaxY = viewport.height - taskbarHeight;
 
   // Dragging state
   const dragRef = useRef<{
@@ -379,7 +381,8 @@ export const WindowFrame: React.FC<WindowFrameProps> = ({
           if ((e.target as HTMLElement).closest('button')) return;
           onToggleMaximize();
         }}
-        className={`h-[36px] shrink-0 flex items-center justify-between pl-2.5 pr-0 select-none border-b border-black/[0.06] dark:border-white/[0.07] cursor-default bg-transparent ${
+        style={{ height: `${titleBarHeight}px` }}
+        className={`shrink-0 flex items-center justify-between pl-2.5 pr-0 select-none border-b border-black/[0.06] dark:border-white/[0.07] cursor-default bg-transparent ${
           isActive
             ? 'text-[#111827] dark:text-white'
             : 'text-[#6b7280] dark:text-[#9ca3af]'
@@ -462,6 +465,7 @@ export const WindowFrame: React.FC<WindowFrameProps> = ({
         }`}
       >
         <div
+          style={{ zoom: uiScaleMult }}
           className={`w-full min-h-full ${
             tab.route === '/' ||
             tab.route === '/home' ||

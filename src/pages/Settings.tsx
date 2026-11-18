@@ -21,6 +21,7 @@ import { KEYBIND_DEFINITIONS, DEFAULT_KEYBINDS, eventToKeyString, validateKeybin
 import { KeybindAction } from '../types';
 import { showAppToast } from '../utils/toast';
 import { FluentEmoji } from '../components/FluentEmoji';
+import { getViveFeatureId } from '../utils/viveFeatures';
 
 const SETTING_LABELS: Partial<Record<keyof SystemSettings, string>> = {
   theme: 'App theme',
@@ -210,7 +211,7 @@ export const Settings: React.FC<SettingsProps> = ({
   };
 
   const matchesExperimental =
-    matchesSearch(['Velocity Features', 'Velocity', 'vivetool', 'tabbed sparkle', 'tabbed', 'windows mode', 'windows 11', 'taskbar', 'start menu', 'windowed', 'desktop', 'Insider experiments', 'Insider Flags', 'thử nghiệm', 'touch keyboard', 'native keyboard', 'bàn phím cảm ứng', 'bàn phím ảo', 'refreshed search icon', 'search icon', 'immersive search', 'fluent icons', 'flumojs', 'fluent emojis', 'emoji', '3d icons', 'animated boot screen', 'boot screen', 'khởi động', 'video khởi động']);
+    matchesSearch(['Vive Features', 'Vive', 'Velocity Features', 'Velocity', 'vivetool', 'tabbed sparkle', 'tabbed', 'windows mode', 'windows 11', 'taskbar', 'start menu', 'windowed', 'desktop', 'Insider experiments', 'Insider Flags', 'thử nghiệm', 'touch keyboard', 'native keyboard', 'bàn phím cảm ứng', 'bàn phím ảo', 'refreshed search icon', 'search icon', 'immersive search', 'fluent icons', 'flumojs', 'fluent emojis', 'emoji', '3d icons', 'animated boot screen', 'boot screen', 'khởi động', 'video khởi động']);
   const matchesInterface = 
     matchesSearch(['Appearance', 'Interface', 'giao diện', 'chế độ ứng dụng', 'ban ngày', 'ban đêm', 'light', 'dark', 'thanh điều hướng', 'navigation', 'side view', 'top view', 'tab view', 'thu phóng giao diện', 'font', 'vị trí thanh bên', 'siêu chế độ tối', 'super dark', 'Open Settings in new tab', 'open settings', 'tab mới', 'new tab']);
   const matchesAccessibility = matchesSearch(['Accessibility', 'trợ năng', 'hover to expand']);
@@ -292,7 +293,7 @@ export const Settings: React.FC<SettingsProps> = ({
                 <div className="flex items-center gap-2.5">
                   <img src="/icons/settings/insider.png" alt="" aria-hidden="true" draggable={false} className="fluent-3d-icon w-6 h-6 object-contain shrink-0" />
                   <h2 className="text-base sm:text-lg font-bold text-[#111827] dark:text-white tracking-tight">
-                    Velocity Features
+                    Vive Features
                   </h2>
                 </div>
                 <ChevronDown 
@@ -315,8 +316,8 @@ export const Settings: React.FC<SettingsProps> = ({
               className="overflow-hidden"
             >
               <div className="space-y-2.5 bg-transparent pt-0.5">
-                {/* 1. Tabbed Sparkle (Velocity Feature) */}
-                {matchesSearch(['Tabbed Sparkle', 'Velocity Features', 'Velocity', 'tab bar', 'multitasking', 'multi-tab', 'tabs', 'vivetool']) && (
+                {/* 1. Tabbed Sparkle (Vive Feature) */}
+                {matchesSearch(['Tabbed Sparkle', 'Vive Features', 'Vive', 'Velocity Features', 'Velocity', 'tab bar', 'multitasking', 'multi-tab', 'tabs', 'vivetool', getViveFeatureId('tabbedSparkle')]) && (
                   <motion.div
                     variants={slideUpVariant}
                     initial="hidden"
@@ -337,12 +338,15 @@ export const Settings: React.FC<SettingsProps> = ({
                       <div className="min-w-0 flex-1">
                         <div
                           id="tabbed-sparkle-label"
-                          className="font-normal text-sm text-[#111827] dark:text-white flex items-center gap-2"
+                          className="font-normal text-sm text-[#111827] dark:text-white flex flex-wrap items-center gap-2"
                           style={{ fontWeight: 400 }}
                         >
                           <span>Tabbed Sparkle</span>
                           <span className="text-[10px] px-1.5 py-0.5 rounded-[6px] uppercase tracking-wider bg-[#0078d4]/10 dark:bg-[#4cc2ff]/20 text-[#0078d4] dark:text-[#4cc2ff] font-semibold">
-                            Velocity
+                            Vive
+                          </span>
+                          <span className="text-[10px] px-1.5 py-0.5 rounded-[6px] font-mono bg-black/5 dark:bg-white/10 text-[#6B7280] dark:text-[#9CA3AF]">
+                            ID: {getViveFeatureId('tabbedSparkle')}
                           </span>
                         </div>
                         <p
@@ -371,8 +375,8 @@ export const Settings: React.FC<SettingsProps> = ({
                   </motion.div>
                 )}
 
-                {/* 1b. Windows Mode (Velocity Feature) */}
-                {matchesSearch(['Windows Mode', 'Windows 11', 'Velocity Features', 'Velocity', 'taskbar', 'start menu', 'windowed', 'desktop', 'wallpaper', 'vivetool']) && (
+                {/* 1b. Windows Mode (Vive Feature) */}
+                {matchesSearch(['Windows Mode', 'Windows 11', 'Vive Features', 'Vive', 'Velocity Features', 'Velocity', 'taskbar', 'start menu', 'windowed', 'desktop', 'wallpaper', 'vivetool', getViveFeatureId('windowsMode')]) && (
                   <motion.div
                     variants={slideUpVariant}
                     initial="hidden"
@@ -400,12 +404,15 @@ export const Settings: React.FC<SettingsProps> = ({
                       <div className="min-w-0 flex-1">
                         <div
                           id="windows-mode-label"
-                          className="font-normal text-sm text-[#111827] dark:text-white flex items-center gap-2"
+                          className="font-normal text-sm text-[#111827] dark:text-white flex flex-wrap items-center gap-2"
                           style={{ fontWeight: 400 }}
                         >
                           <span>Windows Mode</span>
                           <span className="text-[10px] px-1.5 py-0.5 rounded-[6px] uppercase tracking-wider bg-[#0078d4]/10 dark:bg-[#4cc2ff]/20 text-[#0078d4] dark:text-[#4cc2ff] font-semibold">
-                            Velocity
+                            Vive
+                          </span>
+                          <span className="text-[10px] px-1.5 py-0.5 rounded-[6px] font-mono bg-black/5 dark:bg-white/10 text-[#6B7280] dark:text-[#9CA3AF]">
+                            ID: {getViveFeatureId('windowsMode')}
                           </span>
                         </div>
                         <p
@@ -434,7 +441,7 @@ export const Settings: React.FC<SettingsProps> = ({
                   </motion.div>
                 )}
 
-                {matchesSearch(['Refreshed Search Icon', 'search icon', 'Velocity Features', 'Velocity', 'top bar search']) && (
+                {matchesSearch(['Refreshed Search Icon', 'search icon', 'Vive Features', 'Vive', 'Velocity Features', 'Velocity', 'top bar search', 'vivetool', getViveFeatureId('refreshedSearchIcon')]) && (
                   <motion.div
                     variants={slideUpVariant}
                     initial="hidden"
@@ -445,9 +452,12 @@ export const Settings: React.FC<SettingsProps> = ({
                     className="settings-block-card rounded-[6px] bg-white dark:bg-[#2c3037] shadow-xs px-4 py-3 sm:py-3.5 flex items-center justify-between gap-4 cursor-pointer hover:bg-black/[0.02] dark:hover:bg-[#363b43] transition-colors border-none"
                   >
                     <div className="min-w-0 flex-1 pr-2">
-                      <div id="refreshed-search-icon-label" className="font-normal text-sm text-[#111827] dark:text-white flex items-center gap-2" style={{ fontWeight: 400 }}>
+                      <div id="refreshed-search-icon-label" className="font-normal text-sm text-[#111827] dark:text-white flex flex-wrap items-center gap-2" style={{ fontWeight: 400 }}>
                         <span>Refreshed Search Icon</span>
-                        <span className="text-[10px] px-1.5 py-0.5 rounded-[6px] uppercase tracking-wider bg-[#0078d4]/10 dark:bg-[#4cc2ff]/20 text-[#0078d4] dark:text-[#4cc2ff] font-semibold">Velocity</span>
+                        <span className="text-[10px] px-1.5 py-0.5 rounded-[6px] uppercase tracking-wider bg-[#0078d4]/10 dark:bg-[#4cc2ff]/20 text-[#0078d4] dark:text-[#4cc2ff] font-semibold">Vive</span>
+                        <span className="text-[10px] px-1.5 py-0.5 rounded-[6px] font-mono bg-black/5 dark:bg-white/10 text-[#6B7280] dark:text-[#9CA3AF]">
+                          ID: {getViveFeatureId('refreshedSearchIcon')}
+                        </span>
                       </div>
                       <p id="refreshed-search-icon-description" className="mt-1 text-xs leading-relaxed text-[#6B7280] dark:text-[#9CA3AF]">
                         Updates the top bar search icon for light, dark, and focused states.
@@ -472,7 +482,7 @@ export const Settings: React.FC<SettingsProps> = ({
                 )}
 
                 {/* Touch keyboard */}
-                {matchesSearch(['Touch keyboard', 'Native keyboard', 'bàn phím cảm ứng', 'bàn phím ảo']) && (
+                {matchesSearch(['Touch keyboard', 'Native keyboard', 'bàn phím cảm ứng', 'bàn phím ảo', 'vive', 'vivetool', getViveFeatureId('nativeKeyboard')]) && (
                   <motion.div
                     variants={slideUpVariant}
                     initial="hidden"
@@ -485,10 +495,13 @@ export const Settings: React.FC<SettingsProps> = ({
                     <div className="min-w-0 flex-1 pr-2">
                       <div
                         id="touch-keyboard-label"
-                        className="font-normal text-sm text-[#111827] dark:text-white"
+                        className="font-normal text-sm text-[#111827] dark:text-white flex flex-wrap items-center gap-2"
                         style={{ fontWeight: 400 }}
                       >
-                        Touch keyboard
+                        <span>Touch keyboard</span>
+                        <span className="text-[10px] px-1.5 py-0.5 rounded-[6px] font-mono bg-black/5 dark:bg-white/10 text-[#6B7280] dark:text-[#9CA3AF]">
+                          ID: {getViveFeatureId('nativeKeyboard')}
+                        </span>
                       </div>
                       <p
                         id="touch-keyboard-description"
@@ -614,7 +627,7 @@ export const Settings: React.FC<SettingsProps> = ({
                 )}
 
                 {/* Use Flumojs */}
-                {matchesSearch(['Use Flumojs', 'Flumojs', 'Fluent Emojis', 'emoji']) && (
+                {matchesSearch(['Use Flumojs', 'Flumojs', 'Fluent Emojis', 'emoji', 'vive', 'vivetool', getViveFeatureId('useFlumojs')]) && (
                   <motion.div
                     variants={slideUpVariant}
                     initial="hidden"
@@ -629,10 +642,13 @@ export const Settings: React.FC<SettingsProps> = ({
                         <FluentEmoji emoji="😀" isDecorative className="w-7 h-7 text-[28px]" />
                       </div>
                       <div className="min-w-0 flex-1">
-                        <div id="use-flumojs-label" className="font-normal text-sm text-[#111827] dark:text-white flex items-center gap-2">
+                        <div id="use-flumojs-label" className="font-normal text-sm text-[#111827] dark:text-white flex flex-wrap items-center gap-2">
                           <span>Use Flumojs</span>
                           <span className="text-[10px] px-1.5 py-0.5 rounded-[6px] uppercase tracking-wider bg-[#0078d4]/10 dark:bg-[#4cc2ff]/20 text-[#0078d4] dark:text-[#4cc2ff] font-medium">
                             New
+                          </span>
+                          <span className="text-[10px] px-1.5 py-0.5 rounded-[6px] font-mono bg-black/5 dark:bg-white/10 text-[#6B7280] dark:text-[#9CA3AF]">
+                            ID: {getViveFeatureId('useFlumojs')}
                           </span>
                         </div>
                         <p id="use-flumojs-description" className="text-xs text-[#6b7280] dark:text-[#9ca3af] mt-0.5">
@@ -659,7 +675,7 @@ export const Settings: React.FC<SettingsProps> = ({
                 )}
 
                 {/* Dynamic sidebar icons */}
-                {matchesSearch(['Dynamic sidebar icons', 'dynamic icons', 'sidebar icons', 'icon thanh bên']) && (
+                {matchesSearch(['Dynamic sidebar icons', 'dynamic icons', 'sidebar icons', 'icon thanh bên', 'vive', 'vivetool', getViveFeatureId('dynamicSidebarIcons')]) && (
                   <motion.div
                     variants={slideUpVariant}
                     initial="hidden"
@@ -680,8 +696,11 @@ export const Settings: React.FC<SettingsProps> = ({
                         />
                       </div>
                       <div className="min-w-0 flex-1">
-                        <div className="font-normal text-sm text-[#111827] dark:text-white flex items-center gap-2" style={{ fontWeight: 400 }}>
+                        <div className="font-normal text-sm text-[#111827] dark:text-white flex flex-wrap items-center gap-2" style={{ fontWeight: 400 }}>
                           <span>Dynamic sidebar icons</span>
+                          <span className="text-[10px] px-1.5 py-0.5 rounded-[6px] font-mono bg-black/5 dark:bg-white/10 text-[#6B7280] dark:text-[#9CA3AF]">
+                            ID: {getViveFeatureId('dynamicSidebarIcons')}
+                          </span>
                         </div>
                       </div>
                     </div>
@@ -702,7 +721,7 @@ export const Settings: React.FC<SettingsProps> = ({
                 )}
 
                 {/* Animated boot screen */}
-                {matchesSearch(['Animated boot screen', 'boot screen', 'animated splash', 'khởi động', 'video khởi động', 'splash screen']) && (
+                {matchesSearch(['Animated boot screen', 'boot screen', 'animated splash', 'khởi động', 'video khởi động', 'splash screen', 'vive', 'vivetool', getViveFeatureId('animatedBootScreen')]) && (
                   <motion.div
                     variants={slideUpVariant}
                     initial="hidden"
@@ -726,10 +745,13 @@ export const Settings: React.FC<SettingsProps> = ({
                         />
                       </div>
                       <div className="min-w-0 flex-1">
-                        <div className="font-normal text-sm text-[#111827] dark:text-white flex items-center gap-2" style={{ fontWeight: 400 }}>
+                        <div className="font-normal text-sm text-[#111827] dark:text-white flex flex-wrap items-center gap-2" style={{ fontWeight: 400 }}>
                           <span>Animated boot screen</span>
                           <span className="text-[10px] px-1.5 py-0.5 rounded-[6px] uppercase tracking-wider bg-[#0078d4]/10 dark:bg-[#4cc2ff]/20 text-[#0078d4] dark:text-[#4cc2ff] font-medium">
                             Insider
+                          </span>
+                          <span className="text-[10px] px-1.5 py-0.5 rounded-[6px] font-mono bg-black/5 dark:bg-white/10 text-[#6B7280] dark:text-[#9CA3AF]">
+                            ID: {getViveFeatureId('animatedBootScreen')}
                           </span>
                         </div>
                       </div>

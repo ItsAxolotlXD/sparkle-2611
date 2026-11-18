@@ -53,13 +53,14 @@ import { PcSettings } from './pages/PcSettings';
 import { CHANNELS_DATA } from './data/channels';
 import { NEWS_DATA } from './data/news';
 import { Channel, NewsArticle } from './types';
-import { useSettings } from './hooks/useSettings';
+import { useSettings, getTaskbarHeightPx } from './hooks/useSettings';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
 import { type AppTab } from './components/SparkleTabBar';
 import { WindowFrame, type AppWindowState } from './components/WindowFrame';
 import { WindowsStartMenu } from './components/WindowsStartMenu';
 import { WindowsTaskbar } from './components/WindowsTaskbar';
 import { WindowsContextMenu } from './components/WindowsContextMenu';
+import { DirectCommandFlyout } from './components/DirectCommandFlyout';
 import { Plus, RefreshCw, Monitor, Sun, Moon, Sparkles, Palette, LogOut } from 'lucide-react';
 
 export function getRouteTitle(route: string, channel?: Channel): string {
@@ -158,9 +159,28 @@ export default function App() {
 
   // Windows Mode state & floating window geometry
   const isWindowsMode = Boolean(settings.windowsMode);
+  const taskbarHeight = getTaskbarHeightPx(settings.taskbarScale);
   const [isStartMenuOpen, setIsStartMenuOpen] = useState(false);
+  const [isDirectCommandOpen, setIsDirectCommandOpen] = useState(false);
   const [desktopContextMenu, setDesktopContextMenu] = useState<{ x: number; y: number } | null>(null);
   const [windowStates, setWindowStates] = useState<Record<string, AppWindowState>>({});
+
+  useEffect(() => {
+    const handleOpenDirectCommand = () => {
+      setIsStartMenuOpen(false);
+      setIsDirectCommandOpen(true);
+    };
+    const handleToggleDirectCommand = () => {
+      setIsStartMenuOpen(false);
+      setIsDirectCommandOpen((prev) => !prev);
+    };
+    window.addEventListener('vplay:open-direct-command', handleOpenDirectCommand);
+    window.addEventListener('vplay:toggle-direct-command', handleToggleDirectCommand);
+    return () => {
+      window.removeEventListener('vplay:open-direct-command', handleOpenDirectCommand);
+      window.removeEventListener('vplay:toggle-direct-command', handleToggleDirectCommand);
+    };
+  }, []);
 
   const createDefaultWindowState = useCallback(
     (index: number, zIndex: number): AppWindowState => {
@@ -172,14 +192,14 @@ export default function App() {
           x: 0,
           y: 0,
           width: vw,
-          height: Math.max(320, vh - 48),
+          height: Math.max(320, vh - taskbarHeight),
           isMinimized: false,
           isMaximized: true,
           zIndex,
         };
       }
       const availW = Math.max(420, vw);
-      const availH = Math.max(320, vh - 48);
+      const availH = Math.max(320, vh - taskbarHeight);
       const width = Math.min(1040, Math.max(460, availW - 96));
       const height = Math.min(660, Math.max(340, availH - 72));
       const offsetIdx = index % 6;
@@ -196,7 +216,7 @@ export default function App() {
         zIndex,
       };
     },
-    []
+    [taskbarHeight]
   );
 
   // Ensure every tab has a windowState when Windows Mode is active, and close Start Menu on exit
@@ -1535,11 +1555,13 @@ export default function App() {
       )}
 
       {/* Main App Container */}
-      <div className={`flex-1 flex flex-col min-w-0 min-h-screen transition-[padding] duration-[160ms] ease-[cubic-bezier(0.34,1.45,0.64,1)] ${
+      <div
+        style={isWindowsMode ? { paddingBottom: `${taskbarHeight}px` } : undefined}
+        className={`flex-1 flex flex-col min-w-0 min-h-screen transition-[padding] duration-[160ms] ease-[cubic-bezier(0.34,1.45,0.64,1)] ${
         isWindowsMode ? 'relative z-[1] !bg-transparent' : 'bg-[#f3f3f3] dark:bg-[#1b1f24]'
       } ${
         isWindowsMode
-          ? 'md:pl-0 md:pr-0 pb-[48px]'
+          ? 'md:pl-0 md:pr-0'
           : isInkCanvasEditor || isGalleryViewerOpen
           ? 'md:pl-0 md:pr-0 pb-0'
           : settings.navigationMode === 'topbar'
@@ -1568,7 +1590,8 @@ export default function App() {
               setIsStartMenuOpen(false);
               setDesktopContextMenu({ x: e.clientX, y: e.clientY });
             }}
-            className="windows-desktop-workspace relative z-[1] flex-1 w-full h-[calc(100vh-48px)] overflow-hidden !bg-transparent"
+            style={{ height: `calc(100vh - ${taskbarHeight}px)` }}
+            className="windows-desktop-workspace relative z-[1] flex-1 w-full overflow-hidden !bg-transparent"
           >
             <AnimatePresence>
               {tabs.map((tab) => {
@@ -1692,8 +1715,17 @@ export default function App() {
             activeTabId={activeTabId}
             windowStates={windowStates}
             isStartMenuOpen={isStartMenuOpen}
-            onToggleStartMenu={() => setIsStartMenuOpen((prev) => !prev)}
+            onToggleStartMenu={() => {
+              setIsDirectCommandOpen(false);
+              setIsStartMenuOpen((prev) => !prev);
+            }}
             onCloseStartMenu={() => setIsStartMenuOpen(false)}
+            isDirectCommandOpen={isDirectCommandOpen}
+            onToggleDirectCommand={() => {
+              setIsStartMenuOpen(false);
+              setIsDirectCommandOpen((prev) => !prev);
+            }}
+            onCloseDirectCommand={() => setIsDirectCommandOpen(false)}
             onTaskbarWindowClick={handleTaskbarWindowClick}
             onLaunchRoute={(r, st) => openOrFocusAppWindow(r, st)}
             onCreateNewWindow={(r) => handleCreateTab(r || '/')}
@@ -1805,6 +1837,12 @@ export default function App() {
         onClose={() => setIsSpotlightOpen(false)}
         navigate={navigate}
         onSelectChannel={setCurrentChannel}
+      />
+
+      {/* Direct Command Flyout (available in both Windows Mode and standard mode) */}
+      <DirectCommandFlyout
+        isOpen={isDirectCommandOpen}
+        onClose={() => setIsDirectCommandOpen(false)}
       />
 
       {/* Unsaved Settings Confirmation Modal */}

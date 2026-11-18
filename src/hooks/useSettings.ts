@@ -47,6 +47,10 @@ export interface SystemSettings {
   triangleExperimentVersion?: number;
   tabbedSparkle: boolean;
   windowsMode: boolean;
+  windowsUiScale: 'small' | 'default' | 'large';
+  taskbarSearchStyle: 'box' | 'button';
+  taskbarScale: 'small' | 'default' | 'large';
+  taskbarAlignment: 'center' | 'left';
   refreshedSearchIcon: boolean;
   newWatchTab: boolean;
   fluentIcons: boolean;
@@ -108,6 +112,10 @@ export const DEFAULT_SETTINGS: SystemSettings = {
   triangleExperimentVersion: 1,
   tabbedSparkle: false,
   windowsMode: false,
+  windowsUiScale: 'default',
+  taskbarSearchStyle: 'box',
+  taskbarScale: 'default',
+  taskbarAlignment: 'center',
   refreshedSearchIcon: false,
   newWatchTab: false,
   fluentIcons: false,
@@ -119,6 +127,18 @@ export const DEFAULT_SETTINGS: SystemSettings = {
   loadPagesSequentially: false,
   openSettingsInNewTab: false,
   customKeybinds: DEFAULT_KEYBINDS,
+};
+
+export const getTaskbarHeightPx = (scale?: 'small' | 'default' | 'large'): number => {
+  if (scale === 'small') return 40;
+  if (scale === 'large') return 56;
+  return 48;
+};
+
+export const getWindowsUiScaleMultiplier = (scale?: 'small' | 'default' | 'large'): number => {
+  if (scale === 'small') return 0.88;
+  if (scale === 'large') return 1.12;
+  return 1;
 };
 
 export const FONT_SCALE_CONFIG = [
@@ -210,6 +230,16 @@ export const getStoredSettings = (): SystemSettings => {
         triangleExperimentVersion: 1,
         tabbedSparkle: isTabbedSparkle,
         windowsMode: isWindowsMode,
+        windowsUiScale:
+          parsed.windowsUiScale === 'small' || parsed.windowsUiScale === 'large'
+            ? parsed.windowsUiScale
+            : 'default',
+        taskbarSearchStyle: parsed.taskbarSearchStyle === 'button' ? 'button' : 'box',
+        taskbarScale:
+          parsed.taskbarScale === 'small' || parsed.taskbarScale === 'large'
+            ? parsed.taskbarScale
+            : 'default',
+        taskbarAlignment: parsed.taskbarAlignment === 'left' ? 'left' : 'center',
         newWatchTab: typeof parsed.newWatchTab === 'boolean' ? parsed.newWatchTab : DEFAULT_SETTINGS.newWatchTab,
         fluentIcons: typeof parsed.fluentIcons === 'boolean' ? parsed.fluentIcons : DEFAULT_SETTINGS.fluentIcons,
         dynamicSidebarIcons: typeof parsed.dynamicSidebarIcons === 'boolean' ? parsed.dynamicSidebarIcons : true,
@@ -245,7 +275,7 @@ export const applySystemSettings = (settings: SystemSettings) => {
     document.documentElement.classList.remove('triangle-experiment-active');
   }
 
-  // Windows Mode (Velocity Feature)
+  // Windows Mode (Vive Feature)
   if (settings.windowsMode) {
     document.documentElement.classList.add('windows-mode');
     document.body?.classList.add('windows-mode');
@@ -253,6 +283,13 @@ export const applySystemSettings = (settings: SystemSettings) => {
     document.documentElement.classList.remove('windows-mode');
     document.body?.classList.remove('windows-mode');
   }
+
+  const windowsUiScaleMult = getWindowsUiScaleMultiplier(settings.windowsUiScale);
+  document.documentElement.style.setProperty('--windows-ui-scale', String(windowsUiScaleMult));
+  document.documentElement.dataset.windowsUiScale = settings.windowsUiScale || 'default';
+  document.documentElement.dataset.taskbarScale = settings.taskbarScale || 'default';
+  document.documentElement.dataset.taskbarAlignment = settings.taskbarAlignment || 'center';
+  document.documentElement.dataset.taskbarSearchStyle = settings.taskbarSearchStyle || 'box';
 
   // App Theme Mode (Ban ngày / Ban đêm - Ban đêm là mặc định)
   if (settings.theme === 'light') {

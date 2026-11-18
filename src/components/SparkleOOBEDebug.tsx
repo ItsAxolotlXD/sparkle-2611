@@ -285,7 +285,7 @@ export const SparkleOOBEDebug: React.FC<SparkleOOBEDebugProps> = ({
                     />
                     <DebugAction
                       icon={<FlaskConical className="size-4" aria-hidden="true" />}
-                      title="Open Velocity Features"
+                      title="Open Vive Features"
                       description="Close setup and open experimental features in Settings."
                       descriptionId="debug-insider-description"
                       onClick={onOpenInsiderExperiments}

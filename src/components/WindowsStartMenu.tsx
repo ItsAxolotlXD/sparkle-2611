@@ -40,7 +40,7 @@ import {
   Fluent3DPcSettingsIcon,
 } from './Fluent3DIcons';
 import { FluentPersonFeedbackIcon, FluentSearchIcon } from './FluentIcons';
-import { useSettings } from '../hooks/useSettings';
+import { useSettings, getTaskbarHeightPx, getWindowsUiScaleMultiplier } from '../hooks/useSettings';
 import { useNotes } from '../context/NotesContext';
 import { NEWS_DATA } from '../data/news';
 import { Channel } from '../types';
@@ -130,6 +130,9 @@ export const WindowsStartMenu: React.FC<WindowsStartMenuProps> = ({
   const { settings, updateSetting } = useSettings();
   const { notes, setActiveNoteId } = useNotes();
   const isLightMode = settings.theme === 'light';
+  const taskbarHeight = getTaskbarHeightPx(settings.taskbarScale);
+  const uiScaleMult = getWindowsUiScaleMultiplier(settings.windowsUiScale);
+  const isLeftAligned = settings.taskbarAlignment === 'left';
   const menuRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
 
@@ -650,8 +653,10 @@ export const WindowsStartMenu: React.FC<WindowsStartMenuProps> = ({
                       transition: { duration: 0.26, ease: [0.4, 0, 0.2, 1] },
                     }
               }
-              style={{ zIndex: 8990 }}
-              className="fixed bottom-0 inset-x-0 pb-[56px] flex justify-center px-3 pointer-events-none"
+              style={{ zIndex: 8990, paddingBottom: `${taskbarHeight + 8}px` }}
+              className={`fixed bottom-0 inset-x-0 flex px-3 pointer-events-none ${
+                isLeftAligned ? 'justify-center md:justify-start' : 'justify-center'
+              }`}
             >
               <div
                 ref={menuRef}
@@ -667,6 +672,7 @@ export const WindowsStartMenu: React.FC<WindowsStartMenuProps> = ({
                   backgroundColor: isLightMode ? 'rgba(243, 243, 243, 0.86)' : 'rgba(30, 32, 37, 0.86)',
                   backdropFilter: 'blur(42px) saturate(180%)',
                   WebkitBackdropFilter: 'blur(42px) saturate(180%)',
+                  zoom: uiScaleMult,
                 }}
                 className="pointer-events-auto w-full max-w-[620px] max-h-[calc(100vh-76px)] rounded-[12px] border border-black/10 dark:border-white/[0.12] shadow-none flex flex-col overflow-hidden select-none text-[#111827] dark:text-white"
               >

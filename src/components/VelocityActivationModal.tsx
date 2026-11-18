@@ -11,7 +11,7 @@ interface VelocityActivationModalProps {
 export const VelocityActivationModal: React.FC<VelocityActivationModalProps> = ({
   isOpen,
   onComplete,
-  featureName = 'velocity features',
+  featureName = 'Vive features',
 }) => {
   useEffect(() => {
     if (!isOpen) return;
@@ -46,7 +46,7 @@ export const VelocityActivationModal: React.FC<VelocityActivationModalProps> = (
             id="velocity-activation-title"
             className="text-[19px] sm:text-[21px] font-semibold text-[#111827] dark:text-white tracking-tight leading-snug font-sans mb-2 text-center"
           >
-            Activating velocity features
+            Activating Vive features
           </h2>
 
           {/* Subtext */}
@@ -54,7 +54,7 @@ export const VelocityActivationModal: React.FC<VelocityActivationModalProps> = (
             id="velocity-activation-description"
             className="text-[13px] sm:text-[14px] leading-relaxed text-[#6B7280] dark:text-[#9CA3AF] max-w-[380px] text-center"
           >
-            Activating velocity features. This might take a several minutes...
+            Activating {featureName}. This might take a several minutes...
           </p>
         </motion.div>
       )}

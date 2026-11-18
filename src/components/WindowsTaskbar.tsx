@@ -25,7 +25,7 @@ import {
 } from 'lucide-react';
 import { WindowsContextMenu } from './WindowsContextMenu';
 import { contextMenuUpMotionProps, flyoutPanelClassName, flyoutPanelStyle } from './FlyoutDropdown';
-import { useSettings, SystemSettings } from '../hooks/useSettings';
+import { useSettings, SystemSettings, getTaskbarHeightPx } from '../hooks/useSettings';
 import { useNotes } from '../context/NotesContext';
 import { TabIcon, type AppTab } from './SparkleTabBar';
 import { type AppWindowState } from './WindowFrame';
@@ -113,6 +113,9 @@ interface WindowsTaskbarProps {
   isStartMenuOpen: boolean;
   onToggleStartMenu: () => void;
   onCloseStartMenu: () => void;
+  isDirectCommandOpen: boolean;
+  onToggleDirectCommand: () => void;
+  onCloseDirectCommand: () => void;
   onTaskbarWindowClick: (tabId: string) => void;
   onLaunchRoute: (route: string, state?: any) => void;
   onCreateNewWindow: (route?: string) => void;
@@ -132,6 +135,9 @@ export const WindowsTaskbar: React.FC<WindowsTaskbarProps> = ({
   isStartMenuOpen,
   onToggleStartMenu,
   onCloseStartMenu,
+  isDirectCommandOpen,
+  onToggleDirectCommand,
+  onCloseDirectCommand,
   onTaskbarWindowClick,
   onLaunchRoute,
   onCreateNewWindow,
@@ -146,6 +152,48 @@ export const WindowsTaskbar: React.FC<WindowsTaskbarProps> = ({
   const { settings, updateSetting } = useSettings();
   const { notes, setActiveNoteId, isStickyVisible, toggleSticky, createNote } = useNotes();
   const isLightMode = settings.theme === 'light';
+  const taskbarScale = settings.taskbarScale || 'default';
+  const taskbarHeight = getTaskbarHeightPx(taskbarScale);
+  const flyoutBottomOffset = taskbarHeight + 8;
+  const isLeftAligned = settings.taskbarAlignment === 'left';
+  const isSearchButtonMode = settings.taskbarSearchStyle === 'button';
+
+  const btnSizeClass =
+    taskbarScale === 'small'
+      ? 'w-[34px] h-[34px]'
+      : taskbarScale === 'large'
+      ? 'w-[46px] h-[46px]'
+      : 'w-[40px] h-[40px]';
+  const directCmdBtnSizeClass =
+    taskbarScale === 'small'
+      ? 'w-[30px] h-[32px]'
+      : taskbarScale === 'large'
+      ? 'w-[40px] h-[44px]'
+      : 'w-[34px] h-[38px]';
+  const startIconSizeClass =
+    taskbarScale === 'small'
+      ? 'w-[21px] h-[21px]'
+      : taskbarScale === 'large'
+      ? 'w-[29px] h-[29px]'
+      : 'w-[25px] h-[25px]';
+  const appIconSizeClass =
+    taskbarScale === 'small'
+      ? 'w-[20px] h-[20px]'
+      : taskbarScale === 'large'
+      ? 'w-[28px] h-[28px]'
+      : 'w-[24px] h-[24px]';
+  const searchBoxHeightClass =
+    taskbarScale === 'small'
+      ? 'h-[28px]'
+      : taskbarScale === 'large'
+      ? 'h-[36px]'
+      : 'h-[32px]';
+  const clockTextSizeClass =
+    taskbarScale === 'small'
+      ? 'text-[10.5px]'
+      : taskbarScale === 'large'
+      ? 'text-[12.5px]'
+      : 'text-[11.5px]';
 
   // Live Clock & Date formatted like Windows 11 taskbar
   const [clockText, setClockText] = useState({ time: '', date: '' });
@@ -298,6 +346,7 @@ export const WindowsTaskbar: React.FC<WindowsTaskbarProps> = ({
         isSearchOpen &&
         searchBoxRef.current &&
         !searchBoxRef.current.contains(target) &&
+        !target.closest('#windows-taskbar-search-btn') &&
         (!searchFlyoutRef.current || !searchFlyoutRef.current.contains(target))
       ) {
         setIsSearchOpen(false);
@@ -307,7 +356,8 @@ export const WindowsTaskbar: React.FC<WindowsTaskbarProps> = ({
         isQuickSettingsOpen &&
         quickSettingsRef.current &&
         !quickSettingsRef.current.contains(target) &&
-        !target.closest('#btn-taskbar-quick-settings')
+        !target.closest('#btn-taskbar-quick-settings') &&
+        !target.closest('#btn-taskbar-clock-tray')
       ) {
         setIsQuickSettingsOpen(false);
       }
@@ -354,13 +404,14 @@ export const WindowsTaskbar: React.FC<WindowsTaskbarProps> = ({
     const onFocusSearch = () => {
       setIsSearchOpen(true);
       onCloseStartMenu();
+      onCloseDirectCommand();
       setTimeout(() => {
         searchFlyoutInputRef.current?.focus();
       }, 60);
     };
     window.addEventListener('vplay:focus-topbar-search', onFocusSearch);
     return () => window.removeEventListener('vplay:focus-topbar-search', onFocusSearch);
-  }, [onCloseStartMenu]);
+  }, [onCloseStartMenu, onCloseDirectCommand]);
 
   useEffect(() => {
     if (!isSearchOpen) return;
@@ -505,12 +556,21 @@ export const WindowsTaskbar: React.FC<WindowsTaskbarProps> = ({
       },
       {
         id: 'flag-windows-mode',
-        title: 'Windows Mode (Velocity)',
-        subtitle: 'Velocity Feature',
-        keywords: 'windows mode windows 11 taskbar start menu floating window desktop wallpaper velocity',
+        title: 'Windows Mode (Vive)',
+        subtitle: 'Vive Feature',
+        keywords: 'windows mode windows 11 taskbar start menu floating window desktop wallpaper vive velocity',
         type: 'setting-toggle',
         settingKey: 'windowsMode',
         onSelect: () => onLaunchRoute('/settings'),
+      },
+      {
+        id: 'tool-direct-command',
+        title: 'Direct Command',
+        subtitle: 'Command Prompt UI',
+        keywords: 'direct command cmd terminal prompt cli vivetool session taskbar',
+        type: 'tool',
+        logo: '/assets/aistudio/direct_command_6240d59d.png',
+        onSelect: () => window.dispatchEvent(new CustomEvent('vplay:open-direct-command')),
       },
       {
         id: 'flag-spatial-glass',
@@ -1191,6 +1251,7 @@ export const WindowsTaskbar: React.FC<WindowsTaskbarProps> = ({
           setTaskbarContextMenu({ x: e.clientX, y: e.clientY });
         }}
         style={{
+          height: `${taskbarHeight}px`,
           backgroundColor: isLightMode ? 'rgba(226, 233, 243, 0.72)' : 'rgba(28, 30, 36, 0.76)',
           backdropFilter: 'blur(36px) saturate(165%)',
           WebkitBackdropFilter: 'blur(36px) saturate(165%)',
@@ -1198,41 +1259,52 @@ export const WindowsTaskbar: React.FC<WindowsTaskbarProps> = ({
           outline: 'none',
           boxShadow: 'none',
         }}
-        className="fixed bottom-0 inset-x-0 h-[48px] z-[9000] border-0 outline-none flex items-center justify-between px-2 sm:px-3 select-none text-[#111827] dark:text-white"
+        className="fixed bottom-0 inset-x-0 z-[9000] border-0 outline-none flex items-center justify-between px-2 sm:px-3 select-none text-[#111827] dark:text-white transition-[height] duration-200"
       >
-        {/* 1. Left: Weather Widget matching reference screenshot */}
-        <button
-          id="btn-taskbar-weather"
-          type="button"
-          onClick={() => onLaunchRoute('/news')}
-          onMouseEnter={(e) => showTooltip('Weather & Feed', e)}
-          onMouseLeave={() => setHoverTooltip(null)}
-          className="hidden md:flex items-center gap-2.5 h-[38px] px-2.5 rounded-[6px] hover:bg-black/[0.06] dark:hover:bg-white/[0.08] active:scale-[0.98] transition-all cursor-pointer border-0 outline-none focus:outline-none shrink-0 text-left"
-        >
-          <svg
-            id="windows-taskbar-weather-sun"
-            className="w-6 h-6 shrink-0 fluent-3d-icon"
-            viewBox="0 0 28 28"
-            fill="none"
-            stroke="none"
+        {/* 1. Left: Weather Widget (hidden on left when taskbar alignment is left so Start sits flush left) */}
+        {!isLeftAligned && (
+          <button
+            id="btn-taskbar-weather"
+            type="button"
+            onClick={() => {
+              onCloseDirectCommand();
+              onLaunchRoute('/news');
+            }}
+            onMouseEnter={(e) => showTooltip('Weather & Feed', e)}
+            onMouseLeave={() => setHoverTooltip(null)}
+            className="hidden md:flex items-center gap-2.5 h-[38px] px-2.5 rounded-[6px] hover:bg-black/[0.06] dark:hover:bg-white/[0.08] active:scale-[0.98] transition-all cursor-pointer border-0 outline-none focus:outline-none shrink-0 text-left"
           >
-            <defs>
-              <radialGradient id="win11_sunny_grad" cx="40%" cy="35%" r="65%">
-                <stop offset="0%" stopColor="#FDE047" />
-                <stop offset="55%" stopColor="#F59E0B" />
-                <stop offset="100%" stopColor="#EA580C" />
-              </radialGradient>
-            </defs>
-            <circle cx="14" cy="14" r="9" fill="url(#win11_sunny_grad)" stroke="none" strokeWidth={0} />
-          </svg>
-          <div className="leading-tight">
-            <div className="text-[12px] font-medium">32°C</div>
-            <div className="text-[11px] text-black/65 dark:text-white/70">Sunny</div>
-          </div>
-        </button>
+            <svg
+              id="windows-taskbar-weather-sun"
+              className="w-6 h-6 shrink-0 fluent-3d-icon"
+              viewBox="0 0 28 28"
+              fill="none"
+              stroke="none"
+            >
+              <defs>
+                <radialGradient id="win11_sunny_grad" cx="40%" cy="35%" r="65%">
+                  <stop offset="0%" stopColor="#FDE047" />
+                  <stop offset="55%" stopColor="#F59E0B" />
+                  <stop offset="100%" stopColor="#EA580C" />
+                </radialGradient>
+              </defs>
+              <circle cx="14" cy="14" r="9" fill="url(#win11_sunny_grad)" stroke="none" strokeWidth={0} />
+            </svg>
+            <div className="leading-tight">
+              <div className="text-[12px] font-medium">32°C</div>
+              <div className="text-[11px] text-black/65 dark:text-white/70">Sunny</div>
+            </div>
+          </button>
+        )}
 
-        {/* 2. Center Cluster: Start + Search Pill + Task View + Sidebar-matched Taskbar Icons */}
-        <div className="flex items-center justify-center gap-1 sm:gap-1.5 flex-1 md:flex-none md:absolute md:left-1/2 md:-translate-x-1/2 min-w-0 max-w-full overflow-x-auto no-scrollbar">
+        {/* 2. Main Cluster: Start + Search (Box or Button) + Task View + Taskbar App Icons */}
+        <div
+          className={`flex items-center gap-1 sm:gap-1.5 flex-1 min-w-0 max-w-full overflow-x-auto no-scrollbar ${
+            isLeftAligned
+              ? 'justify-start'
+              : 'justify-center md:flex-none md:absolute md:left-1/2 md:-translate-x-1/2'
+          }`}
+        >
           {/* Start Button (Windows 11 4-pane blue logo) */}
           <button
             id="btn-taskbar-start"
@@ -1242,13 +1314,14 @@ export const WindowsTaskbar: React.FC<WindowsTaskbarProps> = ({
               setIsTrayOverflowOpen(false);
               setIsTaskViewOpen(false);
               setIsSearchOpen(false);
+              onCloseDirectCommand();
               onToggleStartMenu();
             }}
             onMouseEnter={(e) => showTooltip('Start', e)}
             onMouseLeave={() => setHoverTooltip(null)}
             aria-label="Start"
             aria-expanded={isStartMenuOpen}
-            className={`w-[38px] h-[38px] rounded-[6px] flex items-center justify-center shrink-0 transition-all cursor-pointer border-none active:scale-90 ${
+            className={`${btnSizeClass} rounded-[6px] flex items-center justify-center shrink-0 transition-all cursor-pointer border-none active:scale-90 ${
               isStartMenuOpen
                 ? 'bg-black/10 dark:bg-white/[0.14]'
                 : 'hover:bg-black/[0.06] dark:hover:bg-white/[0.08]'
@@ -1258,81 +1331,109 @@ export const WindowsTaskbar: React.FC<WindowsTaskbarProps> = ({
               src="/assets/aistudio/image_24e205f4.png"
               alt="Start"
               draggable={false}
-              className="w-[24px] h-[24px] object-contain select-none pointer-events-none"
+              className={`${startIconSizeClass} object-contain select-none pointer-events-none`}
             />
           </button>
 
-          {/* Search Pill ("Search here" - no outline, 80% opacity background, opens Always-on-Top Trending Search UI) */}
+          {/* Search Box or Search Icon Button based on taskbarSearchStyle */}
           <div ref={searchBoxRef} className="relative shrink-0">
-            <form
-              id="windows-taskbar-search-box"
-              onSubmit={(e) => {
-                e.preventDefault();
-                if (searchQuery.trim() && searchResults.length > 0) {
-                  handleSelectSearchResult(searchResults[0]);
-                } else {
-                  setIsSearchOpen(true);
-                }
-              }}
-              style={{
-                backgroundColor: isLightMode
-                  ? isSearchOpen
-                    ? 'rgba(255, 255, 255, 0.85)'
-                    : 'rgba(255, 255, 255, 0.80)'
-                  : isSearchOpen
-                  ? 'rgba(56, 59, 66, 0.85)'
-                  : 'rgba(56, 59, 66, 0.80)',
-                border: 'none',
-                outline: 'none',
-                boxShadow: 'none',
-              }}
-              className="h-[32px] w-[145px] sm:w-[205px] rounded-full flex items-center pl-3 pr-1 gap-2 transition-colors !border-0 !outline-none focus:!outline-none focus-within:!outline-none ring-0 focus-within:ring-0"
-            >
-              <FluentSearchIcon className="w-[14px] h-[14px] text-[#374151] dark:text-white/90 shrink-0" />
-              <input
-                type="text"
-                value={searchQuery}
-                onFocus={() => {
+            {isSearchButtonMode ? (
+              <button
+                id="windows-taskbar-search-btn"
+                type="button"
+                onClick={() => {
                   onCloseStartMenu();
+                  onCloseDirectCommand();
                   setIsQuickSettingsOpen(false);
                   setIsTrayOverflowOpen(false);
                   setIsTaskViewOpen(false);
-                  setIsSearchOpen(true);
+                  setIsSearchOpen((prev) => !prev);
                 }}
-                onClick={() => {
-                  onCloseStartMenu();
-                  setIsSearchOpen(true);
+                onMouseEnter={(e) => showTooltip('Search', e)}
+                onMouseLeave={() => setHoverTooltip(null)}
+                aria-label="Search"
+                aria-expanded={isSearchOpen}
+                className={`${btnSizeClass} rounded-[6px] flex items-center justify-center shrink-0 transition-all cursor-pointer border-none active:scale-90 ${
+                  isSearchOpen
+                    ? 'bg-black/10 dark:bg-white/[0.14]'
+                    : 'hover:bg-black/[0.06] dark:hover:bg-white/[0.08]'
+                }`}
+              >
+                <FluentSearchIcon className={`${appIconSizeClass} text-[#374151] dark:text-white/90 shrink-0`} />
+              </button>
+            ) : (
+              <form
+                id="windows-taskbar-search-box"
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  if (searchQuery.trim() && searchResults.length > 0) {
+                    handleSelectSearchResult(searchResults[0]);
+                  } else {
+                    setIsSearchOpen(true);
+                  }
                 }}
-                onChange={(e) => {
-                  setSearchQuery(e.target.value);
-                  setShowAllResults(false);
-                  setIsSearchOpen(true);
+                style={{
+                  backgroundColor: isLightMode
+                    ? isSearchOpen
+                      ? 'rgba(255, 255, 255, 0.85)'
+                      : 'rgba(255, 255, 255, 0.80)'
+                    : isSearchOpen
+                    ? 'rgba(56, 59, 66, 0.85)'
+                    : 'rgba(56, 59, 66, 0.80)',
+                  border: 'none',
+                  outline: 'none',
+                  boxShadow: 'none',
                 }}
-                placeholder="Search here"
-                className="flex-1 min-w-0 !bg-transparent text-[12.5px] text-[#111827] dark:text-white placeholder-[#4b5563] dark:placeholder-white/80 !outline-none focus:!outline-none !border-none !border-b-0 !shadow-none"
-              />
-              {searchQuery ? (
-                <button
-                  type="button"
-                  onClick={() => setSearchQuery('')}
-                  aria-label="Clear search"
-                  className="w-5 h-5 rounded-full flex items-center justify-center hover:bg-black/10 dark:hover:bg-white/15 cursor-pointer border-none bg-transparent"
-                >
-                  <X className="w-3 h-3" />
-                </button>
-              ) : (
-                <div
-                  aria-hidden="true"
-                  className="hidden sm:block w-[36px] h-[22px] rounded-full overflow-hidden shrink-0 border border-white/15 shadow-xs"
-                >
-                  <img
-                    src="/assets/aistudio/pink-nature-landscape-with-vegetation-flora_8a81cb83.jpg"
-                    alt=""
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-              )}
-            </form>
+                className={`${searchBoxHeightClass} w-[145px] sm:w-[205px] rounded-full flex items-center pl-3 pr-1 gap-2 transition-colors !border-0 !outline-none focus:!outline-none focus-within:!outline-none ring-0 focus-within:ring-0`}
+              >
+                <FluentSearchIcon className="w-[14px] h-[14px] text-[#374151] dark:text-white/90 shrink-0" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onFocus={() => {
+                    onCloseStartMenu();
+                    onCloseDirectCommand();
+                    setIsQuickSettingsOpen(false);
+                    setIsTrayOverflowOpen(false);
+                    setIsTaskViewOpen(false);
+                    setIsSearchOpen(true);
+                  }}
+                  onClick={() => {
+                    onCloseStartMenu();
+                    onCloseDirectCommand();
+                    setIsSearchOpen(true);
+                  }}
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value);
+                    setShowAllResults(false);
+                    setIsSearchOpen(true);
+                  }}
+                  placeholder="Search here"
+                  className="flex-1 min-w-0 !bg-transparent text-[12.5px] text-[#111827] dark:text-white placeholder-[#4b5563] dark:placeholder-white/80 !outline-none focus:!outline-none !border-none !border-b-0 !shadow-none"
+                />
+                {searchQuery ? (
+                  <button
+                    type="button"
+                    onClick={() => setSearchQuery('')}
+                    aria-label="Clear search"
+                    className="w-5 h-5 rounded-full flex items-center justify-center hover:bg-black/10 dark:hover:bg-white/15 cursor-pointer border-none bg-transparent"
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
+                ) : (
+                  <div
+                    aria-hidden="true"
+                    className="hidden sm:block w-[36px] h-[22px] rounded-full overflow-hidden shrink-0 border border-white/15 shadow-xs"
+                  >
+                    <img
+                      src="/assets/aistudio/pink-nature-landscape-with-vegetation-flora_8a81cb83.jpg"
+                      alt=""
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                )}
+              </form>
+            )}
 
             {/* Straight Slide-Up Search UI Card matching reference screenshot (no fade, no shadow, bottom Search input) */}
             {typeof document !== 'undefined' &&
@@ -1356,8 +1457,10 @@ export const WindowsTaskbar: React.FC<WindowsTaskbarProps> = ({
                               transition: { duration: 0.26, ease: [0.4, 0, 0.2, 1] },
                             }
                       }
-                      style={{ zIndex: 8990 }}
-                      className="fixed bottom-0 inset-x-0 pb-[56px] flex justify-center px-3 pointer-events-none"
+                      style={{ zIndex: 8990, paddingBottom: `${flyoutBottomOffset}px` }}
+                      className={`fixed bottom-0 inset-x-0 flex px-3 pointer-events-none ${
+                        isLeftAligned ? 'justify-center md:justify-start' : 'justify-center'
+                      }`}
                     >
                       <div
                         ref={searchFlyoutRef}
@@ -1583,19 +1686,20 @@ export const WindowsTaskbar: React.FC<WindowsTaskbarProps> = ({
               type="button"
               onClick={() => {
                 onCloseStartMenu();
+                onCloseDirectCommand();
                 setIsSearchOpen(false);
                 setIsTaskViewOpen((prev) => !prev);
               }}
               onMouseEnter={(e) => showTooltip('Task view', e)}
               onMouseLeave={() => setHoverTooltip(null)}
               aria-label="Task view"
-              className={`w-[38px] h-[38px] rounded-[6px] flex items-center justify-center transition-all cursor-pointer border-none active:scale-90 ${
+              className={`${btnSizeClass} rounded-[6px] flex items-center justify-center transition-all cursor-pointer border-none active:scale-90 ${
                 isTaskViewOpen
                   ? 'bg-white/55 dark:bg-white/[0.14]'
                   : 'hover:bg-black/[0.06] dark:hover:bg-white/[0.08]'
               }`}
             >
-              <svg className="w-[19px] h-[19px]" viewBox="0 0 20 20" fill="none">
+              <svg className={appIconSizeClass} viewBox="0 0 20 20" fill="none">
                 <rect x="2.5" y="3.5" width="7.2" height="13" rx="1.6" fill="#0078D4" fillOpacity="0.88" />
                 <rect x="10.3" y="3.5" width="7.2" height="13" rx="1.6" fill={isLightMode ? '#1F2937' : '#E5E7EB'} fillOpacity="0.45" />
               </svg>
@@ -1622,8 +1726,10 @@ export const WindowsTaskbar: React.FC<WindowsTaskbarProps> = ({
                               transition: { duration: 0.26, ease: [0.4, 0, 0.2, 1] },
                             }
                       }
-                      style={{ zIndex: 8990 }}
-                      className="fixed bottom-0 inset-x-0 pb-[56px] flex justify-center px-3 pointer-events-none"
+                      style={{ zIndex: 8990, paddingBottom: `${flyoutBottomOffset}px` }}
+                      className={`fixed bottom-0 inset-x-0 flex px-3 pointer-events-none ${
+                        isLeftAligned ? 'justify-center md:justify-start' : 'justify-center'
+                      }`}
                     >
                       <div
                         ref={taskViewRef}
@@ -1722,6 +1828,7 @@ export const WindowsTaskbar: React.FC<WindowsTaskbarProps> = ({
                     onClick={() => {
                       if (!draggedSlotKey) {
                         onCloseStartMenu();
+                        onCloseDirectCommand();
                         setIsSearchOpen(false);
                         onLaunchRoute(pinned.route);
                       }
@@ -1730,6 +1837,7 @@ export const WindowsTaskbar: React.FC<WindowsTaskbarProps> = ({
                       if (e.key === 'Enter' || e.key === ' ') {
                         e.preventDefault();
                         onCloseStartMenu();
+                        onCloseDirectCommand();
                         setIsSearchOpen(false);
                         onLaunchRoute(pinned.route);
                       }
@@ -1767,7 +1875,7 @@ export const WindowsTaskbar: React.FC<WindowsTaskbarProps> = ({
                     onMouseEnter={(e) => !draggedSlotKey && showTooltip(pinned.title, e)}
                     onMouseLeave={() => setHoverTooltip(null)}
                     aria-label={pinned.title}
-                    className={`relative w-[38px] h-[38px] rounded-[6px] flex items-center justify-center shrink-0 hover:bg-black/[0.06] dark:hover:bg-white/[0.08] active:scale-90 transition-all cursor-pointer border-0 outline-none select-none ${
+                    className={`relative ${btnSizeClass} rounded-[6px] flex items-center justify-center shrink-0 hover:bg-black/[0.06] dark:hover:bg-white/[0.08] active:scale-90 transition-all cursor-pointer border-0 outline-none select-none ${
                       isSlotDragged ? 'opacity-45 scale-90' : ''
                     }`}
                   >
@@ -1777,7 +1885,7 @@ export const WindowsTaskbar: React.FC<WindowsTaskbarProps> = ({
                     {dropSide === 'after' && (
                       <span className="absolute -right-[2px] top-1.5 bottom-1.5 w-[2.5px] rounded-full bg-[#0078d4] dark:bg-[#4cc2ff] pointer-events-none" />
                     )}
-                    <TabIcon route={pinned.route} className="w-[20px] h-[20px] shrink-0" />
+                    <TabIcon route={pinned.route} className={`${appIconSizeClass} shrink-0`} />
                   </div>
                 );
               }
@@ -1794,6 +1902,7 @@ export const WindowsTaskbar: React.FC<WindowsTaskbarProps> = ({
                     onClick={() => {
                       if (!draggedSlotKey) {
                         onCloseStartMenu();
+                        onCloseDirectCommand();
                         setIsSearchOpen(false);
                         onTaskbarWindowClick(tab.id);
                       }
@@ -1802,6 +1911,7 @@ export const WindowsTaskbar: React.FC<WindowsTaskbarProps> = ({
                       if (e.key === 'Enter' || e.key === ' ') {
                         e.preventDefault();
                         onCloseStartMenu();
+                        onCloseDirectCommand();
                         setIsSearchOpen(false);
                         onTaskbarWindowClick(tab.id);
                       }
@@ -1844,7 +1954,7 @@ export const WindowsTaskbar: React.FC<WindowsTaskbarProps> = ({
                     onMouseEnter={(e) => !draggedSlotKey && showTooltip(tab.title, e)}
                     onMouseLeave={() => setHoverTooltip(null)}
                     aria-label={tab.title}
-                    className={`relative w-[38px] h-[38px] rounded-[6px] flex items-center justify-center shrink-0 transition-all cursor-pointer border-0 outline-none active:scale-90 select-none ${
+                    className={`relative ${btnSizeClass} rounded-[6px] flex items-center justify-center shrink-0 transition-all cursor-pointer border-0 outline-none active:scale-90 select-none ${
                       isFocused
                         ? 'bg-black/[0.08] dark:bg-white/[0.12]'
                         : 'hover:bg-black/[0.06] dark:hover:bg-white/[0.08]'
@@ -1856,7 +1966,7 @@ export const WindowsTaskbar: React.FC<WindowsTaskbarProps> = ({
                     {tabIdx === matchingTabs.length - 1 && dropSide === 'after' && (
                       <span className="absolute -right-[2px] top-1.5 bottom-1.5 w-[2.5px] rounded-full bg-[#0078d4] dark:bg-[#4cc2ff] pointer-events-none" />
                     )}
-                    <TabIcon route={tab.route} active={isFocused} className="w-[20px] h-[20px] shrink-0" />
+                    <TabIcon route={tab.route} active={isFocused} className={`${appIconSizeClass} shrink-0`} />
                     <span
                       className={`absolute bottom-[2px] left-1/2 -translate-x-1/2 h-[3px] rounded-full transition-all duration-200 ${
                         isFocused
@@ -1881,6 +1991,7 @@ export const WindowsTaskbar: React.FC<WindowsTaskbarProps> = ({
                 onClick={() => {
                   if (!draggedSlotKey) {
                     onCloseStartMenu();
+                    onCloseDirectCommand();
                     setIsSearchOpen(false);
                     onTaskbarWindowClick(tab.id);
                   }
@@ -1889,6 +2000,7 @@ export const WindowsTaskbar: React.FC<WindowsTaskbarProps> = ({
                   if (e.key === 'Enter' || e.key === ' ') {
                     e.preventDefault();
                     onCloseStartMenu();
+                    onCloseDirectCommand();
                     setIsSearchOpen(false);
                     onTaskbarWindowClick(tab.id);
                   }
@@ -1931,7 +2043,7 @@ export const WindowsTaskbar: React.FC<WindowsTaskbarProps> = ({
                 onMouseEnter={(e) => !draggedSlotKey && showTooltip(tab.title, e)}
                 onMouseLeave={() => setHoverTooltip(null)}
                 aria-label={tab.title}
-                className={`relative w-[38px] h-[38px] rounded-[6px] flex items-center justify-center shrink-0 transition-all cursor-pointer border-0 outline-none active:scale-90 select-none ${
+                className={`relative ${btnSizeClass} rounded-[6px] flex items-center justify-center shrink-0 transition-all cursor-pointer border-0 outline-none active:scale-90 select-none ${
                   isFocused
                     ? 'bg-black/[0.08] dark:bg-white/[0.12]'
                     : 'hover:bg-black/[0.06] dark:hover:bg-white/[0.08]'
@@ -1943,7 +2055,7 @@ export const WindowsTaskbar: React.FC<WindowsTaskbarProps> = ({
                 {dropSide === 'after' && (
                   <span className="absolute -right-[2px] top-1.5 bottom-1.5 w-[2.5px] rounded-full bg-[#0078d4] dark:bg-[#4cc2ff] pointer-events-none" />
                 )}
-                <TabIcon route={tab.route} active={isFocused} className="w-[20px] h-[20px] shrink-0" />
+                <TabIcon route={tab.route} active={isFocused} className={`${appIconSizeClass} shrink-0`} />
                 <span
                   className={`absolute bottom-[2px] left-1/2 -translate-x-1/2 h-[3px] rounded-full transition-all duration-200 ${
                     isFocused
@@ -1956,13 +2068,46 @@ export const WindowsTaskbar: React.FC<WindowsTaskbarProps> = ({
           })}
         </div>
 
-        {/* 3. Right System Tray: ^ Overflow, Wi-Fi + Volume, Clock + Date, Show Desktop */}
+        {/* 3. Right System Tray: ^ Overflow, Wi-Fi + Volume (Control Center), Clock + Date, Direct Command, Show Desktop */}
         <div className="flex items-center gap-0.5 sm:gap-1 shrink-0 h-full">
+          {isLeftAligned && (
+            <button
+              id="btn-taskbar-weather"
+              type="button"
+              onClick={() => {
+                onCloseDirectCommand();
+                onLaunchRoute('/news');
+              }}
+              onMouseEnter={(e) => showTooltip('Weather & Feed', e)}
+              onMouseLeave={() => setHoverTooltip(null)}
+              className="hidden lg:flex items-center gap-2 h-[34px] px-2 rounded-[5px] hover:bg-black/[0.06] dark:hover:bg-white/[0.08] active:scale-[0.98] transition-all cursor-pointer border-0 outline-none focus:outline-none shrink-0 text-left mr-0.5"
+            >
+              <svg
+                id="windows-taskbar-weather-sun"
+                className="w-5 h-5 shrink-0 fluent-3d-icon"
+                viewBox="0 0 28 28"
+                fill="none"
+                stroke="none"
+              >
+                <defs>
+                  <radialGradient id="win11_sunny_grad_tray" cx="40%" cy="35%" r="65%">
+                    <stop offset="0%" stopColor="#FDE047" />
+                    <stop offset="55%" stopColor="#F59E0B" />
+                    <stop offset="100%" stopColor="#EA580C" />
+                  </radialGradient>
+                </defs>
+                <circle cx="14" cy="14" r="9" fill="url(#win11_sunny_grad_tray)" stroke="none" strokeWidth={0} />
+              </svg>
+              <span className="text-[11.5px] font-medium">32°C</span>
+            </button>
+          )}
+
           <div className="relative hidden sm:block">
             <button
               id="btn-taskbar-tray-overflow"
               type="button"
               onClick={() => {
+                onCloseDirectCommand();
                 setIsQuickSettingsOpen(false);
                 setIsTrayOverflowOpen((prev) => !prev);
               }}
@@ -1981,10 +2126,11 @@ export const WindowsTaskbar: React.FC<WindowsTaskbarProps> = ({
                   exit={{ opacity: 0, y: 10, scale: 0.96 }}
                   transition={{ duration: 0.14 }}
                   style={{
+                    bottom: `${flyoutBottomOffset}px`,
                     backgroundColor: isLightMode ? 'rgba(245, 245, 247, 0.92)' : 'rgba(30, 32, 37, 0.92)',
                     backdropFilter: 'blur(28px)',
                   }}
-                  className="absolute right-0 bottom-[52px] w-[195px] p-1.5 rounded-[10px] border border-black/10 dark:border-white/[0.12] shadow-2xl space-y-0.5 z-[9500]"
+                  className="fixed right-12 w-[195px] p-1.5 rounded-[10px] border border-black/10 dark:border-white/[0.12] shadow-2xl space-y-0.5 z-[9500]"
                 >
                   <button
                     type="button"
@@ -2029,6 +2175,7 @@ export const WindowsTaskbar: React.FC<WindowsTaskbarProps> = ({
               id="btn-taskbar-quick-settings"
               type="button"
               onClick={() => {
+                onCloseDirectCommand();
                 setIsTrayOverflowOpen(false);
                 setIsQuickSettingsOpen((prev) => !prev);
               }}
@@ -2047,15 +2194,27 @@ export const WindowsTaskbar: React.FC<WindowsTaskbarProps> = ({
               {isQuickSettingsOpen && (
                 <motion.div
                   ref={quickSettingsRef}
-                  initial={{ opacity: 0, y: 12, scale: 0.96 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: 12, scale: 0.96 }}
-                  transition={{ duration: 0.16 }}
-                  style={{
-                    backgroundColor: isLightMode ? 'rgba(245, 245, 247, 0.92)' : 'rgba(30, 32, 37, 0.92)',
-                    backdropFilter: 'blur(32px) saturate(180%)',
+                  initial={settings.reduceAllMotion ? false : { x: '110%', opacity: 0 }}
+                  animate={{
+                    x: 0,
+                    opacity: 1,
+                    transition: settings.reduceAllMotion
+                      ? { duration: 0 }
+                      : { duration: 0.28, ease: [0.22, 1, 0.36, 1] },
                   }}
-                  className="fixed bottom-[56px] right-3 w-[300px] rounded-[12px] border border-black/10 dark:border-white/[0.12] shadow-2xl p-3.5 space-y-3 z-[9500]"
+                  exit={
+                    settings.reduceAllMotion
+                      ? undefined
+                      : {
+                          x: '110%',
+                          opacity: 0,
+                          transition: { duration: 0.2, ease: [0.4, 0, 1, 1] },
+                        }
+                  }
+                  style={{
+                    bottom: `${flyoutBottomOffset}px`,
+                  }}
+                  className="windows-mica-frame fixed right-3 w-[300px] rounded-[12px] border border-black/10 dark:border-white/[0.12] shadow-2xl p-3.5 space-y-3 z-[9500]"
                 >
                   <div className="grid grid-cols-3 gap-2">
                     <button
@@ -2123,14 +2282,50 @@ export const WindowsTaskbar: React.FC<WindowsTaskbarProps> = ({
             </AnimatePresence>
           </div>
 
-          <button
-            type="button"
-            onClick={() => setIsQuickSettingsOpen((prev) => !prev)}
-            className="h-[36px] px-2 rounded-[5px] flex flex-col items-end justify-center leading-[1.2] hover:bg-black/[0.06] dark:hover:bg-white/[0.08] transition-colors cursor-pointer border-none text-right shrink-0"
-          >
-            <span className="text-[11.5px] font-normal tabular-nums">{clockText.time}</span>
-            <span className="text-[11.5px] font-normal tabular-nums">{clockText.date}</span>
-          </button>
+          <div className="flex items-center gap-0 shrink-0">
+            <button
+              id="btn-taskbar-clock-tray"
+              type="button"
+              onClick={() => {
+                onCloseDirectCommand();
+                setIsQuickSettingsOpen((prev) => !prev);
+              }}
+              className="h-[36px] pl-2 pr-1 rounded-[5px] flex flex-col items-end justify-center leading-[1.2] hover:bg-black/[0.06] dark:hover:bg-white/[0.08] transition-colors cursor-pointer border-none text-right shrink-0"
+            >
+              <span className={`${clockTextSizeClass} font-normal tabular-nums`}>{clockText.time}</span>
+              <span className={`${clockTextSizeClass} font-normal tabular-nums`}>{clockText.date}</span>
+            </button>
+
+            {/* Direct Command icon placed tightly to the right next to Clock Tray */}
+            <button
+              id="btn-taskbar-direct-command"
+              type="button"
+              onClick={() => {
+                onCloseStartMenu();
+                setIsSearchOpen(false);
+                setIsQuickSettingsOpen(false);
+                setIsTrayOverflowOpen(false);
+                setIsTaskViewOpen(false);
+                onToggleDirectCommand();
+              }}
+              onMouseEnter={(e) => showTooltip('Direct Command', e)}
+              onMouseLeave={() => setHoverTooltip(null)}
+              aria-label="Direct Command"
+              aria-expanded={isDirectCommandOpen}
+              className={`${directCmdBtnSizeClass} rounded-[6px] flex items-center justify-center shrink-0 transition-all cursor-pointer border-none active:scale-90 ${
+                isDirectCommandOpen
+                  ? 'bg-black/10 dark:bg-white/[0.14]'
+                  : 'hover:bg-black/[0.06] dark:hover:bg-white/[0.08]'
+              }`}
+            >
+              <img
+                src="/assets/aistudio/direct_command_6240d59d.png"
+                alt="Direct Command"
+                draggable={false}
+                className={`${appIconSizeClass} object-contain select-none pointer-events-none`}
+              />
+            </button>
+          </div>
 
           <button
             type="button"
@@ -2157,7 +2352,7 @@ export const WindowsTaskbar: React.FC<WindowsTaskbarProps> = ({
                 transition={{ duration: 0.18, ease: 'easeOut' }}
                 style={{
                   position: 'fixed',
-                  bottom: '56px',
+                  bottom: `${flyoutBottomOffset}px`,
                   left: `${Math.max(48, Math.min(hoverTooltip.left, (typeof window !== 'undefined' ? window.innerWidth : 1200) - 48))}px`,
                   transform: 'translateX(-50%)',
                   backgroundColor: isLightMode ? 'rgba(255, 255, 255, 0.50)' : 'rgba(24, 24, 28, 0.50)',
@@ -2184,7 +2379,7 @@ export const WindowsTaskbar: React.FC<WindowsTaskbarProps> = ({
                 style={{
                   position: 'fixed',
                   left: Math.max(8, Math.min(taskMenu.x, window.innerWidth - 190)),
-                  bottom: '54px',
+                  bottom: `${taskbarHeight + 6}px`,
                   zIndex: 2147483647,
                   overflow: 'clip',
                 }}
