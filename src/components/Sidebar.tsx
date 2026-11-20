@@ -2080,7 +2080,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   type="button"
                   disabled={isWindowsMode}
                   onClick={isWindowsMode ? undefined : onToggleCollapse} 
-                  onMouseEnter={(e) => showTooltip(isWindowsMode ? 'Expand disabled in Windows Mode' : 'Collapse or expand', e)}
+                  onMouseEnter={(e) => showTooltip(isWindowsMode ? 'Expand disabled in Sparkle Mode' : 'Collapse or expand', e)}
                   onMouseLeave={hideTooltip}
                   className={`w-9 h-9 rounded-[6px] shrink-0 flex items-center justify-center text-black dark:text-white/90 transition-colors ${
                     isWindowsMode

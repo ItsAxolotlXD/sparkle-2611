@@ -55,6 +55,7 @@ import { NEWS_DATA } from '../data/news';
 import { Channel } from '../types';
 import { galleryDB, GalleryMediaItem } from '../services/galleryStorage';
 import { showAppToast } from '../utils/toast';
+import { useHanoiWeather } from '../hooks/useHanoiWeather';
 import {
   WindowsWidgetsBoard,
   CITY_WEATHER_DATA,
@@ -168,6 +169,7 @@ export const WindowsTaskbar: React.FC<WindowsTaskbarProps> = ({
   // Widgets Dashboard state & synced city weather
   const [isWidgetsOpen, setIsWidgetsOpen] = useState(false);
   const [widgetsPrefs, setWidgetsPrefs] = useState(() => loadWidgetsPrefs());
+  const { data: liveHanoiWeather } = useHanoiWeather();
   const weatherHoverTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
@@ -186,10 +188,12 @@ export const WindowsTaskbar: React.FC<WindowsTaskbarProps> = ({
     };
   }, []);
 
-  const activeCityWeather = useMemo(
-    () => CITY_WEATHER_DATA.find((c) => c.id === widgetsPrefs.selectedCityId) || CITY_WEATHER_DATA[0],
-    [widgetsPrefs.selectedCityId]
-  );
+  const activeCityWeather = useMemo(() => {
+    const selected = CITY_WEATHER_DATA.find((city) => city.id === widgetsPrefs.selectedCityId) || CITY_WEATHER_DATA.find((city) => city.id === 'hanoi')!;
+    return selected.id === 'hanoi' && liveHanoiWeather
+      ? { ...selected, ...liveHanoiWeather }
+      : selected;
+  }, [widgetsPrefs.selectedCityId, liveHanoiWeather]);
 
   const handleToggleWidgets = () => {
     onCloseStartMenu();
@@ -632,7 +636,7 @@ export const WindowsTaskbar: React.FC<WindowsTaskbarProps> = ({
       },
       {
         id: 'flag-windows-mode',
-        title: 'Windows Mode (Vive)',
+        title: 'Sparkle Mode (Vive)',
         subtitle: 'Vive Feature',
         keywords: 'windows mode windows 11 taskbar start menu floating window desktop wallpaper vive velocity',
         type: 'setting-toggle',
@@ -1325,7 +1329,7 @@ export const WindowsTaskbar: React.FC<WindowsTaskbarProps> = ({
       <footer
         id="windows-taskbar"
         role="region"
-        aria-label="Windows Taskbar"
+        aria-label="Sparkle Taskbar"
         onContextMenu={(e) => {
           e.preventDefault();
           e.stopPropagation();
@@ -1335,7 +1339,7 @@ export const WindowsTaskbar: React.FC<WindowsTaskbarProps> = ({
         }}
         style={{
           height: `${taskbarHeight}px`,
-          backgroundColor: isLightMode ? 'rgba(226, 233, 243, 0.72)' : 'rgba(28, 30, 36, 0.76)',
+          backgroundColor: isLightMode ? 'rgba(226, 233, 243, 0.76)' : 'rgba(28, 30, 36, 0.80)',
           backdropFilter: 'blur(36px) saturate(165%)',
           WebkitBackdropFilter: 'blur(36px) saturate(165%)',
           border: 'none',
@@ -1459,7 +1463,17 @@ export const WindowsTaskbar: React.FC<WindowsTaskbarProps> = ({
                 }}
                 className={`${searchBoxHeightClass} w-[145px] sm:w-[205px] rounded-full flex items-center pl-3 pr-1 gap-2 transition-colors !border-0 !outline-none focus:!outline-none focus-within:!outline-none ring-0 focus-within:ring-0`}
               >
-                <FluentSearchIcon className="w-[14px] h-[14px] text-[#374151] dark:text-white/90 shrink-0" />
+                {settings.refreshedSearchIcon ? (
+                  <img
+                    src={isSearchOpen ? 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Focused.png-C6h07cJuZkQ7qxr3AwmqXxINQya0tI.x-icon' : isLightMode ? 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Light.png-HoVpbl8N1AMI4rRIqBouhKXe4NoTxd.x-icon' : 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Dark.png-5e1aw6TgUECnUtZ4mPQmegFRSvNg6x.x-icon'}
+                    alt=""
+                    aria-hidden="true"
+                    draggable={false}
+                    className="w-[18px] h-[18px] object-contain shrink-0 pointer-events-none select-none"
+                  />
+                ) : (
+                  <FluentSearchIcon className="w-[14px] h-[14px] text-[#374151] dark:text-white/90 shrink-0" />
+                )}
                 <input
                   type="text"
                   value={searchQuery}
@@ -1482,7 +1496,7 @@ export const WindowsTaskbar: React.FC<WindowsTaskbarProps> = ({
                     setIsSearchOpen(true);
                   }}
                   placeholder="Search here"
-                  className="flex-1 min-w-0 !bg-transparent text-[12.5px] text-[#111827] dark:text-white placeholder-[#4b5563] dark:placeholder-white/80 !outline-none focus:!outline-none !border-none !border-b-0 !shadow-none"
+                  className="flex-1 min-w-0 !bg-transparent text-[12.5px] text-[#111827] dark:text-white placeholder-[#111827] dark:placeholder-white/80 !outline-none focus:!outline-none !border-none !border-b-0 !shadow-none"
                 />
                 {searchQuery ? (
                   <button
@@ -1884,6 +1898,7 @@ export const WindowsTaskbar: React.FC<WindowsTaskbarProps> = ({
           </div>
 
           {/* Unified Draggable Taskbar App Icons (pinned + open windows) */}
+          <AnimatePresence initial={false}>
           {orderedTaskbarSlots.map((slot) => {
             const isSlotDragged = draggedSlotKey === slot.key;
             const dropSide =
@@ -1893,9 +1908,14 @@ export const WindowsTaskbar: React.FC<WindowsTaskbarProps> = ({
               const { pinned, matchingTabs } = slot;
               if (matchingTabs.length === 0) {
                 return (
-                  <div
+                    <motion.div
                     key={slot.key}
                     role="button"
+                    initial={{ opacity: 0, y: 22, scale: 0.78 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 22, scale: 0.78 }}
+                    whileTap={{ y: 6, scale: 0.88 }}
+                    transition={{ type: 'spring', stiffness: 440, damping: 28 }}
                     tabIndex={0}
                     draggable
                     onClick={() => {
@@ -1959,7 +1979,7 @@ export const WindowsTaskbar: React.FC<WindowsTaskbarProps> = ({
                       <span className="absolute -right-[2px] top-1.5 bottom-1.5 w-[2.5px] rounded-full bg-[#0078d4] dark:bg-[#4cc2ff] pointer-events-none" />
                     )}
                     <TabIcon route={pinned.route} className={`${appIconSizeClass} shrink-0`} />
-                  </div>
+                  </motion.div>
                 );
               }
 
@@ -1967,9 +1987,14 @@ export const WindowsTaskbar: React.FC<WindowsTaskbarProps> = ({
                 const ws = windowStates[tab.id];
                 const isFocused = tab.id === activeTabId && !ws?.isMinimized;
                 return (
-                  <div
+                  <motion.div
                     key={tab.id}
                     role="button"
+                    initial={{ opacity: 0, y: 22, scale: 0.78 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 22, scale: 0.78 }}
+                    whileTap={{ y: 6, scale: 0.88 }}
+                    transition={{ type: 'spring', stiffness: 440, damping: 28 }}
                     tabIndex={0}
                     draggable
                     onClick={() => {
@@ -2047,7 +2072,7 @@ export const WindowsTaskbar: React.FC<WindowsTaskbarProps> = ({
                           : 'w-[6px] bg-black/40 dark:bg-white/50'
                       }`}
                     />
-                  </div>
+                  </motion.div>
                 );
               });
             }
@@ -2056,9 +2081,14 @@ export const WindowsTaskbar: React.FC<WindowsTaskbarProps> = ({
             const ws = windowStates[tab.id];
             const isFocused = tab.id === activeTabId && !ws?.isMinimized;
             return (
-              <div
+              <motion.div
                 key={slot.key}
                 role="button"
+                initial={{ opacity: 0, y: 22, scale: 0.78 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: 22, scale: 0.78 }}
+                whileTap={{ y: 6, scale: 0.88 }}
+                transition={{ type: 'spring', stiffness: 440, damping: 28 }}
                 tabIndex={0}
                 draggable
                 onClick={() => {
@@ -2136,9 +2166,10 @@ export const WindowsTaskbar: React.FC<WindowsTaskbarProps> = ({
                       : 'w-[6px] bg-black/40 dark:bg-white/50'
                   }`}
                 />
-              </div>
+              </motion.div>
             );
           })}
+          </AnimatePresence>
         </div>
 
         {/* 3. Right System Tray: ^ Overflow, Wi-Fi + Volume (Control Center), Clock + Date, Direct Command, Show Desktop */}
@@ -2214,7 +2245,7 @@ export const WindowsTaskbar: React.FC<WindowsTaskbarProps> = ({
                     className="w-full h-8 px-2.5 rounded-[6px] flex items-center gap-2.5 text-[12px] hover:bg-black/[0.06] dark:hover:bg-white/[0.08] cursor-pointer text-left border-none"
                   >
                     <SettingsIcon className="w-3.5 h-3.5" />
-                    <span>Windows Mode Settings</span>
+                    <span>Sparkle Mode Settings</span>
                   </button>
                   <button
                     type="button"
@@ -2225,7 +2256,7 @@ export const WindowsTaskbar: React.FC<WindowsTaskbarProps> = ({
                     className="w-full h-8 px-2.5 rounded-[6px] flex items-center gap-2.5 text-[12px] text-[#c42b1c] dark:text-[#ff99a4] hover:bg-black/[0.06] dark:hover:bg-white/[0.08] cursor-pointer text-left border-none"
                   >
                     <LogOut className="w-3.5 h-3.5" />
-                    <span>Exit Windows Mode</span>
+                    <span>Exit Sparkle Mode</span>
                   </button>
                 </motion.div>
               )}
@@ -2570,7 +2601,7 @@ export const WindowsTaskbar: React.FC<WindowsTaskbarProps> = ({
               },
               {
                 id: 'tb-exit-win',
-                label: 'Exit Windows Mode',
+                label: 'Exit Sparkle Mode',
                 icon: <LogOut className="w-4 h-4" />,
                 danger: true,
                 onSelect: () => updateSetting('windowsMode', false),

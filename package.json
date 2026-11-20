@@ -26,6 +26,7 @@
     "pptxgenjs": "^4.0.1",
     "react": "^19.0.1",
     "react-dom": "^19.0.1",
+    "swr": "^2.5.1",
     "xlsx": "^0.18.5"
   },
   "devDependencies": {

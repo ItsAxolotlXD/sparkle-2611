@@ -68,10 +68,10 @@ const ICON_CATALOG: IconEntry[] = [
   { name: '3D Discord', category: '3d', componentName: 'Fluent3DDiscordIcon', component: Fluent3DDiscordIcon, is3D: true, description: 'Icon 3D Colore Cộng đồng Discord' },
   { name: '3D Draws', category: '3d', componentName: 'Fluent3DDrawsIcon', component: Fluent3DDrawsIcon, is3D: true, description: 'Icon 3D Colore Hội họa Paint' },
   { name: '3D Gallery', category: '3d', componentName: 'Fluent3DGalleryIcon', component: Fluent3DGalleryIcon, is3D: true, description: 'Icon 3D Colore Album ảnh & đa phương tiện' },
-  { name: '3D Home', category: '3d', componentName: 'Fluent3DHomeIcon', component: Fluent3DHomeIcon, is3D: true, description: 'Icon 3D Colore Trang chủ Windows 11' },
+  { name: '3D Home', category: '3d', componentName: 'Fluent3DHomeIcon', component: Fluent3DHomeIcon, is3D: true, description: 'Icon 3D Colore Trang chủ Sparkle 27 (Milestone 1)' },
   { name: '3D Notes', category: '3d', componentName: 'Fluent3DNotesIcon', component: Fluent3DNotesIcon, is3D: true, description: 'Icon 3D Colore Ghi chú Notepad' },
   { name: '3D Photopea', category: '3d', componentName: 'Fluent3DPhotopeaIcon', component: Fluent3DPhotopeaIcon, is3D: true, description: 'Icon 3D Colore Thiết kế đồ họa' },
-  { name: '3D Settings', category: '3d', componentName: 'Fluent3DSettingsIcon', component: Fluent3DSettingsIcon, is3D: true, description: 'Icon 3D Colore Thiết lập Windows' },
+  { name: '3D Settings', category: '3d', componentName: 'Fluent3DSettingsIcon', component: Fluent3DSettingsIcon, is3D: true, description: 'Icon 3D Colore Thiết lập Sparkle' },
   { name: '3D VLC', category: '3d', componentName: 'Fluent3DVlcIcon', component: Fluent3DVlcIcon, is3D: true, description: 'Icon 3D Colore Trình phát video VLC' },
   { name: '3D Watch', category: '3d', componentName: 'Fluent3DWatchIcon', component: Fluent3DWatchIcon, is3D: true, description: 'Icon 3D Colore Phim & Truyền hình' },
   { name: 'Arrow loop', category: 'system', componentName: 'FluentUpdatesIcon', component: FluentUpdatesIcon, glyphHex: 'E895', description: 'Đồng bộ và cập nhật phần mềm' },
@@ -88,7 +88,7 @@ const ICON_CATALOG: IconEntry[] = [
   { name: 'Gallery', category: 'media', componentName: 'FluentGalleryIcon', component: FluentGalleryIcon, glyphHex: 'EB9F', description: 'Thư viện hình ảnh và tài liệu' },
   { name: 'Highlights', category: 'doc', componentName: 'FluentArticlesIcon', component: FluentArticlesIcon, glyphHex: 'E8BD', description: 'Bài viết và điểm tin nổi bật' },
   { name: 'Home', category: 'system', componentName: 'FluentHomeIcon', component: FluentHomeIcon, glyphHex: 'E80F', description: 'Trang chủ và tổng quan ứng dụng' },
-  { name: 'Ink Canvas', category: 'media', componentName: 'FluentInkCanvasIcon', component: FluentInkCanvasIcon, glyphHex: 'ED63', description: 'Khung vẽ tự do Windows Ink' },
+  { name: 'Ink Canvas', category: 'media', componentName: 'FluentInkCanvasIcon', component: FluentInkCanvasIcon, glyphHex: 'ED63', description: 'Khung vẽ tự do Sparkle Ink' },
   { name: 'Photopea', category: 'media', componentName: 'FluentPhotopeaIcon', component: FluentPhotopeaIcon, glyphHex: 'E8B7', description: 'Công cụ chỉnh sửa đồ họa ảnh' },
   { name: 'Rename', category: 'doc', componentName: 'FluentRenameIcon', component: FluentRenameIcon, glyphHex: 'E8AC', description: 'Đổi tên tệp hoặc thư mục' },
   { name: 'Screenbox', category: 'media', componentName: 'FluentScreenbugIcon', component: FluentScreenbugIcon, glyphHex: 'E7F4', description: 'Biểu trưng kênh và màn hình' },
@@ -326,7 +326,7 @@ export const FullscreenDialog: React.FC<DialogProps> = ({
             </div>
           </a>
 
-          {/* Card 2: Windows Design - Red */}
+          {/* Card 2: Sparkle Design - Red */}
           <a
             href="https://learn.microsoft.com/windows/apps/design/"
             target="_blank"
@@ -357,7 +357,7 @@ export const FullscreenDialog: React.FC<DialogProps> = ({
             </div>
             <div className="px-2 sm:px-2.5 py-1.5 flex items-center justify-between gap-1 border-t border-black/5 dark:border-white/5">
               <span className="text-[10.5px] sm:text-xs font-medium text-[#111827] dark:text-white truncate">
-                Windows Design
+                Sparkle Design
               </span>
               <ExternalLink className="size-3 text-neutral-500 dark:text-neutral-400 group-hover:text-neutral-900 dark:group-hover:text-white transition-colors shrink-0" />
             </div>
@@ -440,7 +440,7 @@ export const FullscreenDialog: React.FC<DialogProps> = ({
                   Standard Button Styles
                 </div>
                 <div className="text-xs text-[#6B7280] dark:text-[#9CA3AF] mt-0.5 leading-normal">
-                  Các kiểu nút bấm Primary, Outline, Subtle và Disabled theo quy chuẩn Windows 11 Fluent Design.
+                  Các kiểu nút bấm Primary, Outline, Subtle và Disabled theo quy chuẩn Sparkle 27 (Milestone 1) Fluent Design.
                 </div>
               </div>
               <div className="flex flex-wrap items-center gap-2.5 shrink-0">
@@ -586,7 +586,7 @@ export const FullscreenDialog: React.FC<DialogProps> = ({
                   Checkboxes & radios
                 </div>
                 <div className="text-xs text-[#6B7280] dark:text-[#9CA3AF] mt-0.5 leading-normal">
-                  Hộp kiểm tra và nút chọn đơn chuẩn Windows UI.
+                  Hộp kiểm tra và nút chọn đơn chuẩn Sparkle UI.
                 </div>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
@@ -949,7 +949,7 @@ export const FullscreenDialog: React.FC<DialogProps> = ({
                 Fluent MDL2 Icons
               </h2>
               <p className="text-xs text-[#6B7280] dark:text-[#9CA3AF] mt-0.5">
-                Thư viện biểu tượng chuẩn Fluent MDL2 Icons, Fluent System Icons và Fluent 3D Colore dành cho giao diện WinUI 3 & Windows 11.
+                Thư viện biểu tượng chuẩn Fluent MDL2 Icons, Fluent System Icons và Fluent 3D Colore dành cho giao diện WinUI 3 & Sparkle 27 (Milestone 1).
               </p>
             </div>
           </div>

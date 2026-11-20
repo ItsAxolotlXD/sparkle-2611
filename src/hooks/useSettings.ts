@@ -54,6 +54,7 @@ export interface SystemSettings {
   taskbarScale: 'small' | 'default' | 'large';
   taskbarAlignment: 'center' | 'left';
   refreshedSearchIcon: boolean;
+  refreshedSearchIconVersion?: number;
   newWatchTab: boolean;
   fluentIcons: boolean;
   dynamicSidebarIcons: boolean;
@@ -119,7 +120,8 @@ export const DEFAULT_SETTINGS: SystemSettings = {
   taskbarSearchStyle: 'box',
   taskbarScale: 'default',
   taskbarAlignment: 'center',
-  refreshedSearchIcon: false,
+  refreshedSearchIcon: true,
+  refreshedSearchIconVersion: 1,
   newWatchTab: false,
   fluentIcons: false,
   dynamicSidebarIcons: true,
@@ -246,6 +248,10 @@ export const getStoredSettings = (): SystemSettings => {
             ? parsed.taskbarScale
             : 'default',
         taskbarAlignment: parsed.taskbarAlignment === 'left' ? 'left' : 'center',
+        refreshedSearchIcon: parsed.refreshedSearchIconVersion === 1
+          ? (typeof parsed.refreshedSearchIcon === 'boolean' ? parsed.refreshedSearchIcon : true)
+          : true,
+        refreshedSearchIconVersion: 1,
         newWatchTab: typeof parsed.newWatchTab === 'boolean' ? parsed.newWatchTab : DEFAULT_SETTINGS.newWatchTab,
         fluentIcons: typeof parsed.fluentIcons === 'boolean' ? parsed.fluentIcons : DEFAULT_SETTINGS.fluentIcons,
         dynamicSidebarIcons: typeof parsed.dynamicSidebarIcons === 'boolean' ? parsed.dynamicSidebarIcons : true,

@@ -14,12 +14,12 @@ const VIVE_FEATURE_DEFS: ViveFeatureDefinition[] = [
   {
     key: 'tabbedSparkle',
     name: 'Tabbed Sparkle',
-    description: 'Transforms the top bar into a multi-tab bar like Windows 11 File Explorer.',
+    description: 'Transforms the top bar into a multi-tab bar like Sparkle File Explorer.',
   },
   {
     key: 'windowsMode',
-    name: 'Windows Mode',
-    description: 'Turns Sparkle into a Windows 11 desktop with bottom taskbar, Start menu, and floating windows.',
+    name: 'Sparkle Mode',
+    description: 'Turns Sparkle into the Sparkle 27 (Milestone 1) desktop with a bottom taskbar, Start menu, and floating windows.',
   },
   {
     key: 'refreshedSearchIcon',
@@ -53,7 +53,7 @@ const VIVE_IDS_STORAGE_KEY = 'sparkle_vive_feature_ids_v1';
 const FALLBACK_RANDOM_IDS: Record<string, string> = {
   tabbedSparkle: '48291034',
   windowsMode: '57392018',
-  refreshedSearchIcon: '63918472',
+  refreshedSearchIcon: '96642006',
   nativeKeyboard: '71840295',
   useFlumojs: '84920156',
   dynamicSidebarIcons: '92047183',
@@ -99,7 +99,8 @@ function loadOrCreateViveFeatureIds(): Record<string, string> {
 
   for (const def of VIVE_FEATURE_DEFS) {
     const k = String(def.key);
-    const existingId = stored[k];
+    const existingId = k === 'refreshedSearchIcon' ? FALLBACK_RANDOM_IDS[k] : stored[k];
+    if (existingId !== stored[k]) changed = true;
     if (typeof existingId === 'string' && /^\d{8}$/.test(existingId) && !used.has(existingId)) {
       resolved[k] = existingId;
       used.add(existingId);

@@ -510,11 +510,11 @@ const SEEDED_SYSTEM_ENTRIES: ExplorerEntry[] = [
   {
     id: 'sys-c-windows',
     parentId: 'dir-drive-c',
-    name: 'Windows',
+    name: 'Sparkle',
     kind: 'folder',
     modifiedAt: Date.now() - 1000 * 60 * 700,
     locationLabel: 'Local Disk (C:)',
-    pathLabel: 'C:\\Windows',
+    pathLabel: 'C:\\Sparkle',
     status: 'local',
     targetDirId: 'dir-drive-c-win',
     linkedSource: 'system',
@@ -525,8 +525,8 @@ const SEEDED_SYSTEM_ENTRIES: ExplorerEntry[] = [
     name: 'System32',
     kind: 'folder',
     modifiedAt: Date.now() - 1000 * 60 * 700,
-    locationLabel: 'Windows',
-    pathLabel: 'C:\\Windows\\System32',
+    locationLabel: 'Sparkle',
+    pathLabel: 'C:\\Sparkle\\System32',
     status: 'local',
     targetDirId: 'dir-drive-c-win',
     linkedSource: 'system',
@@ -538,11 +538,11 @@ const SEEDED_SYSTEM_ENTRIES: ExplorerEntry[] = [
     kind: 'text',
     sizeBytes: 9420,
     modifiedAt: Date.now() - 1000 * 60 * 700,
-    locationLabel: 'Windows',
-    pathLabel: 'C:\\Windows\\build_26170_manifest.txt',
+    locationLabel: 'Sparkle',
+    pathLabel: 'C:\\Sparkle\\build_26170_manifest.txt',
     status: 'local',
     linkedSource: 'system',
-    textContent: 'Windows 11 Insider Preview\nBuild: 26170.ge_release\nShell: Sparkle Desktop Environment\nDesign System: WinUI 3 + Mica',
+    textContent: 'Sparkle 27 (Milestone 1) Insider Preview\nBuild: 26170.ge_release\nShell: Sparkle Desktop Environment\nDesign System: WinUI 3 + Mica',
   },
   // Data (D:) items
   {
@@ -1714,7 +1714,7 @@ export const FileExplorer: React.FC<FileExplorerProps> = ({ navigate }) => {
         return { id: 'dir-sub-inspiration', name: 'Inspiration', parentId: 'dir-downloads', pathLabel: 'C:\\Users\\Sparkle\\Downloads\\Inspiration', icon: 'folder' };
       }
       if (dirId === 'dir-drive-c-win') {
-        return { id: 'dir-drive-c-win', name: 'Windows', parentId: 'dir-drive-c', pathLabel: 'C:\\Windows', icon: 'folder' };
+        return { id: 'dir-drive-c-win', name: 'Sparkle', parentId: 'dir-drive-c', pathLabel: 'C:\\Sparkle', icon: 'folder' };
       }
       const customFolder = customEntries.find((e) => e.targetDirId === dirId || e.id === dirId);
       if (customFolder) {

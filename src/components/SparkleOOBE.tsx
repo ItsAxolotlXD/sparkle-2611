@@ -256,7 +256,7 @@ const NativeWinUIScrollArea: React.FC<NativeWinUIScrollAreaProps> = ({
 };
 
 // Steps:
-// 1: Choose your preferred mode (App experience / Windows experience)
+// 1: Choose your preferred mode (App experience / Sparkle experience)
 // 2: Choose app theme preferences (Light / Dark)
 // 3: Choose what you want to do (Install / Recover)
 // 4: Who is going to use Sparkle (Enter username)
@@ -459,7 +459,7 @@ export const SparkleOOBE: React.FC<SparkleOOBEProps> = ({
   const [isMuted, setIsMuted] = useState(false);
   const [isDebugPageOpen, setIsDebugPageOpen] = useState(false);
 
-  // Step 1: Preferred mode selection (App experience / Windows experience)
+  // Step 1: Preferred mode selection (App experience / Sparkle experience)
   const [selectedExperienceMode, setSelectedExperienceMode] = useState<'app' | 'windows'>('app');
 
   // Step 2: Theme selection (Light / Dark)
@@ -1001,7 +1001,7 @@ export const SparkleOOBE: React.FC<SparkleOOBEProps> = ({
                 <div className="absolute inset-0 bg-radial from-blue-500/10 via-transparent to-transparent pointer-events-none" />
 
                 <AnimatePresence mode="wait">
-                  {/* STEP 1: Preferred Mode artwork (App vs Windows experience) */}
+                  {/* STEP 1: Preferred Mode artwork (App vs Sparkle experience) */}
                   {currentStep === 1 && (
                     <motion.div
                       key="left-step1-mode"
@@ -1240,7 +1240,7 @@ export const SparkleOOBE: React.FC<SparkleOOBEProps> = ({
                             Choose your preferred mode
                           </h1>
                           <p className="text-[13px] sm:text-[14px] text-neutral-600 mt-1.5 leading-normal">
-                            Select how you would like to use Sparkle. You can switch between App and Windows experiences anytime in Settings.
+                            Select how you would like to use Sparkle. You can switch between App and Sparkle experiences anytime in Settings.
                           </p>
 
                           <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -1291,7 +1291,7 @@ export const SparkleOOBE: React.FC<SparkleOOBEProps> = ({
                               </p>
                             </div>
 
-                            {/* Windows experience Card */}
+                            {/* Sparkle experience Card */}
                             <div
                               onClick={() => setSelectedExperienceMode('windows')}
                               className={`p-4 rounded-[15px] border transition-all cursor-pointer relative ${
@@ -1303,7 +1303,7 @@ export const SparkleOOBE: React.FC<SparkleOOBEProps> = ({
                               <div className="flex items-center justify-between mb-3">
                                 <div className="flex items-center gap-2">
                                   <Monitor className="w-4 h-4 text-[#0078d4]" />
-                                  <span className="text-sm font-semibold text-neutral-900">Windows experience</span>
+                                  <span className="text-sm font-semibold text-neutral-900">Sparkle experience</span>
                                 </div>
                                 {selectedExperienceMode === 'windows' && (
                                   <div className="w-5 h-5 rounded-full bg-[#0067b8] flex items-center justify-center shrink-0">
@@ -1728,7 +1728,7 @@ export const SparkleOOBE: React.FC<SparkleOOBEProps> = ({
                                     </span>
                                   </div>
                                   <div className="text-[11.5px] text-neutral-500 mt-0.5">
-                                    {selectedTheme === 'dark' ? 'Dark theme' : 'Light theme'} · {selectedExperienceMode === 'windows' ? 'Windows experience' : 'App experience'}
+                                    {selectedTheme === 'dark' ? 'Dark theme' : 'Light theme'} · {selectedExperienceMode === 'windows' ? 'Sparkle experience' : 'App experience'}
                                   </div>
                                 </div>
                               </div>

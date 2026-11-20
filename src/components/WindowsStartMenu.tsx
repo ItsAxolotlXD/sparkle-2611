@@ -1125,7 +1125,7 @@ export const WindowsStartMenu: React.FC<WindowsStartMenuProps> = ({
                         className="w-full h-8 px-2.5 rounded-[5px] flex items-center gap-2.5 text-[12.5px] hover:bg-black/[0.06] dark:hover:bg-white/[0.08] cursor-pointer text-left border-none"
                       >
                         <LogOut className="w-3.5 h-3.5 text-[#0078d4] dark:text-[#4cc2ff]" />
-                        <span>Exit Windows Mode</span>
+                        <span>Exit Sparkle Mode</span>
                       </button>
 
                       {onRestartOobe && (
@@ -1385,7 +1385,7 @@ export const WindowsStartMenu: React.FC<WindowsStartMenuProps> = ({
               { id: 'start-div-2', divider: true },
               {
                 id: 'start-exit-win',
-                label: 'Exit Windows Mode',
+                label: 'Exit Sparkle Mode',
                 icon: <LogOut className="w-4 h-4" />,
                 danger: true,
                 onSelect: () => {

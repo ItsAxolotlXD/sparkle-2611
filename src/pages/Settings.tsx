@@ -49,7 +49,7 @@ const SETTING_LABELS: Partial<Record<keyof SystemSettings, string>> = {
   streamAspectRatio: 'Stream aspect ratio',
   immersiveSearch: 'Immersive search',
   refreshedSearchIcon: 'Refreshed Search Icon',
-  windowsMode: 'Windows Mode',
+  windowsMode: 'Sparkle Mode',
   developerMode: 'Developer mode',
   animatedBootScreen: 'Animated boot screen',
   triangleExperiment: 'Loading experiment',
@@ -353,7 +353,7 @@ export const Settings: React.FC<SettingsProps> = ({
                           id="tabbed-sparkle-description"
                           className="mt-1 text-xs leading-relaxed text-[#6B7280] dark:text-[#9CA3AF]"
                         >
-                          Transforms the top bar into a multi-tab bar like Windows 11 File Explorer. Search box moves to the sidebar for easy multitasking across tabs.
+                          Transforms the top bar into a multi-tab bar like Sparkle 27 (Milestone 1) File Explorer. Search box moves to the sidebar for easy multitasking across tabs.
                         </p>
                       </div>
                     </div>
@@ -375,8 +375,8 @@ export const Settings: React.FC<SettingsProps> = ({
                   </motion.div>
                 )}
 
-                {/* 1b. Windows Mode (Vive Feature) */}
-                {matchesSearch(['Windows Mode', 'Windows 11', 'Vive Features', 'Vive', 'Velocity Features', 'Velocity', 'taskbar', 'start menu', 'windowed', 'desktop', 'wallpaper', 'vivetool', getViveFeatureId('windowsMode')]) && (
+                {/* 1b. Sparkle Mode (Vive Feature) */}
+                {matchesSearch(['Sparkle Mode', 'Sparkle 27 (Milestone 1)', 'Vive Features', 'Vive', 'Velocity Features', 'Velocity', 'taskbar', 'start menu', 'windowed', 'desktop', 'wallpaper', 'vivetool', getViveFeatureId('windowsMode')]) && (
                   <motion.div
                     variants={slideUpVariant}
                     initial="hidden"
@@ -407,7 +407,7 @@ export const Settings: React.FC<SettingsProps> = ({
                           className="font-normal text-sm text-[#111827] dark:text-white flex flex-wrap items-center gap-2"
                           style={{ fontWeight: 400 }}
                         >
-                          <span>Windows Mode</span>
+                          <span>Sparkle Mode</span>
                           <span className="text-[10px] px-1.5 py-0.5 rounded-[6px] uppercase tracking-wider bg-[#0078d4]/10 dark:bg-[#4cc2ff]/20 text-[#0078d4] dark:text-[#4cc2ff] font-semibold">
                             Vive
                           </span>
@@ -419,7 +419,7 @@ export const Settings: React.FC<SettingsProps> = ({
                           id="windows-mode-description"
                           className="mt-1 text-xs leading-relaxed text-[#6B7280] dark:text-[#9CA3AF]"
                         >
-                          Turns Sparkle into a Windows 11 desktop with a bottom taskbar, Start menu, OOBE wallpaper, locked collapsed sidebar, and resizable app windows.
+                          Turns Sparkle into a Sparkle 27 (Milestone 1) desktop with a bottom taskbar, Start menu, OOBE wallpaper, locked collapsed sidebar, and resizable app windows.
                         </p>
                       </div>
                     </div>

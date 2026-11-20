@@ -31,7 +31,7 @@ interface CommandSuggestion {
 
 const COMMAND_SUGGESTIONS: CommandSuggestion[] = [
   { syntax: '/help', insertText: '/help', description: 'Get help of all commands available' },
-  { syntax: '/ui /si /small|default|large', insertText: '/ui /si /', description: 'Modifies the UI scale of Windows Mode' },
+  { syntax: '/ui /si /small|default|large', insertText: '/ui /si /', description: 'Modifies the UI scale of Sparkle Mode' },
   { syntax: '/theme /light|dark', insertText: '/theme /', description: 'Change the overall theme' },
   { syntax: '/search /appearance /box|button', insertText: '/search /appearance /', description: 'Change the search style on taskbar' },
   { syntax: '/taskbar /si /small|default|large', insertText: '/taskbar /si /', description: 'Modifies the taskbar scale' },
@@ -39,8 +39,8 @@ const COMMAND_SUGGESTIONS: CommandSuggestion[] = [
   { syntax: '/vivetool /list', insertText: '/vivetool /list', description: 'Shows list of available Vive features' },
   { syntax: '/vivetool /enable /id:<ID>', insertText: '/vivetool /enable /id:', description: 'Force enable a Vive feature by 8-digit ID' },
   { syntax: '/vivetool /disable /id:<ID>', insertText: '/vivetool /disable /id:', description: 'Force disable a Vive feature by 8-digit ID' },
-  { syntax: '/session /start', insertText: '/session /start', description: 'Start Windows Mode' },
-  { syntax: '/session /end', insertText: '/session /end', description: 'Exit Windows Mode' },
+  { syntax: '/session /start', insertText: '/session /start', description: 'Start Sparkle Mode' },
+  { syntax: '/session /end', insertText: '/session /end', description: 'Exit Sparkle Mode' },
 ];
 
 const WELCOME_ENTRY: ConsoleEntry = {
@@ -148,15 +148,15 @@ export const DirectCommandFlyout: React.FC<DirectCommandFlyoutProps> = ({ isOpen
       appendEntry(trimmed, [
         { text: 'Available Sparkle Direct Commands:', tone: 'accent' },
         { text: '  /help                                  Get help of all commands available', prefillCommand: '/help' },
-        { text: '  /ui /si /small|default|large           Modifies UI scale of Windows Mode', prefillCommand: '/ui /si /' },
+        { text: '  /ui /si /small|default|large           Modifies UI scale of Sparkle Mode', prefillCommand: '/ui /si /' },
         { text: '  /theme /light|dark                     Change the overall theme', prefillCommand: '/theme /' },
         { text: '  /search /appearance /box|button        Change taskbar search style', prefillCommand: '/search /appearance /' },
         { text: '  /taskbar /si /small|default|large      Modifies the taskbar scale', prefillCommand: '/taskbar /si /' },
         { text: '  /taskbar /alignment /center|left       Adjust taskbar alignment', prefillCommand: '/taskbar /alignment /' },
         { text: '  /vivetool /enable|disable /id:<ID>     Force enable or disable Vive features', prefillCommand: '/vivetool /enable /id:' },
         { text: '  /vivetool /list                        Shows list of available Vive features', prefillCommand: '/vivetool /list' },
-        { text: '  /session /end                          Exit Windows Mode', prefillCommand: '/session /end' },
-        { text: '  /session /start                        Start Windows Mode', prefillCommand: '/session /start' },
+        { text: '  /session /end                          Exit Sparkle Mode', prefillCommand: '/session /end' },
+        { text: '  /session /start                        Start Sparkle Mode', prefillCommand: '/session /start' },
         { text: '  cls                                    Clear command output', tone: 'muted' },
       ]);
       return;
@@ -169,9 +169,9 @@ export const DirectCommandFlyout: React.FC<DirectCommandFlyoutProps> = ({ isOpen
       if (sub === '/si' && (val === '/small' || val === '/default' || val === '/large')) {
         const scale = val.slice(1) as 'small' | 'default' | 'large';
         updateSetting('windowsUiScale', scale);
-        showAppToast(`Windows Mode UI scale set to ${scale}`, { source: 'settings' });
+        showAppToast(`Sparkle Mode UI scale set to ${scale}`, { source: 'settings' });
         appendEntry(trimmed, [
-          { text: `Windows Mode UI scale updated to "${scale}".`, tone: 'success' },
+          { text: `Sparkle Mode UI scale updated to "${scale}".`, tone: 'success' },
         ]);
       } else {
         appendEntry(trimmed, [
@@ -327,24 +327,24 @@ export const DirectCommandFlyout: React.FC<DirectCommandFlyoutProps> = ({ isOpen
       const sub = lowerTokens[1];
       if (sub === '/end') {
         if (!settings.windowsMode) {
-          appendEntry(trimmed, [{ text: 'Windows Mode is already inactive.', tone: 'muted' }]);
+          appendEntry(trimmed, [{ text: 'Sparkle Mode is already inactive.', tone: 'muted' }]);
         } else {
           updateSetting('windowsMode', false);
-          showAppToast('Exited Windows Mode', { source: 'settings' });
+          showAppToast('Exited Sparkle Mode', { source: 'settings' });
           appendEntry(trimmed, [
-            { text: 'Windows Mode session ended.', tone: 'success' },
-            { text: 'Run /session /start anytime to re-enter Windows Mode.', tone: 'muted', prefillCommand: '/session /start' },
+            { text: 'Sparkle Mode session ended.', tone: 'success' },
+            { text: 'Run /session /start anytime to re-enter Sparkle Mode.', tone: 'muted', prefillCommand: '/session /start' },
           ]);
         }
         return;
       }
       if (sub === '/start') {
         if (settings.windowsMode) {
-          appendEntry(trimmed, [{ text: 'Windows Mode is already running.', tone: 'muted' }]);
+          appendEntry(trimmed, [{ text: 'Sparkle Mode is already running.', tone: 'muted' }]);
         } else {
           updateSetting('windowsMode', true);
-          showAppToast('Started Windows Mode', { source: 'settings' });
-          appendEntry(trimmed, [{ text: 'Windows Mode session started.', tone: 'success' }]);
+          showAppToast('Started Sparkle Mode', { source: 'settings' });
+          appendEntry(trimmed, [{ text: 'Sparkle Mode session started.', tone: 'success' }]);
         }
         return;
       }

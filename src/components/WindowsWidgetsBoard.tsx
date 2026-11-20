@@ -51,6 +51,7 @@ import {
 } from './Fluent3DIcons';
 import { contextMenuMotionProps, flyoutPanelClassName, flyoutPanelStyle } from './FlyoutDropdown';
 import { modalDialogVariants, modalBackdropVariants } from '../utils/animations';
+import { useHanoiWeather } from '../hooks/useHanoiWeather';
 
 export type WidgetId =
   | 'weather'
@@ -214,7 +215,7 @@ export const DEFAULT_WIDGETS_PREFS: WidgetsPreferences = {
   ],
   discoverEnabled: true,
   openOnHover: false,
-  selectedCityId: 'son-duong',
+  selectedCityId: 'hanoi',
   newLookDiscover: false,
   notificationsEnabled: {
     weatherAlerts: true,
@@ -231,6 +232,7 @@ export function loadWidgetsPrefs(): WidgetsPreferences {
       return {
         ...DEFAULT_WIDGETS_PREFS,
         ...parsed,
+        selectedCityId: parsed.selectedCityId === 'son-duong' ? 'hanoi' : parsed.selectedCityId || 'hanoi',
         enabledWidgets: Array.isArray(parsed.enabledWidgets)
           ? parsed.enabledWidgets
           : DEFAULT_WIDGETS_PREFS.enabledWidgets,
@@ -503,6 +505,7 @@ export const WindowsWidgetsBoard: React.FC<WindowsWidgetsBoardProps> = ({
   const taskbarHeight = getTaskbarHeightPx(settings.taskbarScale);
 
   const [prefs, setPrefs] = useState<WidgetsPreferences>(() => loadWidgetsPrefs());
+  const { data: liveHanoiWeather } = useHanoiWeather();
   const [activeNav, setActiveNav] = useState<'widgets' | 'discover' | 'settings'>('widgets');
   const [discoverSubTab, setDiscoverSubTab] = useState<'discover' | 'watch' | 'play'>('discover');
 
@@ -633,10 +636,12 @@ export const WindowsWidgetsBoard: React.FC<WindowsWidgetsBoardProps> = ({
     };
   }, [isOpen, isAddModalOpen, openMenuWidget, onClose]);
 
-  const activeWeather = useMemo(
-    () => CITY_WEATHER_DATA.find((c) => c.id === prefs.selectedCityId) || CITY_WEATHER_DATA[0],
-    [prefs.selectedCityId]
-  );
+  const activeWeather = useMemo(() => {
+    const selected = CITY_WEATHER_DATA.find((city) => city.id === prefs.selectedCityId) || CITY_WEATHER_DATA.find((city) => city.id === 'hanoi')!;
+    return selected.id === 'hanoi' && liveHanoiWeather
+      ? { ...selected, ...liveHanoiWeather }
+      : selected;
+  }, [prefs.selectedCityId, liveHanoiWeather]);
 
   const greetingText = useMemo(() => {
     const h = new Date().getHours();
@@ -652,7 +657,7 @@ export const WindowsWidgetsBoard: React.FC<WindowsWidgetsBoardProps> = ({
   const tipsList = [
     {
       title: 'Use clipboard history',
-      body: 'Select Windows logo key + V to view your clipboard history and paste from it.',
+      body: 'Select Sparkle key + V to view your clipboard history and paste from it.',
     },
     {
       title: 'Quick Direct Command',

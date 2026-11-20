@@ -15,7 +15,7 @@ interface WinUI3ColorPickerModalProps {
 
 const FLUENT_ACCENTS = [
   { name: 'Sky Blue', hex: '#4cc2ff' },
-  { name: 'Windows Blue', hex: '#0078d4' },
+  { name: 'Sparkle Blue', hex: '#0078d4' },
   { name: 'Royal Blue', hex: '#005fb8' },
   { name: 'Teal', hex: '#0099bc' },
   { name: 'Cyan', hex: '#00bcf2' },
@@ -215,10 +215,10 @@ export const WinUI3ColorPickerModal: React.FC<WinUI3ColorPickerModalProps> = ({
               </div>
             </div>
 
-            {/* Windows Accent Colors */}
+            {/* Sparkle Accent Colors */}
             <div>
               <div className="text-xs font-semibold text-[#111827] dark:text-white mb-2">
-                Windows Accent Colors
+                Sparkle Accent Colors
               </div>
               <div className="grid grid-cols-6 sm:grid-cols-9 gap-1.5">
                 {FLUENT_ACCENTS.map((c) => (
