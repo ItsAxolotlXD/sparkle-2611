@@ -1492,6 +1492,23 @@ export default function App() {
 
   const isOfficeRoute = currentRoute.startsWith('/notes') || currentRoute === '/write';
 
+  if (!isSplashFinished) {
+    return (
+      <>
+        {!isBootVideoFinished && settings.animatedBootScreen ? (
+          <AnimatedBootScreen onFinish={() => setIsBootVideoFinished(true)} />
+        ) : (
+          <SplashScreen
+            duration={SPINNING_RING_GIF_LOOP_DURATION_MS * 2}
+            ringSize={60}
+            isClosable={false}
+            onFinish={() => setIsSplashFinished(true)}
+          />
+        )}
+      </>
+    );
+  }
+
   return (
     <NativeKeyboardProvider>
       <NotesProvider>

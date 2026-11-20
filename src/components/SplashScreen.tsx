@@ -23,23 +23,6 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({
   const [isVisible, setIsVisible] = useState(true);
   const [logoError, setLogoError] = useState(false);
   const [isRingGifReady, setIsRingGifReady] = useState(false);
-  const [isLightMode, setIsLightMode] = useState<boolean>(() => {
-    if (typeof document !== 'undefined') {
-      return document.documentElement.classList.contains('light-mode');
-    }
-    return false;
-  });
-
-  useEffect(() => {
-    if (typeof document === 'undefined') return;
-    const checkTheme = () => {
-      setIsLightMode(document.documentElement.classList.contains('light-mode'));
-    };
-    checkTheme();
-    const observer = new MutationObserver(checkTheme);
-    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
-    return () => observer.disconnect();
-  }, []);
 
   useEffect(() => {
     const timer = isRingGifReady
@@ -66,17 +49,10 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({
 
   if (!isVisible) return null;
 
-  // In WinUI 3 tab, primary button color is:
-  // - Dark mode: #4cc2ff
-  // - Light mode: #005fb8
-  const primaryButtonColor = isLightMode ? '#005fb8' : '#4cc2ff';
-
   return (
     <div
       id="vplay-splash-screen"
-      className={`fixed inset-0 z-[99999] ${
-        isLightMode ? 'bg-[#f9f9f9] text-[#111827]' : 'bg-[#1b1f24] text-white'
-      } flex flex-col items-center justify-center select-none transition-colors duration-200`}
+      className="fixed inset-0 z-[99999] flex flex-col items-center justify-center select-none bg-[#1b1f24] text-white"
     >
       {/* Splash content: logo, spinning ring and subtitle all centered together with enlarged gap */}
       <div className="flex flex-col items-center justify-center gap-12 sm:gap-16 text-center px-6 max-w-md w-full">
@@ -91,7 +67,7 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({
               onError={() => setLogoError(true)}
             />
           ) : (
-            <span className={`${isLightMode ? 'text-[#005fb8]' : 'text-[#4cc2ff]'} font-black text-5xl sm:text-6xl tracking-tighter`}>V</span>
+            <span className="text-[#4cc2ff] font-black text-5xl sm:text-6xl tracking-tighter">V</span>
           )}
         </div>
 
@@ -103,7 +79,7 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({
             onGifReady={() => setIsRingGifReady(true)}
           />
           {subtitle && (
-            <p className={`text-[12.5px] sm:text-[13.5px] ${isLightMode ? 'text-[#111827]/85' : 'text-[#FFFFFF]/90'} font-normal tracking-wide max-w-md`}>
+            <p className="text-[12.5px] sm:text-[13.5px] text-white/90 font-normal tracking-wide max-w-md">
               {subtitle}
             </p>
           )}
