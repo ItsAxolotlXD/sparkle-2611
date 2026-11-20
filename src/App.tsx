@@ -1803,7 +1803,7 @@ export default function App() {
                   },
                   {
                     id: 'desk-exit-win',
-                    label: 'Exit Windows Mode',
+                    label: 'Exit Sparkle Mode',
                     icon: <LogOut className="w-4 h-4" />,
                     danger: true,
                     onSelect: () => updateSetting('windowsMode', false),

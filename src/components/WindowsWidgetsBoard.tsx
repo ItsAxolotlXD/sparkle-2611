@@ -652,7 +652,7 @@ export const WindowsWidgetsBoard: React.FC<WindowsWidgetsBoardProps> = ({
   const tipsList = [
     {
       title: 'Use clipboard history',
-      body: 'Select Windows logo key + V to view your clipboard history and paste from it.',
+      body: 'Select Sparkle key + V to view your clipboard history and paste from it.',
     },
     {
       title: 'Quick Direct Command',

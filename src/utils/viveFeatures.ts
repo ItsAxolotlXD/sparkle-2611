@@ -14,12 +14,12 @@ const VIVE_FEATURE_DEFS: ViveFeatureDefinition[] = [
   {
     key: 'tabbedSparkle',
     name: 'Tabbed Sparkle',
-    description: 'Transforms the top bar into a multi-tab bar like Windows 11 File Explorer.',
+    description: 'Transforms the top bar into a multi-tab bar like Sparkle File Explorer.',
   },
   {
     key: 'windowsMode',
-    name: 'Windows Mode',
-    description: 'Turns Sparkle into a Windows 11 desktop with bottom taskbar, Start menu, and floating windows.',
+    name: 'Sparkle Mode',
+    description: 'Turns Sparkle into the Sparkle 27 (Milestone 1) desktop with a bottom taskbar, Start menu, and floating windows.',
   },
   {
     key: 'refreshedSearchIcon',

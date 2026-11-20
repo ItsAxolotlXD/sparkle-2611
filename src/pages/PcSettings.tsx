@@ -105,7 +105,7 @@ const PC_SETTINGS_STORAGE_KEY = 'sparkle_pc_settings_v1';
 
 const DEFAULT_PC_SETTINGS: PcSettingsState = {
   deviceName: 'vm-w11-ssd',
-  deviceModel: 'Sparkle Workstation 24H2',
+  deviceModel: 'Sparkle 27 (Milestone 1)',
   userName: 'Sparkle User',
   userEmail: 'Unregistered Account',
   selectedThemeId: DEFAULT_WALLPAPER_ID,
@@ -164,7 +164,7 @@ const NAV_CATEGORIES: NavCategoryDef[] = [
   { id: 'gaming', label: 'Gaming', icon: Gamepad2, iconColor: 'text-violet-600 dark:text-violet-400', keywords: 'game mode xbox bar captures fps' },
   { id: 'accessibility', label: 'Accessibility', icon: AccessibilityIcon, iconColor: 'text-sky-600 dark:text-sky-400', keywords: 'text size scrollbars contrast motion accessibility' },
   { id: 'privacy', label: 'Privacy & security', icon: ShieldCheck, iconColor: 'text-emerald-600 dark:text-emerald-400', keywords: 'windows security defender scan virus camera mic privacy' },
-  { id: 'update', label: 'Windows Update', icon: RefreshCw, iconColor: 'text-[#0067b8] dark:text-[#4cc2ff]', keywords: 'windows update check patch version pause history' },
+  { id: 'update', label: 'Sparkle Update', icon: RefreshCw, iconColor: 'text-[#0067b8] dark:text-[#4cc2ff]', keywords: 'windows update check patch version pause history' },
 ];
 
 interface PcSettingsProps {
@@ -283,9 +283,9 @@ export const PcSettings: React.FC<PcSettingsProps> = ({ navigate, initialCategor
     setUpdateResultMsg('Checking for updates...');
     setTimeout(() => {
       setIsCheckingUpdate(false);
-      setUpdateResultMsg("You're up to date — Windows 11 Sparkle Build 26100.2454");
+      setUpdateResultMsg("You're up to date — Sparkle 27 (Milestone 1) Build 26100.2454");
       updatePc('lastUpdateCheck', `Today, ${new Date().toLocaleTimeString()}`);
-      showAppToast('Hệ thống đang ở phiên bản mới nhất', { appName: 'Windows Update' });
+      showAppToast('Hệ thống đang ở phiên bản mới nhất', { appName: 'Sparkle Update' });
     }, 1500);
   };
 
@@ -298,7 +298,7 @@ export const PcSettings: React.FC<PcSettingsProps> = ({ navigate, initialCategor
         if (p >= 100) {
           clearInterval(timer);
           setIsScanning(false);
-          showAppToast('Quét bảo mật hoàn tất: Không phát hiện mối đe dọa nào.', { appName: 'Windows Security' });
+          showAppToast('Quét bảo mật hoàn tất: Không phát hiện mối đe dọa nào.', { appName: 'Sparkle Security' });
           return 100;
         }
         return Math.min(100, p + 22);
@@ -341,8 +341,13 @@ export const PcSettings: React.FC<PcSettingsProps> = ({ navigate, initialCategor
       id="pc-settings-page"
       className="w-full h-full flex flex-col md:flex-row overflow-hidden bg-transparent text-[#1b1b1b] dark:text-[#f3f3f3] select-none"
     >
-      {/* Left Navigation Sidebar (Windows 11 Settings style from Hình 2) */}
-      <aside className="w-full md:w-[270px] shrink-0 flex flex-col border-b md:border-b-0 md:border-r border-black/[0.07] dark:border-white/[0.07] bg-[#f5f6f8]/65 dark:bg-[#1f2228]/65 backdrop-blur-xl">
+      {/* Left Navigation Sidebar (Sparkle 27 (Milestone 1) Settings style from Hình 2) */}
+      <motion.aside
+        initial={{ opacity: 0, x: -16 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.32, ease: [0.16, 1, 0.3, 1] }}
+        className="w-full md:w-[270px] shrink-0 flex flex-col border-b md:border-b-0 md:border-r border-black/[0.07] dark:border-white/[0.07] bg-[#f5f6f8]/65 dark:bg-[#1f2228]/65 backdrop-blur-xl"
+      >
         {/* User Profile Header */}
         <div className="px-4 pt-4 pb-3 flex items-center gap-3">
           <div className="w-11 h-11 rounded-full bg-gradient-to-br from-[#0067b8] to-[#4cc2ff] text-white flex items-center justify-center font-semibold text-[16px] shadow-xs shrink-0">
@@ -360,8 +365,9 @@ export const PcSettings: React.FC<PcSettingsProps> = ({ navigate, initialCategor
 
         {/* "Find a setting" Search Box */}
         <div className="px-3.5 pb-3">
-          <div className="relative flex items-center h-[34px] rounded-[6px] bg-white/90 dark:bg-[#2c3037]/90 border border-black/10 dark:border-white/10 border-b-2 border-b-black/25 dark:border-b-white/25 focus-within:border-b-[#0067b8] dark:focus-within:border-b-[#4cc2ff] px-2.5 transition-colors">
+          <div className="relative flex items-center h-[34px] rounded-[6px] bg-white/90 dark:bg-[#2c3037]/90 border border-black/10 dark:border-white/10 focus-within:border-[#0067b8] dark:focus-within:border-[#4cc2ff] px-2.5 transition-colors">
             <input
+              id="pc-settings-search-input"
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -389,9 +395,13 @@ export const PcSettings: React.FC<PcSettingsProps> = ({ navigate, initialCategor
             const Icon = cat.icon;
             const active = activeCategory === cat.id;
             return (
-              <button
+              <motion.button
                 key={cat.id}
                 type="button"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -6 }}
+                transition={{ duration: 0.24, delay: Math.min(filteredCategories.indexOf(cat) * 0.025, 0.2) }}
                 onClick={() => setActiveCategory(cat.id)}
                 className={`relative shrink-0 md:w-full h-[36px] px-3 rounded-[6px] flex items-center gap-3 text-[13px] transition-colors cursor-pointer text-left ${
                   active
@@ -405,9 +415,11 @@ export const PcSettings: React.FC<PcSettingsProps> = ({ navigate, initialCategor
                     className="hidden md:block absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-[16px] rounded-full bg-[#0067b8] dark:bg-[#4cc2ff]"
                   />
                 )}
-                <Icon className={`w-[17px] h-[17px] shrink-0 ${cat.iconColor}`} />
+                <span className={`w-[22px] h-[22px] shrink-0 rounded-[6px] flex items-center justify-center bg-gradient-to-br from-white/80 to-black/[0.06] dark:from-white/[0.18] dark:to-black/20 shadow-[0_1px_2px_rgba(0,0,0,0.18)]`}>
+                  <Icon className={`w-[16px] h-[16px] drop-shadow-[0_1px_1px_rgba(0,0,0,0.24)] ${cat.iconColor}`} />
+                </span>
                 <span className="truncate whitespace-nowrap">{cat.label}</span>
-              </button>
+              </motion.button>
             );
           })}
           {filteredCategories.length === 0 && (
@@ -416,15 +428,21 @@ export const PcSettings: React.FC<PcSettingsProps> = ({ navigate, initialCategor
             </div>
           )}
         </nav>
-      </aside>
+      </motion.aside>
 
       {/* Main Content Area */}
       <div className="flex-1 min-w-0 h-full overflow-y-auto p-4 sm:p-6 md:px-8 md:py-6">
-        <div className="max-w-[980px] mx-auto space-y-5">
+        <motion.div
+          key={activeCategory}
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.24, ease: [0.16, 1, 0.3, 1] }}
+          className="max-w-[980px] mx-auto space-y-5"
+        >
           {/* Page Heading */}
           <div className="flex items-center justify-between gap-4">
             <h1 className="text-[26px] font-semibold tracking-[-0.015em] text-[#111827] dark:text-white">
-              {NAV_CATEGORIES.find((c) => c.id === activeCategory)?.label || 'Home'}
+              {NAV_CATEGORIES.find((c) => c.id === activeCategory)?.label || 'Sparkle'}
             </h1>
             {activeCategory !== 'home' && (
               <button
@@ -498,7 +516,7 @@ export const PcSettings: React.FC<PcSettingsProps> = ({ navigate, initialCategor
                       <RefreshCw className="w-4 h-4" />
                     </div>
                     <div>
-                      <div className="text-[13px] font-medium">Windows Update</div>
+                      <div className="text-[13px] font-medium">Sparkle Update</div>
                       <div className="text-[11.5px] text-[#6b7280] dark:text-[#9ca3af]">
                         Last checked: {pcState.lastUpdateCheck}
                       </div>
@@ -1043,7 +1061,7 @@ export const PcSettings: React.FC<PcSettingsProps> = ({ navigate, initialCategor
               <div className={rowClass}>
                 <div>
                   <div className="text-[13.5px] font-medium">Choose your mode</div>
-                  <div className="text-[12px] text-[#6b7280] dark:text-[#9ca3af]">Change the colors that appear in Windows and your apps</div>
+                  <div className="text-[12px] text-[#6b7280] dark:text-[#9ca3af]">Change the colors that appear in Sparkle and your apps</div>
                 </div>
                 <select
                   value={settings.theme}
@@ -1058,7 +1076,7 @@ export const PcSettings: React.FC<PcSettingsProps> = ({ navigate, initialCategor
               <div className={rowClass}>
                 <div>
                   <div className="text-[13.5px] font-medium">Transparency & Mica effects</div>
-                  <div className="text-[12px] text-[#6b7280] dark:text-[#9ca3af]">Windows and surfaces appear translucent with desktop wallpaper</div>
+                  <div className="text-[12px] text-[#6b7280] dark:text-[#9ca3af]">Sparkle and surfaces appear translucent with desktop wallpaper</div>
                 </div>
                 <WinSwitch
                   checked={pcState.transparencyEffects}
@@ -1069,10 +1087,42 @@ export const PcSettings: React.FC<PcSettingsProps> = ({ navigate, initialCategor
               <div className={rowClass}>
                 <div>
                   <div className="text-[13.5px] font-medium">Center taskbar icons</div>
-                  <div className="text-[12px] text-[#6b7280] dark:text-[#9ca3af]">Windows 11 centered taskbar alignment</div>
+                  <div className="text-[12px] text-[#6b7280] dark:text-[#9ca3af]">Sparkle 27 centered taskbar alignment</div>
                 </div>
                 <WinSwitch checked={pcState.taskbarCentered} onToggle={() => updatePc('taskbarCentered', !pcState.taskbarCentered)} />
               </div>
+
+              {([
+                { key: 'windowsUiScale', label: 'Global interface scale', command: '/ui /si', value: settings.windowsUiScale || 'default' },
+                { key: 'taskbarScale', label: 'Taskbar size', command: '/taskbar /si', value: settings.taskbarScale || 'default' },
+                { key: 'taskbarAlignment', label: 'Taskbar alignment', command: '/taskbar /alignment', value: settings.taskbarAlignment || 'center' },
+              ] as const).map((option) => (
+                <div key={option.key} className={rowClass}>
+                  <div>
+                    <div className="text-[13.5px] font-medium">{option.label}</div>
+                    <div className="text-[12px] text-[#6b7280] dark:text-[#9ca3af]">Command: {option.command}</div>
+                  </div>
+                  <select
+                    aria-label={option.label}
+                    value={option.value}
+                    onChange={(event) => updateSetting(option.key, event.target.value as never)}
+                    className="h-[30px] px-2.5 rounded-[5px] bg-white dark:bg-[#1f2329] border border-black/15 dark:border-white/15 text-[12.5px]"
+                  >
+                    {option.key === 'taskbarAlignment' ? (
+                      <>
+                        <option value="left">Left</option>
+                        <option value="center">Center</option>
+                      </>
+                    ) : (
+                      <>
+                        <option value="small">Small</option>
+                        <option value="default">Default</option>
+                        <option value="large">Large</option>
+                      </>
+                    )}
+                  </select>
+                </div>
+              ))}
             </div>
           )}
 
@@ -1139,7 +1189,7 @@ export const PcSettings: React.FC<PcSettingsProps> = ({ navigate, initialCategor
                 <div className="flex items-center gap-3">
                   <Lock className="w-4.5 h-4.5 text-[#0067b8] dark:text-[#4cc2ff]" />
                   <div>
-                    <div className="text-[13.5px] font-medium">Windows Hello PIN</div>
+                    <div className="text-[13.5px] font-medium">Sparkle Hello PIN</div>
                     <div className="text-[12px] text-[#6b7280] dark:text-[#9ca3af]">Sign in securely to your PC</div>
                   </div>
                 </div>
@@ -1180,7 +1230,7 @@ export const PcSettings: React.FC<PcSettingsProps> = ({ navigate, initialCategor
                 <div className="flex items-center gap-3">
                   <Globe className="w-4.5 h-4.5" />
                   <div>
-                    <div className="text-[13.5px] font-medium">Windows display language</div>
+                    <div className="text-[13.5px] font-medium">Sparkle display language</div>
                     <div className="text-[12px] text-[#6b7280] dark:text-[#9ca3af]">Preferred OS interface language</div>
                   </div>
                 </div>
@@ -1271,7 +1321,7 @@ export const PcSettings: React.FC<PcSettingsProps> = ({ navigate, initialCategor
                   <div className="flex items-center gap-3">
                     <CheckCircle2 className="w-6 h-6 text-emerald-500 shrink-0" />
                     <div>
-                      <div className="text-[14.5px] font-semibold">Windows Security — Protected</div>
+                      <div className="text-[14.5px] font-semibold">Sparkle Security — Protected</div>
                       <div className="text-[12px] text-[#6b7280] dark:text-[#9ca3af]">
                         Virus & threat protection, Firewall, and App guard are active.
                       </div>
@@ -1367,7 +1417,7 @@ export const PcSettings: React.FC<PcSettingsProps> = ({ navigate, initialCategor
               </div>
             </div>
           )}
-        </div>
+        </motion.div>
       </div>
 
       {/* Rename PC ContentDialog */}

@@ -395,7 +395,7 @@ export const WindowFrame: React.FC<WindowFrameProps> = ({
           onToggleMaximize();
         }}
         style={{ height: `${effectiveTitleBarHeight}px` }}
-        className={`shrink-0 flex items-center justify-between ${hasMergedTabBar ? 'pl-2' : 'pl-2.5'} pr-0 select-none border-b border-black/[0.06] dark:border-white/[0.07] cursor-default bg-transparent ${
+        className={`shrink-0 flex items-center justify-between ${hasMergedTabBar ? 'pl-2' : 'pl-2.5'} pr-0 select-none cursor-default bg-transparent ${
           isActive
             ? 'text-[#111827] dark:text-white'
             : 'text-[#6b7280] dark:text-[#9ca3af]'

@@ -638,7 +638,7 @@ export const TopBar: React.FC<TopBarProps> = ({
       },
       {
         id: 'flag-windows-mode',
-        title: 'Windows Mode (Vive)',
+        title: 'Sparkle Mode (Vive)',
         subtitle: 'Vive Feature',
         keywords: 'windows mode windows 11 taskbar start menu floating window desktop wallpaper vive velocity',
         type: 'setting-toggle',

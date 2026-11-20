@@ -632,7 +632,7 @@ export const WindowsTaskbar: React.FC<WindowsTaskbarProps> = ({
       },
       {
         id: 'flag-windows-mode',
-        title: 'Windows Mode (Vive)',
+        title: 'Sparkle Mode (Vive)',
         subtitle: 'Vive Feature',
         keywords: 'windows mode windows 11 taskbar start menu floating window desktop wallpaper vive velocity',
         type: 'setting-toggle',
@@ -1325,7 +1325,7 @@ export const WindowsTaskbar: React.FC<WindowsTaskbarProps> = ({
       <footer
         id="windows-taskbar"
         role="region"
-        aria-label="Windows Taskbar"
+        aria-label="Sparkle Taskbar"
         onContextMenu={(e) => {
           e.preventDefault();
           e.stopPropagation();
@@ -1884,6 +1884,7 @@ export const WindowsTaskbar: React.FC<WindowsTaskbarProps> = ({
           </div>
 
           {/* Unified Draggable Taskbar App Icons (pinned + open windows) */}
+          <AnimatePresence initial={false}>
           {orderedTaskbarSlots.map((slot) => {
             const isSlotDragged = draggedSlotKey === slot.key;
             const dropSide =
@@ -1893,9 +1894,14 @@ export const WindowsTaskbar: React.FC<WindowsTaskbarProps> = ({
               const { pinned, matchingTabs } = slot;
               if (matchingTabs.length === 0) {
                 return (
-                  <div
+                    <motion.div
                     key={slot.key}
                     role="button"
+                    initial={{ opacity: 0, y: 22, scale: 0.78 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 22, scale: 0.78 }}
+                    whileTap={{ y: 6, scale: 0.88 }}
+                    transition={{ type: 'spring', stiffness: 440, damping: 28 }}
                     tabIndex={0}
                     draggable
                     onClick={() => {
@@ -1959,7 +1965,7 @@ export const WindowsTaskbar: React.FC<WindowsTaskbarProps> = ({
                       <span className="absolute -right-[2px] top-1.5 bottom-1.5 w-[2.5px] rounded-full bg-[#0078d4] dark:bg-[#4cc2ff] pointer-events-none" />
                     )}
                     <TabIcon route={pinned.route} className={`${appIconSizeClass} shrink-0`} />
-                  </div>
+                  </motion.div>
                 );
               }
 
@@ -1967,9 +1973,14 @@ export const WindowsTaskbar: React.FC<WindowsTaskbarProps> = ({
                 const ws = windowStates[tab.id];
                 const isFocused = tab.id === activeTabId && !ws?.isMinimized;
                 return (
-                  <div
+                  <motion.div
                     key={tab.id}
                     role="button"
+                    initial={{ opacity: 0, y: 22, scale: 0.78 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 22, scale: 0.78 }}
+                    whileTap={{ y: 6, scale: 0.88 }}
+                    transition={{ type: 'spring', stiffness: 440, damping: 28 }}
                     tabIndex={0}
                     draggable
                     onClick={() => {
@@ -2047,7 +2058,7 @@ export const WindowsTaskbar: React.FC<WindowsTaskbarProps> = ({
                           : 'w-[6px] bg-black/40 dark:bg-white/50'
                       }`}
                     />
-                  </div>
+                  </motion.div>
                 );
               });
             }
@@ -2056,9 +2067,14 @@ export const WindowsTaskbar: React.FC<WindowsTaskbarProps> = ({
             const ws = windowStates[tab.id];
             const isFocused = tab.id === activeTabId && !ws?.isMinimized;
             return (
-              <div
+              <motion.div
                 key={slot.key}
                 role="button"
+                initial={{ opacity: 0, y: 22, scale: 0.78 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: 22, scale: 0.78 }}
+                whileTap={{ y: 6, scale: 0.88 }}
+                transition={{ type: 'spring', stiffness: 440, damping: 28 }}
                 tabIndex={0}
                 draggable
                 onClick={() => {
@@ -2136,9 +2152,10 @@ export const WindowsTaskbar: React.FC<WindowsTaskbarProps> = ({
                       : 'w-[6px] bg-black/40 dark:bg-white/50'
                   }`}
                 />
-              </div>
+              </motion.div>
             );
           })}
+          </AnimatePresence>
         </div>
 
         {/* 3. Right System Tray: ^ Overflow, Wi-Fi + Volume (Control Center), Clock + Date, Direct Command, Show Desktop */}
@@ -2214,7 +2231,7 @@ export const WindowsTaskbar: React.FC<WindowsTaskbarProps> = ({
                     className="w-full h-8 px-2.5 rounded-[6px] flex items-center gap-2.5 text-[12px] hover:bg-black/[0.06] dark:hover:bg-white/[0.08] cursor-pointer text-left border-none"
                   >
                     <SettingsIcon className="w-3.5 h-3.5" />
-                    <span>Windows Mode Settings</span>
+                    <span>Sparkle Mode Settings</span>
                   </button>
                   <button
                     type="button"
@@ -2225,7 +2242,7 @@ export const WindowsTaskbar: React.FC<WindowsTaskbarProps> = ({
                     className="w-full h-8 px-2.5 rounded-[6px] flex items-center gap-2.5 text-[12px] text-[#c42b1c] dark:text-[#ff99a4] hover:bg-black/[0.06] dark:hover:bg-white/[0.08] cursor-pointer text-left border-none"
                   >
                     <LogOut className="w-3.5 h-3.5" />
-                    <span>Exit Windows Mode</span>
+                    <span>Exit Sparkle Mode</span>
                   </button>
                 </motion.div>
               )}
@@ -2570,7 +2587,7 @@ export const WindowsTaskbar: React.FC<WindowsTaskbarProps> = ({
               },
               {
                 id: 'tb-exit-win',
-                label: 'Exit Windows Mode',
+                label: 'Exit Sparkle Mode',
                 icon: <LogOut className="w-4 h-4" />,
                 danger: true,
                 onSelect: () => updateSetting('windowsMode', false),
