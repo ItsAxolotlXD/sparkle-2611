@@ -529,21 +529,22 @@ export const WindowFrame: React.FC<WindowFrameProps> = ({
             {children}
           </WindowTitleBarPortalContext.Provider>
         </div>
-        {showLaunchSplash && (
-          <div
-            role="status"
-            aria-label={`Loading ${tab.title}`}
-            className="absolute inset-0 z-40 flex items-center justify-center"
-            style={{
-              backgroundColor: settings.theme === 'light' ? '#ffffff' : '#202020',
-              backgroundImage: 'none',
-              opacity: 1,
-            }}
-          >
-            <TabIcon route={tab.route} active={isActive} className="w-16 h-16 shrink-0 drop-shadow-sm" />
-          </div>
-        )}
       </div>
+      {showLaunchSplash && (
+        <div
+          role="status"
+          aria-label={`Loading ${tab.title}`}
+          className="absolute inset-0 z-[100] flex items-center justify-center"
+          style={{
+            backgroundColor: settings.theme === 'light' ? '#ffffff' : '#202020',
+            backgroundImage: 'none',
+            opacity: 1,
+            isolation: 'isolate',
+          }}
+        >
+          <TabIcon route={tab.route} active={isActive} className="w-16 h-16 shrink-0 drop-shadow-sm" />
+        </div>
+      )}
     </motion.section>
   );
 };
