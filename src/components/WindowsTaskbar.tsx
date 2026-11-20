@@ -1339,7 +1339,7 @@ export const WindowsTaskbar: React.FC<WindowsTaskbarProps> = ({
         }}
         style={{
           height: `${taskbarHeight}px`,
-          backgroundColor: isLightMode ? 'rgba(226, 233, 243, 0.72)' : 'rgba(28, 30, 36, 0.76)',
+          backgroundColor: isLightMode ? 'rgba(226, 233, 243, 0.76)' : 'rgba(28, 30, 36, 0.80)',
           backdropFilter: 'blur(36px) saturate(165%)',
           WebkitBackdropFilter: 'blur(36px) saturate(165%)',
           border: 'none',

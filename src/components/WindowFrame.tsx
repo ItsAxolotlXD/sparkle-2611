@@ -533,9 +533,12 @@ export const WindowFrame: React.FC<WindowFrameProps> = ({
           <div
             role="status"
             aria-label={`Loading ${tab.title}`}
-            className={`absolute inset-0 z-40 flex items-center justify-center ${
-              settings.theme === 'light' ? 'bg-white' : 'bg-[#202020]'
-            }`}
+            className="absolute inset-0 z-40 flex items-center justify-center"
+            style={{
+              backgroundColor: settings.theme === 'light' ? '#ffffff' : '#202020',
+              backgroundImage: 'none',
+              opacity: 1,
+            }}
           >
             <TabIcon route={tab.route} active={isActive} className="w-16 h-16 shrink-0 drop-shadow-sm" />
           </div>
