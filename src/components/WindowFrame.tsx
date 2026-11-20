@@ -314,7 +314,7 @@ export const WindowFrame: React.FC<WindowFrameProps> = ({
         reduceMotion
           ? false
           : {
-              opacity: 0,
+              opacity: 1,
               scale: 0.86,
               y: 16,
               left: computedLeft,
