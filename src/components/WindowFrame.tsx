@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect, useCallback, createContext } from 'react';
+import React, { useRef, useState, useEffect, useLayoutEffect, useCallback, createContext } from 'react';
 import { motion } from 'motion/react';
 import { Minus, Square, X, ArrowLeft } from 'lucide-react';
 import { TabIcon, type AppTab } from './SparkleTabBar';
@@ -69,6 +69,13 @@ export const WindowFrame: React.FC<WindowFrameProps> = ({
     width: typeof window !== 'undefined' ? window.innerWidth : 1280,
     height: typeof window !== 'undefined' ? window.innerHeight : 800,
   }));
+  const [showLaunchSplash, setShowLaunchSplash] = useState(true);
+
+  useLayoutEffect(() => {
+    setShowLaunchSplash(true);
+    const timer = window.setTimeout(() => setShowLaunchSplash(false), 2000);
+    return () => window.clearTimeout(timer);
+  }, [tab.route]);
 
   useEffect(() => {
     const onResize = () => {
@@ -487,6 +494,8 @@ export const WindowFrame: React.FC<WindowFrameProps> = ({
         } relative bg-transparent ${isCustomRouteFull ? 'p-0' : ''}`}
       >
         <div
+          aria-hidden={showLaunchSplash}
+          inert={showLaunchSplash}
           style={{ zoom: uiScaleMult }}
           className={`w-full ${hasMergedTabBar ? 'h-full overflow-hidden' : 'min-h-full'} ${
             tab.route === '/' ||
@@ -520,6 +529,17 @@ export const WindowFrame: React.FC<WindowFrameProps> = ({
             {children}
           </WindowTitleBarPortalContext.Provider>
         </div>
+        {showLaunchSplash && (
+          <div
+            role="status"
+            aria-label={`Loading ${tab.title}`}
+            className={`absolute inset-0 z-40 flex items-center justify-center ${
+              settings.theme === 'light' ? 'bg-white' : 'bg-[#202020]'
+            }`}
+          >
+            <TabIcon route={tab.route} active={isActive} className="w-16 h-16 shrink-0 drop-shadow-sm" />
+          </div>
+        )}
       </div>
     </motion.section>
   );

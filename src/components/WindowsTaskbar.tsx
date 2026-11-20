@@ -55,6 +55,7 @@ import { NEWS_DATA } from '../data/news';
 import { Channel } from '../types';
 import { galleryDB, GalleryMediaItem } from '../services/galleryStorage';
 import { showAppToast } from '../utils/toast';
+import { useHanoiWeather } from '../hooks/useHanoiWeather';
 import {
   WindowsWidgetsBoard,
   CITY_WEATHER_DATA,
@@ -168,6 +169,7 @@ export const WindowsTaskbar: React.FC<WindowsTaskbarProps> = ({
   // Widgets Dashboard state & synced city weather
   const [isWidgetsOpen, setIsWidgetsOpen] = useState(false);
   const [widgetsPrefs, setWidgetsPrefs] = useState(() => loadWidgetsPrefs());
+  const { data: liveHanoiWeather } = useHanoiWeather();
   const weatherHoverTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
@@ -186,10 +188,12 @@ export const WindowsTaskbar: React.FC<WindowsTaskbarProps> = ({
     };
   }, []);
 
-  const activeCityWeather = useMemo(
-    () => CITY_WEATHER_DATA.find((c) => c.id === widgetsPrefs.selectedCityId) || CITY_WEATHER_DATA[0],
-    [widgetsPrefs.selectedCityId]
-  );
+  const activeCityWeather = useMemo(() => {
+    const selected = CITY_WEATHER_DATA.find((city) => city.id === widgetsPrefs.selectedCityId) || CITY_WEATHER_DATA.find((city) => city.id === 'hanoi')!;
+    return selected.id === 'hanoi' && liveHanoiWeather
+      ? { ...selected, ...liveHanoiWeather }
+      : selected;
+  }, [widgetsPrefs.selectedCityId, liveHanoiWeather]);
 
   const handleToggleWidgets = () => {
     onCloseStartMenu();
@@ -1465,7 +1469,7 @@ export const WindowsTaskbar: React.FC<WindowsTaskbarProps> = ({
                     alt=""
                     aria-hidden="true"
                     draggable={false}
-                    className="w-[14px] h-[14px] object-contain shrink-0 pointer-events-none select-none"
+                    className="w-[18px] h-[18px] object-contain shrink-0 pointer-events-none select-none"
                   />
                 ) : (
                   <FluentSearchIcon className="w-[14px] h-[14px] text-[#374151] dark:text-white/90 shrink-0" />
