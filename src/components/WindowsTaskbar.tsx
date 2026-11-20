@@ -1459,7 +1459,17 @@ export const WindowsTaskbar: React.FC<WindowsTaskbarProps> = ({
                 }}
                 className={`${searchBoxHeightClass} w-[145px] sm:w-[205px] rounded-full flex items-center pl-3 pr-1 gap-2 transition-colors !border-0 !outline-none focus:!outline-none focus-within:!outline-none ring-0 focus-within:ring-0`}
               >
-                <FluentSearchIcon className="w-[14px] h-[14px] text-[#374151] dark:text-white/90 shrink-0" />
+                {settings.refreshedSearchIcon ? (
+                  <img
+                    src={isSearchOpen ? 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Focused.png-C6h07cJuZkQ7qxr3AwmqXxINQya0tI.x-icon' : isLightMode ? 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Light.png-HoVpbl8N1AMI4rRIqBouhKXe4NoTxd.x-icon' : 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Dark.png-5e1aw6TgUECnUtZ4mPQmegFRSvNg6x.x-icon'}
+                    alt=""
+                    aria-hidden="true"
+                    draggable={false}
+                    className="w-[14px] h-[14px] object-contain shrink-0 pointer-events-none select-none"
+                  />
+                ) : (
+                  <FluentSearchIcon className="w-[14px] h-[14px] text-[#374151] dark:text-white/90 shrink-0" />
+                )}
                 <input
                   type="text"
                   value={searchQuery}
@@ -1482,7 +1492,7 @@ export const WindowsTaskbar: React.FC<WindowsTaskbarProps> = ({
                     setIsSearchOpen(true);
                   }}
                   placeholder="Search here"
-                  className="flex-1 min-w-0 !bg-transparent text-[12.5px] text-[#111827] dark:text-white placeholder-[#4b5563] dark:placeholder-white/80 !outline-none focus:!outline-none !border-none !border-b-0 !shadow-none"
+                  className="flex-1 min-w-0 !bg-transparent text-[12.5px] text-[#111827] dark:text-white placeholder-[#111827] dark:placeholder-white/80 !outline-none focus:!outline-none !border-none !border-b-0 !shadow-none"
                 />
                 {searchQuery ? (
                   <button

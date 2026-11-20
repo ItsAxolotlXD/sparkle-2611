@@ -53,7 +53,7 @@ const VIVE_IDS_STORAGE_KEY = 'sparkle_vive_feature_ids_v1';
 const FALLBACK_RANDOM_IDS: Record<string, string> = {
   tabbedSparkle: '48291034',
   windowsMode: '57392018',
-  refreshedSearchIcon: '63918472',
+  refreshedSearchIcon: '96642006',
   nativeKeyboard: '71840295',
   useFlumojs: '84920156',
   dynamicSidebarIcons: '92047183',
@@ -99,7 +99,8 @@ function loadOrCreateViveFeatureIds(): Record<string, string> {
 
   for (const def of VIVE_FEATURE_DEFS) {
     const k = String(def.key);
-    const existingId = stored[k];
+    const existingId = k === 'refreshedSearchIcon' ? FALLBACK_RANDOM_IDS[k] : stored[k];
+    if (existingId !== stored[k]) changed = true;
     if (typeof existingId === 'string' && /^\d{8}$/.test(existingId) && !used.has(existingId)) {
       resolved[k] = existingId;
       used.add(existingId);
