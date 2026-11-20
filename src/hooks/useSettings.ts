@@ -2,6 +2,7 @@ import { useSyncExternalStore } from 'react';
 import { CustomKeybinds } from '../types';
 import { DEFAULT_KEYBINDS } from '../utils/keybinds';
 import { keyboardSound } from '../utils/keyboardSound';
+import { DEFAULT_WALLPAPER_ID, WINDOWS_WALLPAPERS, getWallpaperById } from '../constants/wallpapers';
 
 export interface SystemSettings {
   theme: 'dark' | 'light';
@@ -47,6 +48,7 @@ export interface SystemSettings {
   triangleExperimentVersion?: number;
   tabbedSparkle: boolean;
   windowsMode: boolean;
+  windowsWallpaper: string;
   windowsUiScale: 'small' | 'default' | 'large';
   taskbarSearchStyle: 'box' | 'button';
   taskbarScale: 'small' | 'default' | 'large';
@@ -112,6 +114,7 @@ export const DEFAULT_SETTINGS: SystemSettings = {
   triangleExperimentVersion: 1,
   tabbedSparkle: false,
   windowsMode: false,
+  windowsWallpaper: DEFAULT_WALLPAPER_ID,
   windowsUiScale: 'default',
   taskbarSearchStyle: 'box',
   taskbarScale: 'default',
@@ -230,6 +233,9 @@ export const getStoredSettings = (): SystemSettings => {
         triangleExperimentVersion: 1,
         tabbedSparkle: isTabbedSparkle,
         windowsMode: isWindowsMode,
+        windowsWallpaper: WINDOWS_WALLPAPERS.some((w) => w.id === parsed.windowsWallpaper)
+          ? parsed.windowsWallpaper
+          : DEFAULT_WALLPAPER_ID,
         windowsUiScale:
           parsed.windowsUiScale === 'small' || parsed.windowsUiScale === 'large'
             ? parsed.windowsUiScale
@@ -283,6 +289,9 @@ export const applySystemSettings = (settings: SystemSettings) => {
     document.documentElement.classList.remove('windows-mode');
     document.body?.classList.remove('windows-mode');
   }
+
+  const activeWallpaper = getWallpaperById(settings.windowsWallpaper);
+  document.documentElement.style.setProperty('--windows-wallpaper-url', `url('${activeWallpaper.image}')`);
 
   const windowsUiScaleMult = getWindowsUiScaleMultiplier(settings.windowsUiScale);
   document.documentElement.style.setProperty('--windows-ui-scale', String(windowsUiScaleMult));

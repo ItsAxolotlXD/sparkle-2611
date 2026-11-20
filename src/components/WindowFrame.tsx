@@ -1,8 +1,16 @@
-import React, { useRef, useState, useEffect, useCallback } from 'react';
+import React, { useRef, useState, useEffect, useCallback, createContext } from 'react';
 import { motion } from 'motion/react';
 import { Minus, Square, X, ArrowLeft } from 'lucide-react';
 import { TabIcon, type AppTab } from './SparkleTabBar';
 import { useSettings, getTaskbarHeightPx, getWindowsUiScaleMultiplier } from '../hooks/useSettings';
+
+export const WindowTitleBarPortalContext = createContext<{
+  titleBarSlotEl: HTMLDivElement | null;
+  isInsideWindowFrame: boolean;
+}>({
+  titleBarSlotEl: null,
+  isInsideWindowFrame: false,
+});
 
 export interface AppWindowState {
   x: number;
@@ -100,11 +108,14 @@ export const WindowFrame: React.FC<WindowFrameProps> = ({
   } | null>(null);
 
   const [isInteracting, setIsInteracting] = useState(false);
+  const [titleBarSlotEl, setTitleBarSlotEl] = useState<HTMLDivElement | null>(null);
+  const hasMergedTabBar = tab.route === '/file-explorer' || tab.route.startsWith('/file-explorer/');
+  const effectiveTitleBarHeight = hasMergedTabBar ? Math.max(titleBarHeight, 40) : titleBarHeight;
 
   const handleTitlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
     if (e.button !== 0) return;
     const target = e.target as HTMLElement;
-    if (target.closest('button')) return;
+    if (target.closest('button, input, [role="tab"], [data-window-no-drag]')) return;
 
     onFocus();
     e.currentTarget.setPointerCapture(e.pointerId);
@@ -279,7 +290,9 @@ export const WindowFrame: React.FC<WindowFrameProps> = ({
     tab.route === '/html-writer' ||
     tab.route.startsWith('/html-writer/') ||
     tab.route === '/pc-settings' ||
-    tab.route.startsWith('/pc-settings/');
+    tab.route.startsWith('/pc-settings/') ||
+    tab.route === '/file-explorer' ||
+    tab.route.startsWith('/file-explorer/');
 
   return (
     <motion.section
@@ -378,18 +391,18 @@ export const WindowFrame: React.FC<WindowFrameProps> = ({
         onPointerUp={handleTitlePointerUp}
         onPointerCancel={handleTitlePointerUp}
         onDoubleClick={(e) => {
-          if ((e.target as HTMLElement).closest('button')) return;
+          if ((e.target as HTMLElement).closest('button, input, [role="tab"], [data-window-no-drag]')) return;
           onToggleMaximize();
         }}
-        style={{ height: `${titleBarHeight}px` }}
-        className={`shrink-0 flex items-center justify-between pl-2.5 pr-0 select-none border-b border-black/[0.06] dark:border-white/[0.07] cursor-default bg-transparent ${
+        style={{ height: `${effectiveTitleBarHeight}px` }}
+        className={`shrink-0 flex items-center justify-between ${hasMergedTabBar ? 'pl-2' : 'pl-2.5'} pr-0 select-none border-b border-black/[0.06] dark:border-white/[0.07] cursor-default bg-transparent ${
           isActive
             ? 'text-[#111827] dark:text-white'
             : 'text-[#6b7280] dark:text-[#9ca3af]'
         }`}
       >
-        {/* Left: optional Back + App Icon + Title */}
-        <div className="flex items-center gap-2 min-w-0 flex-1 pr-2">
+        {/* Left: optional Back + Merged Tab Bar OR App Icon + Title */}
+        <div className="flex items-center gap-2 min-w-0 flex-1 h-full pr-2">
           {canGoBack && onGoBack && (
             <button
               type="button"
@@ -403,12 +416,21 @@ export const WindowFrame: React.FC<WindowFrameProps> = ({
               <ArrowLeft className="w-3.5 h-3.5" />
             </button>
           )}
-          <div className="w-4 h-4 flex items-center justify-center shrink-0">
-            <TabIcon route={tab.route} active={isActive} dynamicIcons={dynamicIcons} className="w-4 h-4 shrink-0" />
-          </div>
-          <span className="text-[12px] font-medium truncate leading-none">
-            {tab.title}
-          </span>
+          {hasMergedTabBar ? (
+            <div
+              ref={setTitleBarSlotEl}
+              className="flex-1 min-w-0 h-full flex items-end pt-1"
+            />
+          ) : (
+            <>
+              <div className="w-4 h-4 flex items-center justify-center shrink-0">
+                <TabIcon route={tab.route} active={isActive} dynamicIcons={dynamicIcons} className="w-4 h-4 shrink-0" />
+              </div>
+              <span className="text-[12px] font-medium truncate leading-none">
+                {tab.title}
+              </span>
+            </>
+          )}
         </div>
 
         {/* Right: Windows 11 Caption Controls */}
@@ -460,13 +482,13 @@ export const WindowFrame: React.FC<WindowFrameProps> = ({
 
       {/* Scrollable Window Body */}
       <div
-        className={`window-content-area flex-1 min-h-0 overflow-y-auto overflow-x-hidden relative bg-transparent ${
-          isCustomRouteFull ? 'p-0' : ''
-        }`}
+        className={`window-content-area flex-1 min-h-0 ${
+          hasMergedTabBar ? 'overflow-hidden flex flex-col' : 'overflow-y-auto overflow-x-hidden'
+        } relative bg-transparent ${isCustomRouteFull ? 'p-0' : ''}`}
       >
         <div
           style={{ zoom: uiScaleMult }}
-          className={`w-full min-h-full ${
+          className={`w-full ${hasMergedTabBar ? 'h-full overflow-hidden' : 'min-h-full'} ${
             tab.route === '/' ||
             tab.route === '/home' ||
             tab.route === '/news' ||
@@ -485,12 +507,18 @@ export const WindowFrame: React.FC<WindowFrameProps> = ({
             tab.route === '/html-writer' ||
             tab.route.startsWith('/html-writer/') ||
             tab.route === '/pc-settings' ||
-            tab.route.startsWith('/pc-settings/')
+            tab.route.startsWith('/pc-settings/') ||
+            tab.route === '/file-explorer' ||
+            tab.route.startsWith('/file-explorer/')
               ? 'p-0 h-full'
               : 'px-4 sm:px-6 py-5 max-w-7xl mx-auto'
           }`}
         >
-          {children}
+          <WindowTitleBarPortalContext.Provider
+            value={{ titleBarSlotEl, isInsideWindowFrame: true }}
+          >
+            {children}
+          </WindowTitleBarPortalContext.Provider>
         </div>
       </div>
     </motion.section>

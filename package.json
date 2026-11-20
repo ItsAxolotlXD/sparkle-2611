@@ -1,7 +1,7 @@
 {
   "name": "waves-community",
   "private": true,
-  "version": "26165",
+  "version": "26170",
   "type": "module",
   "scripts": {
     "dev": "vite --host 0.0.0.0 --port 3000",

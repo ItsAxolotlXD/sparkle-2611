@@ -325,4 +325,11 @@ export const FluentPcSettingsIcon: React.FC<{ className?: string; style?: React.
   </svg>
 );
 
-
+export const FluentFileExplorerIcon: React.FC<{ className?: string; style?: React.CSSProperties }> = ({ className = 'w-5 h-5', style }) => (
+  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={className} style={style}>
+    <path
+      d="M4.25 4C3.00736 4 2 5.00736 2 6.25V17.75C2 18.9926 3.00736 20 4.25 20H19.75C20.9926 20 22 18.9926 22 17.75V8.75C22 7.50736 20.9926 6.5 19.75 6.5H11.5607L9.56066 4.5C9.27936 4.2187 8.89783 4.06066 8.5 4.06066L8.43934 4H4.25ZM3.5 6.25C3.5 5.83579 3.83579 5.5 4.25 5.5H8.18934L9.68934 7H3.5V6.25ZM3.5 8.5H19.75C20.1642 8.5 20.5 8.83579 20.5 9.25V17.75C20.5 18.1642 20.1642 18.5 19.75 18.5H16.25V15.5C16.25 14.2574 15.2426 13.25 14 13.25H10C8.75736 13.25 7.75 14.2574 7.75 15.5V18.5H4.25C3.83579 18.5 3.5 18.1642 3.5 17.75V8.5ZM9.25 18.5V15.5C9.25 15.0858 9.58579 14.75 10 14.75H14C14.4142 14.75 14.75 15.0858 14.75 15.5V18.5H9.25Z"
+      fill="currentColor"
+    />
+  </svg>
+);

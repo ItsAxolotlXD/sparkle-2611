@@ -910,7 +910,7 @@ export const SparkleOOBE: React.FC<SparkleOOBEProps> = ({
     <div 
       className="fixed inset-0 z-[999999] flex flex-col items-center justify-start sm:justify-center p-2 sm:p-4 md:p-6 overflow-y-auto overflow-x-hidden"
       style={{
-        backgroundImage: "url('/assets/aistudio/image_9bd7238e.png')",
+        backgroundImage: "url('/assets/aistudio/WIP_Light_184e3e28.png')",
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat',
@@ -1314,7 +1314,7 @@ export const SparkleOOBE: React.FC<SparkleOOBEProps> = ({
                               {/* Mini Windows 11 Desktop preview */}
                               <div
                                 className="h-20 rounded-[12px] border border-neutral-300/80 overflow-hidden relative flex flex-col justify-between p-1.5 bg-cover bg-center"
-                                style={{ backgroundImage: "url('/assets/aistudio/image_9bd7238e.png')" }}
+                                style={{ backgroundImage: "url('/assets/aistudio/WIP_Light_184e3e28.png')" }}
                               >
                                 <div className="w-3/4 h-11 bg-white/95 rounded-[5px] shadow-sm border border-black/10 p-1 mx-auto mt-0.5">
                                   <div className="flex items-center justify-between border-b border-neutral-200 pb-0.5">

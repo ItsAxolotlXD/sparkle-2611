@@ -31,6 +31,7 @@ import {
   FluentInkCanvasIcon,
   FluentHtmlWriterIcon,
   FluentPcSettingsIcon,
+  FluentFileExplorerIcon,
 } from './FluentIcons';
 import {
   Fluent3DHomeIcon,
@@ -47,6 +48,7 @@ import {
   Fluent3DFolderSearchIcon,
   Fluent3DHtmlWriterIcon,
   Fluent3DPcSettingsIcon,
+  Fluent3DFileExplorerIcon,
 } from './Fluent3DIcons';
 import { useSettings } from '../hooks/useSettings';
 
@@ -341,6 +343,13 @@ export const TabIcon: React.FC<{ route: string; active?: boolean; dynamicIcons?:
         alt="WinUI 3"
         className={`${iconClass} shrink-0 object-contain winui-sidebar-icon`}
       />
+    );
+  }
+  if (route.startsWith('/file-explorer')) {
+    return useFluent3DForContent ? (
+      <Fluent3DFileExplorerIcon className={iconClass} />
+    ) : (
+      <FluentFileExplorerIcon className={`${iconClass} text-[#111827] dark:text-white`} />
     );
   }
   if (route.startsWith('/pc-settings')) {

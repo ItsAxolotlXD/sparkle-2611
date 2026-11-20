@@ -55,7 +55,8 @@ import {
   FluentArrowUploadIcon,
   FluentCameraIcon,
   FluentHtmlWriterIcon,
-  FluentPcSettingsIcon
+  FluentPcSettingsIcon,
+  FluentFileExplorerIcon
 } from './FluentIcons';
 import {
   Fluent3DHomeIcon,
@@ -75,7 +76,8 @@ import {
   Fluent3DSettingsIcon,
   Fluent3DCameraIcon,
   Fluent3DHtmlWriterIcon,
-  Fluent3DPcSettingsIcon
+  Fluent3DPcSettingsIcon,
+  Fluent3DFileExplorerIcon
 } from './Fluent3DIcons';
 import { useFavorites } from '../hooks/useFavorites';
 import { useSettings } from '../hooks/useSettings';
@@ -827,6 +829,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     if (route === '/draws' && (currentRoute === '/draws' || currentRoute.startsWith('/draws'))) return true;
     if (route === '/vlc' && (currentRoute === '/vlc' || currentRoute.startsWith('/vlc'))) return true;
     if (route === '/camera' && (currentRoute === '/camera' || currentRoute.startsWith('/camera'))) return true;
+    if (route === '/file-explorer' && (currentRoute === '/file-explorer' || currentRoute.startsWith('/file-explorer'))) return true;
     if (route === '/html-writer' && (currentRoute === '/html-writer' || currentRoute.startsWith('/html-writer'))) return true;
     if (route === '/pc-settings' && (currentRoute === '/pc-settings' || currentRoute.startsWith('/pc-settings'))) return true;
     if (route === '/craftmine' && currentRoute === '/craftmine') return true;
@@ -1052,6 +1055,23 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <span>Photopea</span>
           </div>
           <span className="text-[10px] px-1.5 py-0.5 rounded bg-black/5 dark:bg-white/10 text-neutral-600 dark:text-neutral-300 font-medium">Photo editor</span>
+        </button>
+
+        {/* File Explorer Tool */}
+        <button
+          type="button"
+          id="tool-sidebar-file-explorer"
+          onClick={() => {
+            setIsToolsFlyoutOpen(false);
+            handleNavClick('/file-explorer');
+          }}
+          className="w-full h-[36px] px-3 rounded-[4px] flex items-center justify-between text-[13px] text-[#111827] dark:text-white hover:bg-black/5 dark:hover:bg-white/10 active:bg-black/10 dark:active:bg-white/15 transition-colors cursor-pointer text-left"
+        >
+          <div className="flex items-center gap-2.5">
+            <FluentFileExplorerIcon className="w-4 h-4 shrink-0 text-black dark:text-white" />
+            <span>File Explorer</span>
+          </div>
+          <span className="text-[10px] px-1.5 py-0.5 rounded bg-black/5 dark:bg-white/10 text-neutral-600 dark:text-neutral-300 font-medium">WinUI 3</span>
         </button>
 
         {/* HTML Writer Tool */}
@@ -1751,6 +1771,32 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </button>
           </div>
 
+          {/* File Explorer */}
+          <div className="w-full">
+            <button
+              type="button"
+              id={isMobile ? 'mobile-nav-file-explorer' : 'sidebar-nav-file-explorer'}
+              data-nav-active={(currentRoute === '/file-explorer' || currentRoute.startsWith('/file-explorer')) ? 'true' : undefined}
+              onClick={() => handleNavClick('/file-explorer')}
+              aria-label="File Explorer"
+              className={`sidebar-nav-item w-full h-[38px] flex items-center justify-between px-3 cursor-pointer relative text-left rounded-[6px] transition-colors ${
+                (currentRoute === '/file-explorer' || currentRoute.startsWith('/file-explorer'))
+                  ? 'bg-black/5 dark:bg-white/[0.08] text-black dark:text-white font-medium shadow-xs'
+                  : 'text-black dark:text-[#cccccc] hover:bg-black/5 dark:hover:bg-white/[0.05] hover:text-black dark:hover:text-white'
+              }`}
+            >
+              <div className="flex items-center gap-3.5 truncate">
+                {useFluent3DForContent ? (
+                  <Fluent3DFileExplorerIcon className="w-5 h-5 shrink-0" />
+                ) : (
+                  <FluentFileExplorerIcon className="w-5 h-5 shrink-0 text-black dark:text-white" />
+                )}
+                <span className="truncate text-[13.5px]">File Explorer</span>
+              </div>
+              <span className="text-[10px] px-1.5 py-0.5 rounded bg-black/5 dark:bg-white/10 text-neutral-600 dark:text-neutral-300 font-medium">WinUI 3</span>
+            </button>
+          </div>
+
           {/* 10. HTML Writer */}
           <div className="w-full">
             <button
@@ -2229,6 +2275,28 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     <Fluent3DCameraIcon className="w-5 h-5 shrink-0" />
                   ) : (
                     <FluentCameraIcon className="w-5 h-5 text-black dark:text-white" />
+                  )}
+                </button>
+
+                {/* File Explorer Icon */}
+                <button
+                  type="button"
+                  id="sidebar-collapsed-file-explorer"
+                  data-nav-active={(currentRoute === '/file-explorer' || currentRoute.startsWith('/file-explorer')) ? 'true' : undefined}
+                  onClick={() => handleNavClick('/file-explorer')}
+                  onMouseEnter={(e) => showTooltip('File Explorer', e)}
+                  onMouseLeave={hideTooltip}
+                  aria-label="File Explorer"
+                  className={`sidebar-nav-item w-10 h-[38px] rounded-[6px] shrink-0 flex items-center justify-center relative transition-colors cursor-pointer ${
+                    (currentRoute === '/file-explorer' || currentRoute.startsWith('/file-explorer'))
+                      ? 'bg-black/5 dark:bg-white/[0.08] text-black dark:text-white shadow-xs'
+                      : 'text-black dark:text-[#cccccc] hover:bg-black/5 dark:hover:bg-white/[0.05] hover:text-black dark:hover:text-white'
+                  }`}
+                >
+                  {useFluent3DForContent ? (
+                    <Fluent3DFileExplorerIcon className="w-5 h-5 shrink-0" />
+                  ) : (
+                    <FluentFileExplorerIcon className="w-5 h-5 text-black dark:text-white" />
                   )}
                 </button>
 

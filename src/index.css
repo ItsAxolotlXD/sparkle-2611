@@ -704,7 +704,7 @@ html:not(.light-mode) [id^="news-card-"]:hover {
 
 
 /* Light mode: toàn bộ chữ trên toàn bộ các tab đổi hết sang màu đen (#000000) */
-html.light-mode :is(h1, h2, h3, h4, h5, h6, p, label, li, dt, dd, blockquote, div, span, b, strong, i, em, td, th, time, small, caption, button, a):not(.fluent-btn-primary):not(.fluent-btn-primary *):not(#btn-discord-join):not(#btn-discord-join *):not(#btn-home-join-discord):not(#btn-home-join-discord *):not([class*="bg-[#5865F2]"]):not([class*="bg-[#0078d4]"]):not([class*="bg-[#0067b8]"]):not([class*="bg-[#0067B8]"]):not([class*="bg-[#4cc2ff]"]):not([class*="bg-[#E6005A]"]):not([class*="bg-[#E50914]"]):not([class*="bg-emerald"]):not([class*="bg-rose"]):not([class*="bg-red"]):not([class*="bg-amber"]):not([class*="bg-blue"]):not([class*="text-[#0078d4]"]):not([class*="text-[#0067b8]"]):not([class*="text-[#0067B8]"]):not([class*="text-[#4cc2ff]"]):not([class*="text-[#E6005A]"]):not([class*="text-emerald"]):not([class*="text-rose"]):not([class*="text-red"]):not([class*="text-amber"]):not([class*="text-blue"]) {
+html.light-mode :is(h1, h2, h3, h4, h5, h6, p, label, li, dt, dd, blockquote, div, span, b, strong, i, em, td, th, time, small, caption, button, a):not(.fluent-btn-primary):not(.fluent-btn-primary *):not(#btn-discord-join):not(#btn-discord-join *):not(#btn-home-join-discord):not(#btn-home-join-discord *):not(#btn-fe-import-device):not(#btn-fe-import-device *):not([class*="bg-[#5865F2]"]):not([class*="bg-[#0078d4]"]):not([class*="bg-[#0063b8]"]):not([class*="bg-[#0063B8]"]):not([class*="bg-[#0067b8]"]):not([class*="bg-[#0067B8]"]):not([class*="bg-[#4cc2ff]"]):not([class*="bg-[#4CC2FF]"]):not([class*="bg-[#E6005A]"]):not([class*="bg-[#E50914]"]):not([class*="bg-emerald"]):not([class*="bg-rose"]):not([class*="bg-red"]):not([class*="bg-amber"]):not([class*="bg-blue"]):not([class*="text-[#0078d4]"]):not([class*="text-[#0063b8]"]):not([class*="text-[#0063B8]"]):not([class*="text-[#0067b8]"]):not([class*="text-[#0067B8]"]):not([class*="text-[#4cc2ff]"]):not([class*="text-[#4CC2FF]"]):not([class*="text-[#E6005A]"]):not([class*="text-emerald"]):not([class*="text-rose"]):not([class*="text-red"]):not([class*="text-amber"]):not([class*="text-blue"]) {
   color: #000000 !important;
 }
 
@@ -2042,7 +2042,7 @@ html.windows-mode.light-mode #fixed-app-background-solid,
 html.windows-mode.super-dark #fixed-app-background-solid,
 body.windows-mode #fixed-app-background-solid {
   background-color: #16161a !important;
-  background-image: url('/assets/aistudio/image_9bd7238e.png') !important;
+  background-image: var(--windows-wallpaper-url, url('/assets/aistudio/WIP_Light_184e3e28.png')) !important;
   background-size: cover !important;
   background-position: center !important;
   background-repeat: no-repeat !important;
@@ -5634,32 +5634,31 @@ html.light-mode .text-\[\#a1a1aa\] {
 }
 
 /* 2. Mặc định toàn bộ Icon (SVG, Lucide, Path) ở Light Mode là MÀU ĐEN */
-html.light-mode svg:not(.fluent-3d-icon):not(.fluent-3d-icon *):not(:has(linearGradient)):not(:has(radialGradient)):not(#windows-taskbar-weather-sun),
-html.light-mode .lucide,
-html.light-mode [data-lucide] {
+html.light-mode :where(svg:not(.fluent-3d-icon):not(.fluent-3d-icon *):not(:has(linearGradient)):not(:has(radialGradient)):not(#windows-taskbar-weather-sun), .lucide, [data-lucide]) {
   color: #000000 !important;
   stroke: #000000 !important;
 }
 
-html.light-mode svg:not(:has(linearGradient)):not(:has(radialGradient)):not(#windows-taskbar-weather-sun) path:not(.fluent-3d-icon *),
-html.light-mode svg:not(:has(linearGradient)):not(:has(radialGradient)):not(#windows-taskbar-weather-sun) circle:not([data-spinning-ring="true"]):not([data-progress-ring-track="true"]):not([stroke="#005fb8"]):not([stroke="#4cc2ff"]):not(.fluent-3d-icon *),
-html.light-mode svg:not(:has(linearGradient)):not(:has(radialGradient)):not(#windows-taskbar-weather-sun) rect:not(.fluent-3d-icon *),
-html.light-mode svg:not(:has(linearGradient)):not(:has(radialGradient)):not(#windows-taskbar-weather-sun) line:not(.fluent-3d-icon *),
-html.light-mode svg:not(:has(linearGradient)):not(:has(radialGradient)):not(#windows-taskbar-weather-sun) polyline:not(.fluent-3d-icon *),
-html.light-mode svg:not(:has(linearGradient)):not(:has(radialGradient)):not(#windows-taskbar-weather-sun) polygon:not(.fluent-3d-icon *) {
+html.light-mode :where(svg:not(:has(linearGradient)):not(:has(radialGradient)):not(#windows-taskbar-weather-sun) path:not(.fluent-3d-icon *),
+svg:not(:has(linearGradient)):not(:has(radialGradient)):not(#windows-taskbar-weather-sun) circle:not([data-spinning-ring="true"]):not([data-progress-ring-track="true"]):not([stroke="#005fb8"]):not([stroke="#0063B8"]):not([stroke="#4cc2ff"]):not(.fluent-3d-icon *),
+svg:not(:has(linearGradient)):not(:has(radialGradient)):not(#windows-taskbar-weather-sun) rect:not(.fluent-3d-icon *),
+svg:not(:has(linearGradient)):not(:has(radialGradient)):not(#windows-taskbar-weather-sun) line:not(.fluent-3d-icon *),
+svg:not(:has(linearGradient)):not(:has(radialGradient)):not(#windows-taskbar-weather-sun) polyline:not(.fluent-3d-icon *),
+svg:not(:has(linearGradient)):not(:has(radialGradient)):not(#windows-taskbar-weather-sun) polygon:not(.fluent-3d-icon *),
+svg:not(:has(linearGradient)):not(:has(radialGradient)):not(#windows-taskbar-weather-sun) ellipse:not(.fluent-3d-icon *)) {
   stroke: #000000 !important;
 }
 
-html.light-mode svg:not(:has(linearGradient)).fill-current:not(.fluent-3d-icon *),
-html.light-mode svg:not(:has(linearGradient)) [fill="currentColor"]:not(.fluent-3d-icon *),
-html.light-mode svg:not(:has(linearGradient)) [fill="#FFFFFF"]:not(.fluent-3d-icon *),
-html.light-mode svg:not(:has(linearGradient)) [fill="#fff"]:not(.fluent-3d-icon *),
-html.light-mode svg:not(:has(linearGradient)) [fill="#4cc2ff"]:not(.fluent-3d-icon *),
-html.light-mode svg:not(:has(linearGradient)) [fill="#4CC2FF"]:not(.fluent-3d-icon *),
-html.light-mode svg:not(:has(linearGradient))[fill="#FFFFFF"],
-html.light-mode svg:not(:has(linearGradient))[fill="#fff"],
-html.light-mode svg:not(:has(linearGradient))[fill="#4cc2ff"],
-html.light-mode svg:not(:has(linearGradient))[fill="#4CC2FF"] {
+html.light-mode :where(svg:not(:has(linearGradient)).fill-current:not(.fluent-3d-icon *),
+svg:not(:has(linearGradient)) [fill="currentColor"]:not(.fluent-3d-icon *),
+svg:not(:has(linearGradient)) [fill="#FFFFFF"]:not(.fluent-3d-icon *),
+svg:not(:has(linearGradient)) [fill="#fff"]:not(.fluent-3d-icon *),
+svg:not(:has(linearGradient)) [fill="#4cc2ff"]:not(.fluent-3d-icon *),
+svg:not(:has(linearGradient)) [fill="#4CC2FF"]:not(.fluent-3d-icon *),
+svg:not(:has(linearGradient))[fill="#FFFFFF"],
+svg:not(:has(linearGradient))[fill="#fff"],
+svg:not(:has(linearGradient))[fill="#4cc2ff"],
+svg:not(:has(linearGradient))[fill="#4CC2FF"]) {
   fill: #000000 !important;
 }
 
@@ -5688,20 +5687,30 @@ html.light-mode button.fluent-btn-primary:not(.bg-\[\#5865F2\]),
 html.light-mode button[class*="bg-[#4cc2ff]"],
 html.light-mode button[class*="bg-[#4CC2FF]"],
 html.light-mode button.bg-\[\#4cc2ff\],
+html.light-mode button[class*="bg-[#0063b8]"],
+html.light-mode button[class*="bg-[#0063B8]"],
+html.light-mode button[class*="bg-[#0067b8]"],
+html.light-mode button[class*="bg-[#0067B8]"],
 html.light-mode button[class*="bg-[#005fb8]"],
 html.light-mode button.bg-\[\#005fb8\],
 html.light-mode [role="button"][class*="bg-[#4cc2ff]"],
 html.light-mode [role="button"][class*="bg-[#4CC2FF]"],
 html.light-mode [role="button"].bg-\[\#4cc2ff\],
+html.light-mode [role="button"][class*="bg-[#0063b8]"],
+html.light-mode [role="button"][class*="bg-[#0063B8]"],
 html.light-mode [role="button"][class*="bg-[#005fb8]"],
 html.light-mode [role="button"].bg-\[\#005fb8\],
 html.light-mode a[class*="bg-[#4cc2ff]"],
 html.light-mode a.bg-\[\#4cc2ff\],
+html.light-mode a[class*="bg-[#0063b8]"],
+html.light-mode a[class*="bg-[#0063B8]"],
 html.light-mode a[class*="bg-[#005fb8]"],
 html.light-mode a.bg-\[\#005fb8\],
 html.light-mode .bg-\[\#4cc2ff\],
 html.light-mode [class*="bg-[#4cc2ff]"]:not([class*="bg-[#4cc2ff]/"]),
 html.light-mode [class*="bg-[#4CC2FF]"]:not([class*="bg-[#4CC2FF]/"]),
+html.light-mode [class*="bg-[#0063b8]"]:not([class*="bg-[#0063b8]/"]),
+html.light-mode [class*="bg-[#0063B8]"]:not([class*="bg-[#0063B8]/"]),
 html.light-mode .bg-\[\#005fb8\],
 html.light-mode [class*="bg-[#005fb8]"]:not([class*="bg-[#005fb8]/"]),
 html.light-mode button[role="switch"][aria-checked="true"],
@@ -5722,6 +5731,10 @@ html.light-mode button.fluent-btn-primary:not(.bg-\[\#5865F2\]):hover,
 html.light-mode button[class*="bg-[#4cc2ff]"]:hover,
 html.light-mode button[class*="bg-[#4CC2FF]"]:hover,
 html.light-mode button.bg-\[\#4cc2ff\]:hover,
+html.light-mode button[class*="bg-[#0063b8]"]:hover,
+html.light-mode button[class*="bg-[#0063B8]"]:hover,
+html.light-mode button[class*="bg-[#0067b8]"]:hover,
+html.light-mode button[class*="bg-[#0067B8]"]:hover,
 html.light-mode button[class*="bg-[#005fb8]"]:hover,
 html.light-mode button.bg-\[\#005fb8\]:hover,
 html.light-mode #btn-top-settings-apply-checkbox:hover,
@@ -5730,7 +5743,7 @@ html.light-mode #btn-test-vplay-switch:hover,
 html.light-mode #btn-changelogs-read:hover,
 html.light-mode #btn-update-vplay:hover,
 html.light-mode #btn-welcome-continue:hover {
-  background-color: #0067c0 !important;
+  background-color: #0058a6 !important;
   color: #FFFFFF !important;
 }
 
@@ -5739,6 +5752,10 @@ html.light-mode button.fluent-btn-primary:not(.bg-\[\#5865F2\]):active,
 html.light-mode button[class*="bg-[#4cc2ff]"]:active,
 html.light-mode button[class*="bg-[#4CC2FF]"]:active,
 html.light-mode button.bg-\[\#4cc2ff\]:active,
+html.light-mode button[class*="bg-[#0063b8]"]:active,
+html.light-mode button[class*="bg-[#0063B8]"]:active,
+html.light-mode button[class*="bg-[#0067b8]"]:active,
+html.light-mode button[class*="bg-[#0067B8]"]:active,
 html.light-mode button[class*="bg-[#005fb8]"]:active,
 html.light-mode button.bg-\[\#005fb8\]:active,
 html.light-mode #btn-top-settings-apply-checkbox:active,
@@ -5747,30 +5764,40 @@ html.light-mode #btn-test-vplay-switch:active,
 html.light-mode #btn-changelogs-read:active,
 html.light-mode #btn-update-vplay:active,
 html.light-mode #btn-welcome-continue:active {
-  background-color: #0051a2 !important;
+  background-color: #004c91 !important;
   color: #FFFFFF !important;
 }
 
-/* Chữ trắng trên các nút và thành phần trên màu #005fb8 */
+/* Chữ trắng trên các nút và thành phần trên màu #0063B8 */
 html.light-mode .fluent-btn-primary:not(.bg-\[\#5865F2\]) *,
 html.light-mode button.fluent-btn-primary:not(.bg-\[\#5865F2\]) *,
 html.light-mode button[class*="bg-[#4cc2ff]"] *,
 html.light-mode button[class*="bg-[#4CC2FF]"] *,
 html.light-mode button.bg-\[\#4cc2ff\] *,
+html.light-mode button[class*="bg-[#0063b8]"] *,
+html.light-mode button[class*="bg-[#0063B8]"] *,
+html.light-mode button[class*="bg-[#0067b8]"] *,
+html.light-mode button[class*="bg-[#0067B8]"] *,
 html.light-mode button[class*="bg-[#005fb8]"] *,
 html.light-mode button.bg-\[\#005fb8\] *,
 html.light-mode [role="button"][class*="bg-[#4cc2ff]"] *,
 html.light-mode [role="button"][class*="bg-[#4CC2FF]"] *,
 html.light-mode [role="button"].bg-\[\#4cc2ff\] *,
+html.light-mode [role="button"][class*="bg-[#0063b8]"] *,
+html.light-mode [role="button"][class*="bg-[#0063B8]"] *,
 html.light-mode [role="button"][class*="bg-[#005fb8]"] *,
 html.light-mode [role="button"].bg-\[\#005fb8\] *,
 html.light-mode a[class*="bg-[#4cc2ff]"] *,
 html.light-mode a.bg-\[\#4cc2ff\] *,
+html.light-mode a[class*="bg-[#0063b8]"] *,
+html.light-mode a[class*="bg-[#0063B8]"] *,
 html.light-mode a[class*="bg-[#005fb8]"] *,
 html.light-mode a.bg-\[\#005fb8\] *,
 html.light-mode .bg-\[\#4cc2ff\] *,
 html.light-mode [class*="bg-[#4cc2ff]"]:not([class*="bg-[#4cc2ff]/"]) *,
 html.light-mode [class*="bg-[#4CC2FF]"]:not([class*="bg-[#4CC2FF]/"]) *,
+html.light-mode [class*="bg-[#0063b8]"]:not([class*="bg-[#0063b8]/"]) *,
+html.light-mode [class*="bg-[#0063B8]"]:not([class*="bg-[#0063B8]/"]) *,
 html.light-mode .bg-\[\#005fb8\] *,
 html.light-mode [class*="bg-[#005fb8]"]:not([class*="bg-[#005fb8]/"]) *,
 html.light-mode button[role="switch"][aria-checked="true"] *,
@@ -5786,26 +5813,36 @@ html.light-mode .floaty-bar__item.is-active * {
   color: #FFFFFF !important;
 }
 
-/* Icon trắng trên các nút và thành phần trên màu #005fb8 */
+/* Icon trắng trên các nút và thành phần trên màu #0063B8 */
 html.light-mode .fluent-btn-primary:not(.bg-\[\#5865F2\]) svg,
 html.light-mode button.fluent-btn-primary:not(.bg-\[\#5865F2\]) svg,
 html.light-mode button[class*="bg-[#4cc2ff]"] svg,
 html.light-mode button[class*="bg-[#4CC2FF]"] svg,
 html.light-mode button.bg-\[\#4cc2ff\] svg,
+html.light-mode button[class*="bg-[#0063b8]"] svg,
+html.light-mode button[class*="bg-[#0063B8]"] svg,
+html.light-mode button[class*="bg-[#0067b8]"] svg,
+html.light-mode button[class*="bg-[#0067B8]"] svg,
 html.light-mode button[class*="bg-[#005fb8]"] svg,
 html.light-mode button.bg-\[\#005fb8\] svg,
 html.light-mode [role="button"][class*="bg-[#4cc2ff]"] svg,
 html.light-mode [role="button"][class*="bg-[#4CC2FF]"] svg,
 html.light-mode [role="button"].bg-\[\#4cc2ff\] svg,
+html.light-mode [role="button"][class*="bg-[#0063b8]"] svg,
+html.light-mode [role="button"][class*="bg-[#0063B8]"] svg,
 html.light-mode [role="button"][class*="bg-[#005fb8]"] svg,
 html.light-mode [role="button"].bg-\[\#005fb8\] svg,
 html.light-mode a[class*="bg-[#4cc2ff]"] svg,
 html.light-mode a.bg-\[\#4cc2ff\] svg,
+html.light-mode a[class*="bg-[#0063b8]"] svg,
+html.light-mode a[class*="bg-[#0063B8]"] svg,
 html.light-mode a[class*="bg-[#005fb8]"] svg,
 html.light-mode a.bg-\[\#005fb8\] svg,
 html.light-mode .bg-\[\#4cc2ff\] svg,
 html.light-mode [class*="bg-[#4cc2ff]"]:not([class*="bg-[#4cc2ff]/"]) svg,
 html.light-mode [class*="bg-[#4CC2FF]"]:not([class*="bg-[#4CC2FF]/"]) svg,
+html.light-mode [class*="bg-[#0063b8]"]:not([class*="bg-[#0063b8]/"]) svg,
+html.light-mode [class*="bg-[#0063B8]"]:not([class*="bg-[#0063B8]/"]) svg,
 html.light-mode .bg-\[\#005fb8\] svg,
 html.light-mode [class*="bg-[#005fb8]"]:not([class*="bg-[#005fb8]/"]) svg,
 html.light-mode button[role="switch"][aria-checked="true"] svg,
@@ -5826,20 +5863,30 @@ html.light-mode button.fluent-btn-primary:not(.bg-\[\#5865F2\]) path,
 html.light-mode button[class*="bg-[#4cc2ff]"] path,
 html.light-mode button[class*="bg-[#4CC2FF]"] path,
 html.light-mode button.bg-\[\#4cc2ff\] path,
+html.light-mode button[class*="bg-[#0063b8]"] path,
+html.light-mode button[class*="bg-[#0063B8]"] path,
+html.light-mode button[class*="bg-[#0067b8]"] path,
+html.light-mode button[class*="bg-[#0067B8]"] path,
 html.light-mode button[class*="bg-[#005fb8]"] path,
 html.light-mode button.bg-\[\#005fb8\] path,
 html.light-mode [role="button"][class*="bg-[#4cc2ff]"] path,
 html.light-mode [role="button"][class*="bg-[#4CC2FF]"] path,
 html.light-mode [role="button"].bg-\[\#4cc2ff\] path,
+html.light-mode [role="button"][class*="bg-[#0063b8]"] path,
+html.light-mode [role="button"][class*="bg-[#0063B8]"] path,
 html.light-mode [role="button"][class*="bg-[#005fb8]"] path,
 html.light-mode [role="button"].bg-\[\#005fb8\] path,
 html.light-mode a[class*="bg-[#4cc2ff]"] path,
 html.light-mode a.bg-\[\#4cc2ff\] path,
+html.light-mode a[class*="bg-[#0063b8]"] path,
+html.light-mode a[class*="bg-[#0063B8]"] path,
 html.light-mode a[class*="bg-[#005fb8]"] path,
 html.light-mode a.bg-\[\#005fb8\] path,
 html.light-mode .bg-\[\#4cc2ff\] path,
 html.light-mode [class*="bg-[#4cc2ff]"]:not([class*="bg-[#4cc2ff]/"]) path,
 html.light-mode [class*="bg-[#4CC2FF]"]:not([class*="bg-[#4CC2FF]/"]) path,
+html.light-mode [class*="bg-[#0063b8]"]:not([class*="bg-[#0063b8]/"]) path,
+html.light-mode [class*="bg-[#0063B8]"]:not([class*="bg-[#0063B8]/"]) path,
 html.light-mode .bg-\[\#005fb8\] path,
 html.light-mode [class*="bg-[#005fb8]"]:not([class*="bg-[#005fb8]/"]) path,
 html.light-mode #btn-top-settings-apply-checkbox path,
@@ -5855,11 +5902,15 @@ html.light-mode .floaty-bar__item.is-active path {
 html.light-mode .fluent-btn-primary:not(.bg-\[\#5865F2\]) svg.fill-current,
 html.light-mode button.fluent-btn-primary:not(.bg-\[\#5865F2\]) svg.fill-current,
 html.light-mode button[class*="bg-[#4cc2ff]"] svg.fill-current,
+html.light-mode button[class*="bg-[#0063b8]"] svg.fill-current,
+html.light-mode button[class*="bg-[#0063B8]"] svg.fill-current,
 html.light-mode button[class*="bg-[#005fb8]"] svg.fill-current,
 html.light-mode .floaty-bar__item.is-active svg.fill-current,
 html.light-mode .fluent-btn-primary:not(.bg-\[\#5865F2\]) svg [fill="currentColor"],
 html.light-mode button.fluent-btn-primary:not(.bg-\[\#5865F2\]) svg [fill="currentColor"],
 html.light-mode button[class*="bg-[#4cc2ff]"] svg [fill="currentColor"],
+html.light-mode button[class*="bg-[#0063b8]"] svg [fill="currentColor"],
+html.light-mode button[class*="bg-[#0063B8]"] svg [fill="currentColor"],
 html.light-mode button[class*="bg-[#005fb8]"] svg [fill="currentColor"],
 html.light-mode .floaty-bar__item.is-active svg [fill="currentColor"] {
   fill: #FFFFFF !important;
@@ -5869,19 +5920,19 @@ html.light-mode .floaty-bar__item.is-active img {
   filter: brightness(0) invert(1) !important;
 }
 
-/* 4. Viền border-[#4cc2ff] chuyển sang #005fb8 ở Light Mode */
+/* 4. Viền border-[#4cc2ff] chuyển sang #0063B8 ở Light Mode */
 html.light-mode .border-\[\#4cc2ff\],
 html.light-mode [class*="border-[#4cc2ff]"],
 html.light-mode .border-\[\#4CC2FF\],
 html.light-mode [class*="border-[#4CC2FF]"] {
-  border-color: #005fb8 !important;
+  border-color: #0063B8 !important;
 }
 
 html.light-mode .border-b-\[\#4cc2ff\],
 html.light-mode [class*="border-b-[#4cc2ff]"],
 html.light-mode .border-b-\[\#4CC2FF\],
 html.light-mode [class*="border-b-[#4CC2FF]"] {
-  border-bottom-color: #005fb8 !important;
+  border-bottom-color: #0063B8 !important;
 }
 
 /* 5. Vòng xoay tiến trình Thick Spinning Ring thích ứng Light Mode (ngoại trừ splash screen khởi động) */
@@ -8888,11 +8939,11 @@ html.light-mode #topbar-search-box::before {
 }
 
 /* Standalone input elements across the app synchronized with TopBar search style */
-input[type="text"]:not(#topbar-search-box input):not(#windows-taskbar-search-box input):not(#windows-taskbar-search-flyout input):not(#windows-direct-command-flyout input):not(#windows-start-search-box input):not(.fluent-search-box input):not(.fluent-input-box input):not([type="range"]):not([type="checkbox"]):not([type="radio"]):not(#floating-search-input),
+input[type="text"]:not(#topbar-search-box input):not(#windows-taskbar-search-box input):not(#windows-taskbar-search-flyout input):not(#windows-direct-command-flyout input):not(#windows-start-search-box input):not(#fe-search-box input):not(#fe-address-box input):not(.fluent-search-box input):not(.fluent-input-box input):not([type="range"]):not([type="checkbox"]):not([type="radio"]):not(#floating-search-input),
 input[type="email"]:not(.fluent-search-box input):not(.fluent-input-box input),
 input[type="password"]:not(.fluent-search-box input):not(.fluent-input-box input),
-input[type="search"]:not(#floating-search-input):not(#topbar-search-box input):not(#windows-taskbar-search-box input):not(#windows-taskbar-search-flyout input):not(#windows-direct-command-flyout input):not(#windows-start-search-box input):not(.fluent-search-box input):not(.fluent-input-box input),
-input[type="url"]:not(#floating-search-input):not(.fluent-search-box input):not(.fluent-input-box input) {
+input[type="search"]:not(#floating-search-input):not(#topbar-search-box input):not(#windows-taskbar-search-box input):not(#windows-taskbar-search-flyout input):not(#windows-direct-command-flyout input):not(#windows-start-search-box input):not(#fe-search-box input):not(#fe-address-box input):not(.fluent-search-box input):not(.fluent-input-box input),
+input[type="url"]:not(#floating-search-input):not(#fe-search-box input):not(#fe-address-box input):not(.fluent-search-box input):not(.fluent-input-box input) {
   background-color: #282c31 !important;
   border: none !important;
   border-bottom: 2px solid rgba(255, 255, 255, 0.45) !important;
@@ -8903,21 +8954,21 @@ input[type="url"]:not(#floating-search-input):not(.fluent-search-box input):not(
   transition: background-color 0.2s ease, border-bottom-color 0.2s ease !important;
 }
 
-input[type="text"]:focus:not(#topbar-search-box input):not(#windows-taskbar-search-box input):not(#windows-taskbar-search-flyout input):not(#windows-direct-command-flyout input):not(#windows-start-search-box input):not(.fluent-search-box input):not(.fluent-input-box input):not([type="range"]):not([type="checkbox"]):not([type="radio"]):not(#floating-search-input),
+input[type="text"]:focus:not(#topbar-search-box input):not(#windows-taskbar-search-box input):not(#windows-taskbar-search-flyout input):not(#windows-direct-command-flyout input):not(#windows-start-search-box input):not(#fe-search-box input):not(#fe-address-box input):not(.fluent-search-box input):not(.fluent-input-box input):not([type="range"]):not([type="checkbox"]):not([type="radio"]):not(#floating-search-input),
 input[type="email"]:focus:not(.fluent-search-box input):not(.fluent-input-box input),
 input[type="password"]:focus:not(.fluent-search-box input):not(.fluent-input-box input),
-input[type="search"]:focus:not(#floating-search-input):not(#topbar-search-box input):not(#windows-taskbar-search-box input):not(#windows-taskbar-search-flyout input):not(#windows-direct-command-flyout input):not(#windows-start-search-box input):not(.fluent-search-box input):not(.fluent-input-box input),
-input[type="url"]:focus:not(#floating-search-input):not(.fluent-search-box input):not(.fluent-input-box input) {
+input[type="search"]:focus:not(#floating-search-input):not(#topbar-search-box input):not(#windows-taskbar-search-box input):not(#windows-taskbar-search-flyout input):not(#windows-direct-command-flyout input):not(#windows-start-search-box input):not(#fe-search-box input):not(#fe-address-box input):not(.fluent-search-box input):not(.fluent-input-box input),
+input[type="url"]:focus:not(#floating-search-input):not(#fe-search-box input):not(#fe-address-box input):not(.fluent-search-box input):not(.fluent-input-box input) {
   background-color: #282c31 !important;
   border-bottom: 2px solid var(--ui-accent, #4cc2ff) !important;
   outline: none !important;
 }
 
-html.light-mode input[type="text"]:not(#topbar-search-box input):not(#windows-taskbar-search-box input):not(#windows-taskbar-search-flyout input):not(#windows-direct-command-flyout input):not(#windows-start-search-box input):not(.fluent-search-box input):not(.fluent-input-box input):not([type="range"]):not([type="checkbox"]):not([type="radio"]):not(#floating-search-input),
+html.light-mode input[type="text"]:not(#topbar-search-box input):not(#windows-taskbar-search-box input):not(#windows-taskbar-search-flyout input):not(#windows-direct-command-flyout input):not(#windows-start-search-box input):not(#fe-search-box input):not(#fe-address-box input):not(.fluent-search-box input):not(.fluent-input-box input):not([type="range"]):not([type="checkbox"]):not([type="radio"]):not(#floating-search-input),
 html.light-mode input[type="email"]:not(.fluent-search-box input):not(.fluent-input-box input),
 html.light-mode input[type="password"]:not(.fluent-search-box input):not(.fluent-input-box input),
-html.light-mode input[type="search"]:not(#floating-search-input):not(#topbar-search-box input):not(#windows-taskbar-search-box input):not(#windows-taskbar-search-flyout input):not(#windows-direct-command-flyout input):not(#windows-start-search-box input):not(.fluent-search-box input):not(.fluent-input-box input),
-html.light-mode input[type="url"]:not(#floating-search-input):not(.fluent-search-box input):not(.fluent-input-box input) {
+html.light-mode input[type="search"]:not(#floating-search-input):not(#topbar-search-box input):not(#windows-taskbar-search-box input):not(#windows-taskbar-search-flyout input):not(#windows-direct-command-flyout input):not(#windows-start-search-box input):not(#fe-search-box input):not(#fe-address-box input):not(.fluent-search-box input):not(.fluent-input-box input),
+html.light-mode input[type="url"]:not(#floating-search-input):not(#fe-search-box input):not(#fe-address-box input):not(.fluent-search-box input):not(.fluent-input-box input) {
   background-color: #fbfbfb !important;
   background: #fbfbfb !important;
   opacity: 1 !important;
@@ -8928,11 +8979,11 @@ html.light-mode input[type="url"]:not(#floating-search-input):not(.fluent-search
   outline: none !important;
 }
 
-html.light-mode input[type="text"]:focus:not(#topbar-search-box input):not(#windows-taskbar-search-box input):not(#windows-taskbar-search-flyout input):not(#windows-direct-command-flyout input):not(#windows-start-search-box input):not(.fluent-search-box input):not(.fluent-input-box input):not([type="range"]):not([type="checkbox"]):not([type="radio"]):not(#floating-search-input),
+html.light-mode input[type="text"]:focus:not(#topbar-search-box input):not(#windows-taskbar-search-box input):not(#windows-taskbar-search-flyout input):not(#windows-direct-command-flyout input):not(#windows-start-search-box input):not(#fe-search-box input):not(#fe-address-box input):not(.fluent-search-box input):not(.fluent-input-box input):not([type="range"]):not([type="checkbox"]):not([type="radio"]):not(#floating-search-input),
 html.light-mode input[type="email"]:focus:not(.fluent-search-box input):not(.fluent-input-box input),
 html.light-mode input[type="password"]:focus:not(.fluent-search-box input):not(.fluent-input-box input),
-html.light-mode input[type="search"]:focus:not(#floating-search-input):not(#topbar-search-box input):not(#windows-taskbar-search-box input):not(#windows-taskbar-search-flyout input):not(#windows-direct-command-flyout input):not(#windows-start-search-box input):not(.fluent-search-box input):not(.fluent-input-box input),
-html.light-mode input[type="url"]:focus:not(#floating-search-input):not(.fluent-search-box input):not(.fluent-input-box input) {
+html.light-mode input[type="search"]:focus:not(#floating-search-input):not(#topbar-search-box input):not(#windows-taskbar-search-box input):not(#windows-taskbar-search-flyout input):not(#windows-direct-command-flyout input):not(#windows-start-search-box input):not(#fe-search-box input):not(#fe-address-box input):not(.fluent-search-box input):not(.fluent-input-box input),
+html.light-mode input[type="url"]:focus:not(#floating-search-input):not(#fe-search-box input):not(#fe-address-box input):not(.fluent-search-box input):not(.fluent-input-box input) {
   background-color: #ffffff !important;
   background: #ffffff !important;
   opacity: 1 !important;
@@ -8945,45 +8996,45 @@ html.light-mode input[type="url"]:focus:not(#floating-search-input):not(.fluent-
   z-index: 2147483647 !important;
 }
 
-/* Normalize blue UI accents to the requested theme accent. */
+/* Normalize blue UI accents to the requested theme accent (#4CC2FF dark / #0063B8 light). */
 :root {
   --ui-accent: #4cc2ff;
 }
 
 html.light-mode {
-  --ui-accent: #0067b8;
+  --ui-accent: #0063B8;
 }
 
-:is([class*="bg-[#4cc2ff]"], [class*="bg-[#6bd0ff]"], [class*="bg-[#3bb2ef]"], [class*="bg-[#75d5ff]"], [class*="bg-[#005fb8]"], [class*="bg-[#0067c0]"], [class*="bg-[#00458b]"], [class*="bg-[#0051a2]"], [class*="bg-[#0078d4]"], [class*="bg-[#106ebe]"], [class*="bg-[#5865F2]"], [class*="bg-[#4752C4]"], [class*="bg-blue-"], [class*="bg-sky-"], [class*="bg-cyan-"], [class*="bg-indigo-"]) {
+:is([class*="bg-[#4cc2ff]"]:not([class*="bg-[#4cc2ff]/"]), [class*="bg-[#4CC2FF]"]:not([class*="bg-[#4CC2FF]/"]), [class*="bg-[#6bd0ff]"], [class*="bg-[#3bb2ef]"], [class*="bg-[#75d5ff]"], [class*="bg-[#0063b8]"]:not([class*="bg-[#0063b8]/"]), [class*="bg-[#0063B8]"]:not([class*="bg-[#0063B8]/"]), [class*="bg-[#0067b8]"]:not([class*="bg-[#0067b8]/"]), [class*="bg-[#0067B8]"]:not([class*="bg-[#0067B8]/"]), [class*="bg-[#005fb8]"]:not([class*="bg-[#005fb8]/"]), [class*="bg-[#0067c0]"], [class*="bg-[#00458b]"], [class*="bg-[#0051a2]"], [class*="bg-[#0078d4]"], [class*="bg-[#106ebe]"], [class*="bg-[#5865F2]"], [class*="bg-[#4752C4]"], [class*="bg-blue-"], [class*="bg-sky-"], [class*="bg-cyan-"], [class*="bg-indigo-"]) {
   background-color: var(--ui-accent) !important;
   background-image: none !important;
 }
 
-:is([class*="text-[#4cc2ff]"], [class*="text-[#6bd0ff]"], [class*="text-[#3bb2ef]"], [class*="text-[#75d5ff]"], [class*="text-[#005fb8]"], [class*="text-[#0067c0]"], [class*="text-[#00458b]"], [class*="text-[#0051a2]"], [class*="text-[#0078d4]"], [class*="text-[#106ebe]"], [class*="text-[#5865F2]"], [class*="text-[#4752C4]"], [class*="text-blue-"], [class*="text-sky-"], [class*="text-cyan-"], [class*="text-indigo-"]) {
+:is([class*="text-[#4cc2ff]"], [class*="text-[#4CC2FF]"], [class*="text-[#6bd0ff]"], [class*="text-[#3bb2ef]"], [class*="text-[#75d5ff]"], [class*="text-[#0063b8]"], [class*="text-[#0063B8]"], [class*="text-[#0067b8]"], [class*="text-[#0067B8]"], [class*="text-[#005fb8]"], [class*="text-[#0067c0]"], [class*="text-[#00458b]"], [class*="text-[#0051a2]"], [class*="text-[#0078d4]"], [class*="text-[#106ebe]"], [class*="text-[#5865F2]"], [class*="text-[#4752C4]"], [class*="text-blue-"], [class*="text-sky-"], [class*="text-cyan-"], [class*="text-indigo-"]) {
   color: var(--ui-accent) !important;
 }
 
-:is([class*="border-[#4cc2ff]"], [class*="border-[#6bd0ff]"], [class*="border-[#3bb2ef]"], [class*="border-[#75d5ff]"], [class*="border-[#005fb8]"], [class*="border-[#0067c0]"], [class*="border-[#00458b]"], [class*="border-[#0051a2]"], [class*="border-[#0078d4]"], [class*="border-[#106ebe]"], [class*="border-[#5865F2]"], [class*="border-[#4752C4]"], [class*="border-blue-"], [class*="border-sky-"], [class*="border-cyan-"], [class*="border-indigo-"]) {
+:is([class*="border-[#4cc2ff]"], [class*="border-[#4CC2FF]"], [class*="border-[#6bd0ff]"], [class*="border-[#3bb2ef]"], [class*="border-[#75d5ff]"], [class*="border-[#0063b8]"], [class*="border-[#0063B8]"], [class*="border-[#0067b8]"], [class*="border-[#0067B8]"], [class*="border-[#005fb8]"], [class*="border-[#0067c0]"], [class*="border-[#00458b]"], [class*="border-[#0051a2]"], [class*="border-[#0078d4]"], [class*="border-[#106ebe]"], [class*="border-[#5865F2]"], [class*="border-[#4752C4]"], [class*="border-blue-"], [class*="border-sky-"], [class*="border-cyan-"], [class*="border-indigo-"]) {
   border-color: var(--ui-accent) !important;
 }
 
-:is([class*="outline-[#4cc2ff]"], [class*="outline-[#005fb8]"], [class*="outline-[#0078d4]"], [class*="outline-blue-"], [class*="outline-sky-"], [class*="outline-cyan-"]) {
+:is([class*="outline-[#4cc2ff]"], [class*="outline-[#4CC2FF]"], [class*="outline-[#0063b8]"], [class*="outline-[#0063B8]"], [class*="outline-[#0067b8]"], [class*="outline-[#005fb8]"], [class*="outline-[#0078d4]"], [class*="outline-blue-"], [class*="outline-sky-"], [class*="outline-cyan-"]) {
   outline-color: var(--ui-accent) !important;
 }
 
-:is([class*="ring-[#4cc2ff]"], [class*="ring-[#005fb8]"], [class*="ring-[#0078d4]"], [class*="ring-blue-"], [class*="ring-sky-"], [class*="ring-cyan-"]) {
+:is([class*="ring-[#4cc2ff]"], [class*="ring-[#4CC2FF]"], [class*="ring-[#0063b8]"], [class*="ring-[#0063B8]"], [class*="ring-[#0067b8]"], [class*="ring-[#005fb8]"], [class*="ring-[#0078d4]"], [class*="ring-blue-"], [class*="ring-sky-"], [class*="ring-cyan-"]) {
   --tw-ring-color: var(--ui-accent) !important;
 }
 
-:is([class*="accent-[#4cc2ff]"], [class*="accent-[#6bd0ff]"], [class*="accent-[#3bb2ef]"], [class*="accent-[#75d5ff]"], [class*="accent-[#005fb8]"], [class*="accent-[#0067c0]"], [class*="accent-[#00458b]"], [class*="accent-[#0051a2]"], [class*="accent-[#0078d4]"], [class*="accent-[#106ebe]"], [class*="accent-blue-"], [class*="accent-sky-"], [class*="accent-cyan-"], .winui-checkbox, .winui-slider, .winui3 input[type="checkbox"], .winui3 input[type="radio"], .winui3 input[type="range"]) {
+:is([class*="accent-[#4cc2ff]"], [class*="accent-[#4CC2FF]"], [class*="accent-[#6bd0ff]"], [class*="accent-[#3bb2ef]"], [class*="accent-[#75d5ff]"], [class*="accent-[#0063b8]"], [class*="accent-[#0063B8]"], [class*="accent-[#0067b8]"], [class*="accent-[#005fb8]"], [class*="accent-[#0067c0]"], [class*="accent-[#00458b]"], [class*="accent-[#0051a2]"], [class*="accent-[#0078d4]"], [class*="accent-[#106ebe]"], [class*="accent-blue-"], [class*="accent-sky-"], [class*="accent-cyan-"], .winui-checkbox, .winui-slider, .winui3 input[type="checkbox"], .winui3 input[type="radio"], .winui3 input[type="range"]) {
   accent-color: var(--ui-accent) !important;
 }
 
-:is([class*="fill-[#4cc2ff]"], [class*="fill-[#6bd0ff]"], [class*="fill-[#3bb2ef]"], [class*="fill-[#75d5ff]"], [class*="fill-[#005fb8]"], [class*="fill-[#0067c0]"], [class*="fill-[#00458b]"], [class*="fill-[#0051a2]"], [class*="fill-[#0078d4]"], [class*="fill-[#106ebe]"], [class*="fill-blue-"], [class*="fill-sky-"], [class*="fill-cyan-"]) {
+:is([class*="fill-[#4cc2ff]"], [class*="fill-[#4CC2FF]"], [class*="fill-[#6bd0ff]"], [class*="fill-[#3bb2ef]"], [class*="fill-[#75d5ff]"], [class*="fill-[#0063b8]"], [class*="fill-[#0063B8]"], [class*="fill-[#0067b8]"], [class*="fill-[#005fb8]"], [class*="fill-[#0067c0]"], [class*="fill-[#00458b]"], [class*="fill-[#0051a2]"], [class*="fill-[#0078d4]"], [class*="fill-[#106ebe]"], [class*="fill-blue-"], [class*="fill-sky-"], [class*="fill-cyan-"]) {
   fill: var(--ui-accent) !important;
 }
 
-:is([class*="stroke-[#4cc2ff]"], [class*="stroke-[#6bd0ff]"], [class*="stroke-[#3bb2ef]"], [class*="stroke-[#75d5ff]"], [class*="stroke-[#005fb8]"], [class*="stroke-[#0067c0]"], [class*="stroke-[#00458b]"], [class*="stroke-[#0051a2]"], [class*="stroke-[#0078d4]"], [class*="stroke-[#106ebe]"], [class*="stroke-blue-"], [class*="stroke-sky-"], [class*="stroke-cyan-"]) {
+:is([class*="stroke-[#4cc2ff]"], [class*="stroke-[#4CC2FF]"], [class*="stroke-[#6bd0ff]"], [class*="stroke-[#3bb2ef]"], [class*="stroke-[#75d5ff]"], [class*="stroke-[#0063b8]"], [class*="stroke-[#0063B8]"], [class*="stroke-[#0067b8]"], [class*="stroke-[#005fb8]"], [class*="stroke-[#0067c0]"], [class*="stroke-[#00458b]"], [class*="stroke-[#0051a2]"], [class*="stroke-[#0078d4]"], [class*="stroke-[#106ebe]"], [class*="stroke-blue-"], [class*="stroke-sky-"], [class*="stroke-cyan-"]) {
   stroke: var(--ui-accent) !important;
 }
 
@@ -9017,23 +9068,23 @@ html.light-mode .fluent-input-box::before,
   background-color: var(--ui-accent) !important;
 }
 
-:is([class*="rgba(76,194,255"], [class*="rgba(76, 194, 255"], [class*="rgba(0,95,184"], [class*="rgba(0, 95, 184"], [class*="rgba(0,120,212"], [class*="rgba(0, 120, 212"]) {
+:is([class*="rgba(76,194,255"], [class*="rgba(76, 194, 255"], [class*="rgba(0,95,184"], [class*="rgba(0, 95, 184"], [class*="rgba(0,99,184"], [class*="rgba(0, 99, 184"], [class*="rgba(0,120,212"], [class*="rgba(0, 120, 212"]) {
   box-shadow: 0 0 12px color-mix(in srgb, var(--ui-accent) 45%, transparent) !important;
 }
 
-:is([fill="#4cc2ff"], [fill="#6bd0ff"], [fill="#3bb2ef"], [fill="#75d5ff"], [fill="#005fb8"], [fill="#0067c0"], [fill="#00458b"], [fill="#0051a2"], [fill="#0078d4"], [fill="#106ebe"]) {
+:is([fill="#4cc2ff"], [fill="#4CC2FF"], [fill="#6bd0ff"], [fill="#3bb2ef"], [fill="#75d5ff"], [fill="#0063b8"], [fill="#0063B8"], [fill="#0067b8"], [fill="#005fb8"], [fill="#0067c0"], [fill="#00458b"], [fill="#0051a2"], [fill="#0078d4"], [fill="#106ebe"]) {
   fill: var(--ui-accent) !important;
 }
 
-:is([stroke="#4cc2ff"], [stroke="#6bd0ff"], [stroke="#3bb2ef"], [stroke="#75d5ff"], [stroke="#005fb8"], [stroke="#0067c0"], [stroke="#00458b"], [stroke="#0051a2"], [stroke="#0078d4"], [stroke="#106ebe"]) {
+:is([stroke="#4cc2ff"], [stroke="#4CC2FF"], [stroke="#6bd0ff"], [stroke="#3bb2ef"], [stroke="#75d5ff"], [stroke="#0063b8"], [stroke="#0063B8"], [stroke="#0067b8"], [stroke="#005fb8"], [stroke="#0067c0"], [stroke="#00458b"], [stroke="#0051a2"], [stroke="#0078d4"], [stroke="#106ebe"]) {
   stroke: var(--ui-accent) !important;
 }
 
-:is([style*="color: #4cc2ff"], [style*="color:#4cc2ff"], [style*="color: #005fb8"], [style*="color:#005fb8"], [style*="color: #0078d4"], [style*="color:#0078d4"], [style*="color: rgb(76, 194, 255)"], [style*="color: rgb(0, 95, 184)"], [style*="color: rgb(0, 120, 212)"]) {
+:is([style*="color: #4cc2ff"], [style*="color:#4cc2ff"], [style*="color: #4CC2FF"], [style*="color:#4CC2FF"], [style*="color: #0063b8"], [style*="color:#0063b8"], [style*="color: #0063B8"], [style*="color:#0063B8"], [style*="color: #0067b8"], [style*="color:#0067b8"], [style*="color: #005fb8"], [style*="color:#005fb8"], [style*="color: #0078d4"], [style*="color:#0078d4"], [style*="color: rgb(76, 194, 255)"], [style*="color: rgb(0, 95, 184)"], [style*="color: rgb(0, 99, 184)"], [style*="color: rgb(0, 103, 184)"], [style*="color: rgb(0, 120, 212)"]) {
   color: var(--ui-accent) !important;
 }
 
-:is([style*="background-color: #4cc2ff"], [style*="background-color:#4cc2ff"], [style*="background-color: #005fb8"], [style*="background-color:#005fb8"], [style*="background-color: #0078d4"], [style*="background-color:#0078d4"], [style*="background-color: rgb(76, 194, 255)"], [style*="background-color: rgb(0, 95, 184)"], [style*="background-color: rgb(0, 120, 212)"]) {
+:is([style*="background-color: #4cc2ff"], [style*="background-color:#4cc2ff"], [style*="background-color: #4CC2FF"], [style*="background-color:#4CC2FF"], [style*="background-color: #0063b8"], [style*="background-color:#0063b8"], [style*="background-color: #0063B8"], [style*="background-color:#0063B8"], [style*="background-color: #0067b8"], [style*="background-color:#0067b8"], [style*="background-color: #005fb8"], [style*="background-color:#005fb8"], [style*="background-color: #0078d4"], [style*="background-color:#0078d4"], [style*="background-color: rgb(76, 194, 255)"], [style*="background-color: rgb(0, 95, 184)"], [style*="background-color: rgb(0, 99, 184)"], [style*="background-color: rgb(0, 103, 184)"], [style*="background-color: rgb(0, 120, 212)"]) {
   background-color: var(--ui-accent) !important;
   background-image: none !important;
 }
@@ -9045,6 +9096,7 @@ html.light-mode .winui3-light,
   --winui-primary-hover: var(--ui-accent);
 }
 
+/* WinUI 3 Contrast Rule: white text & icons on #0063B8, black text & icons on #4CC2FF */
 html.light-mode .fluent-btn-primary,
 html.light-mode .fluent-btn-primary *,
 html.light-mode #btn-top-settings-apply-checkbox,
@@ -9055,17 +9107,175 @@ html.light-mode #btn-add-stream-submit,
 html.light-mode #btn-add-stream-submit *,
 html.light-mode .btn-fd932f,
 html.light-mode .btn-fd932f *,
-html.light-mode button[class*="bg-[#4cc2ff]"],
-html.light-mode button[class*="bg-[#4cc2ff]"] *,
-html.light-mode button[class*="bg-[#0067b8]"],
-html.light-mode button[class*="bg-[#0067b8]"] *,
-html.light-mode button[class*="bg-[#0067B8]"],
-html.light-mode button[class*="bg-[#0067B8]"] *,
-html.light-mode button[class*="bg-[#005fb8]"],
-html.light-mode button[class*="bg-[#005fb8]"] *,
-html.light-mode button[class*="bg-[#0078d4]"],
-html.light-mode button[class*="bg-[#0078d4]"] * {
+html.light-mode button[class*="bg-[#4cc2ff]"]:not([class*="bg-[#4cc2ff]/"]),
+html.light-mode button[class*="bg-[#4cc2ff]"]:not([class*="bg-[#4cc2ff]/"]) *,
+html.light-mode button[class*="bg-[#4CC2FF]"]:not([class*="bg-[#4CC2FF]/"]),
+html.light-mode button[class*="bg-[#4CC2FF]"]:not([class*="bg-[#4CC2FF]/"]) *,
+html.light-mode button[class*="bg-[#0063b8]"]:not([class*="bg-[#0063b8]/"]),
+html.light-mode button[class*="bg-[#0063b8]"]:not([class*="bg-[#0063b8]/"]) *,
+html.light-mode button[class*="bg-[#0063B8]"]:not([class*="bg-[#0063B8]/"]),
+html.light-mode button[class*="bg-[#0063B8]"]:not([class*="bg-[#0063B8]/"]) *,
+html.light-mode button[class*="bg-[#0067b8]"]:not([class*="bg-[#0067b8]/"]),
+html.light-mode button[class*="bg-[#0067b8]"]:not([class*="bg-[#0067b8]/"]) *,
+html.light-mode button[class*="bg-[#0067B8]"]:not([class*="bg-[#0067B8]/"]),
+html.light-mode button[class*="bg-[#0067B8]"]:not([class*="bg-[#0067B8]/"]) *,
+html.light-mode button[class*="bg-[#005fb8]"]:not([class*="bg-[#005fb8]/"]),
+html.light-mode button[class*="bg-[#005fb8]"]:not([class*="bg-[#005fb8]/"]) *,
+html.light-mode button[class*="bg-[#0078d4]"]:not([class*="bg-[#0078d4]/"]),
+html.light-mode button[class*="bg-[#0078d4]"]:not([class*="bg-[#0078d4]/"]) *,
+html.light-mode [class*="bg-[#0063B8]"]:not([class*="bg-[#0063B8]/"]) :not(.fluent-3d-icon),
+html.light-mode [class*="bg-[#0063b8]"]:not([class*="bg-[#0063b8]/"]) :not(.fluent-3d-icon),
+html.light-mode [style*="background-color: #0063B8"]:not(.fluent-3d-icon),
+html.light-mode [style*="background-color: #0063B8"]:not(.fluent-3d-icon) *,
+html.light-mode [style*="background-color: #0063b8"]:not(.fluent-3d-icon),
+html.light-mode [style*="background-color: #0063b8"]:not(.fluent-3d-icon) *,
+html.light-mode [style*="background-color: rgb(0, 99, 184)"]:not(.fluent-3d-icon),
+html.light-mode [style*="background-color: rgb(0, 99, 184)"]:not(.fluent-3d-icon) * {
   color: #ffffff !important;
+}
+
+/* Light mode: mọi SVG shape và IMG icon trên nền #0063B8 đều đổi sang overlay màu trắng */
+html.light-mode :is(
+  .fluent-btn-primary:not(.bg-\[\#5865F2\]),
+  #btn-top-settings-apply-checkbox,
+  #btn-hero-watch-now,
+  #btn-add-stream-submit,
+  #btn-fe-import-device,
+  #btn-livetv-add-custom-channel,
+  .btn-fd932f,
+  .floaty-bar__item.is-active,
+  [class*="bg-[#0063B8]"]:not([class*="bg-[#0063B8]/"]),
+  [class*="bg-[#0063b8]"]:not([class*="bg-[#0063b8]/"]),
+  [class*="bg-[#0067b8]"]:not([class*="bg-[#0067b8]/"]),
+  [class*="bg-[#0067B8]"]:not([class*="bg-[#0067B8]/"]),
+  [class*="bg-[#005fb8]"]:not([class*="bg-[#005fb8]/"]),
+  [class*="bg-[#0078d4]"]:not([class*="bg-[#0078d4]/"]),
+  [class*="bg-[#4cc2ff]"]:not([class*="bg-[#4cc2ff]/"]),
+  [class*="bg-[#4CC2FF]"]:not([class*="bg-[#4CC2FF]/"]),
+  [style*="background-color: #0063B8"],
+  [style*="background-color: #0063b8"],
+  [style*="background-color: rgb(0, 99, 184)"]
+) :is(svg, svg path, svg circle, svg rect, svg line, svg polyline, svg polygon, svg ellipse) {
+  color: #ffffff !important;
+  stroke: #ffffff !important;
+}
+
+html.light-mode :is(
+  .fluent-btn-primary:not(.bg-\[\#5865F2\]),
+  #btn-top-settings-apply-checkbox,
+  #btn-hero-watch-now,
+  #btn-add-stream-submit,
+  #btn-fe-import-device,
+  #btn-livetv-add-custom-channel,
+  .btn-fd932f,
+  .floaty-bar__item.is-active,
+  [class*="bg-[#0063B8]"]:not([class*="bg-[#0063B8]/"]),
+  [class*="bg-[#0063b8]"]:not([class*="bg-[#0063b8]/"]),
+  [class*="bg-[#0067b8]"]:not([class*="bg-[#0067b8]/"]),
+  [class*="bg-[#0067B8]"]:not([class*="bg-[#0067B8]/"]),
+  [class*="bg-[#005fb8]"]:not([class*="bg-[#005fb8]/"]),
+  [class*="bg-[#0078d4]"]:not([class*="bg-[#0078d4]/"]),
+  [class*="bg-[#4cc2ff]"]:not([class*="bg-[#4cc2ff]/"]),
+  [class*="bg-[#4CC2FF]"]:not([class*="bg-[#4CC2FF]/"]),
+  [style*="background-color: #0063B8"],
+  [style*="background-color: #0063b8"],
+  [style*="background-color: rgb(0, 99, 184)"]
+) :is(svg.fill-current, svg [fill]:not([fill="none"]):not([fill="transparent"])) {
+  fill: #ffffff !important;
+}
+
+html.light-mode :is(
+  .fluent-btn-primary:not(.bg-\[\#5865F2\]),
+  #btn-top-settings-apply-checkbox,
+  #btn-hero-watch-now,
+  #btn-add-stream-submit,
+  #btn-fe-import-device,
+  #btn-livetv-add-custom-channel,
+  .btn-fd932f,
+  .floaty-bar__item.is-active,
+  [class*="bg-[#0063B8]"]:not([class*="bg-[#0063B8]/"]),
+  [class*="bg-[#0063b8]"]:not([class*="bg-[#0063b8]/"]),
+  [class*="bg-[#0067b8]"]:not([class*="bg-[#0067b8]/"]),
+  [class*="bg-[#0067B8]"]:not([class*="bg-[#0067B8]/"]),
+  [class*="bg-[#005fb8]"]:not([class*="bg-[#005fb8]/"]),
+  [class*="bg-[#0078d4]"]:not([class*="bg-[#0078d4]/"]),
+  [class*="bg-[#4cc2ff]"]:not([class*="bg-[#4cc2ff]/"]),
+  [class*="bg-[#4CC2FF]"]:not([class*="bg-[#4CC2FF]/"]),
+  [style*="background-color: #0063B8"],
+  [style*="background-color: #0063b8"],
+  [style*="background-color: rgb(0, 99, 184)"]
+) img {
+  filter: brightness(0) invert(1) !important;
+}
+
+html.light-mode :is(
+  .fluent-btn-primary:not(.bg-\[\#5865F2\]),
+  #btn-top-settings-apply-checkbox,
+  #btn-hero-watch-now,
+  #btn-add-stream-submit,
+  #btn-fe-import-device,
+  #btn-livetv-add-custom-channel,
+  .btn-fd932f,
+  .floaty-bar__item.is-active,
+  [class*="bg-[#0063B8]"]:not([class*="bg-[#0063B8]/"]),
+  [class*="bg-[#0063b8]"]:not([class*="bg-[#0063b8]/"]),
+  [class*="bg-[#0067b8]"]:not([class*="bg-[#0067b8]/"]),
+  [class*="bg-[#0067B8]"]:not([class*="bg-[#0067B8]/"]),
+  [class*="bg-[#005fb8]"]:not([class*="bg-[#005fb8]/"]),
+  [class*="bg-[#0078d4]"]:not([class*="bg-[#0078d4]/"]),
+  [class*="bg-[#4cc2ff]"]:not([class*="bg-[#4cc2ff]/"]),
+  [class*="bg-[#4CC2FF]"]:not([class*="bg-[#4CC2FF]/"]),
+  [style*="background-color: #0063B8"],
+  [style*="background-color: #0063b8"],
+  [style*="background-color: rgb(0, 99, 184)"]
+) div[style*="mask-image"] {
+  background-color: #ffffff !important;
+}
+
+html:not(.light-mode) .fluent-btn-primary,
+html:not(.light-mode) .fluent-btn-primary *,
+html:not(.light-mode) #btn-top-settings-apply-checkbox,
+html:not(.light-mode) #btn-top-settings-apply-checkbox *,
+html:not(.light-mode) #btn-hero-watch-now,
+html:not(.light-mode) #btn-hero-watch-now *,
+html:not(.light-mode) #btn-add-stream-submit,
+html:not(.light-mode) #btn-add-stream-submit *,
+html:not(.light-mode) .btn-fd932f,
+html:not(.light-mode) .btn-fd932f *,
+html:not(.light-mode) button[class*="bg-[#4cc2ff]"]:not([class*="bg-[#4cc2ff]/"]),
+html:not(.light-mode) button[class*="bg-[#4cc2ff]"]:not([class*="bg-[#4cc2ff]/"]) *,
+html:not(.light-mode) button[class*="bg-[#4CC2FF]"]:not([class*="bg-[#4CC2FF]/"]),
+html:not(.light-mode) button[class*="bg-[#4CC2FF]"]:not([class*="bg-[#4CC2FF]/"]) *,
+html:not(.light-mode) button[class*="bg-[#0063b8]"]:not([class*="bg-[#0063b8]/"]),
+html:not(.light-mode) button[class*="bg-[#0063b8]"]:not([class*="bg-[#0063b8]/"]) *,
+html:not(.light-mode) button[class*="bg-[#0063B8]"]:not([class*="bg-[#0063B8]/"]),
+html:not(.light-mode) button[class*="bg-[#0063B8]"]:not([class*="bg-[#0063B8]/"]) *,
+html:not(.light-mode) button[class*="bg-[#0067b8]"]:not([class*="bg-[#0067b8]/"]),
+html:not(.light-mode) button[class*="bg-[#0067b8]"]:not([class*="bg-[#0067b8]/"]) *,
+html:not(.light-mode) button[class*="bg-[#005fb8]"]:not([class*="bg-[#005fb8]/"]),
+html:not(.light-mode) button[class*="bg-[#005fb8]"]:not([class*="bg-[#005fb8]/"]) *,
+html:not(.light-mode) button[class*="bg-[#0078d4]"]:not([class*="bg-[#0078d4]/"]),
+html:not(.light-mode) button[class*="bg-[#0078d4]"]:not([class*="bg-[#0078d4]/"]) *,
+html:not(.light-mode) [style*="background-color: #4CC2FF"]:not(.fluent-3d-icon),
+html:not(.light-mode) [style*="background-color: #4CC2FF"]:not(.fluent-3d-icon) *,
+html:not(.light-mode) [style*="background-color: #4cc2ff"]:not(.fluent-3d-icon),
+html:not(.light-mode) [style*="background-color: #4cc2ff"]:not(.fluent-3d-icon) *,
+html:not(.light-mode) [style*="background-color: rgb(76, 194, 255)"]:not(.fluent-3d-icon),
+html:not(.light-mode) [style*="background-color: rgb(76, 194, 255)"]:not(.fluent-3d-icon) * {
+  color: #000000 !important;
+}
+
+html:not(.light-mode) .fluent-btn-primary svg,
+html:not(.light-mode) .fluent-btn-primary path,
+html:not(.light-mode) button[class*="bg-[#4cc2ff]"]:not([class*="bg-[#4cc2ff]/"]) svg,
+html:not(.light-mode) button[class*="bg-[#4cc2ff]"]:not([class*="bg-[#4cc2ff]/"]) path,
+html:not(.light-mode) button[class*="bg-[#4CC2FF]"]:not([class*="bg-[#4CC2FF]/"]) svg,
+html:not(.light-mode) button[class*="bg-[#4CC2FF]"]:not([class*="bg-[#4CC2FF]/"]) path,
+html:not(.light-mode) [style*="background-color: #4CC2FF"]:not(.fluent-3d-icon) svg,
+html:not(.light-mode) [style*="background-color: #4cc2ff"]:not(.fluent-3d-icon) svg,
+html:not(.light-mode) [style*="background-color: rgb(76, 194, 255)"]:not(.fluent-3d-icon) svg {
+  color: #000000 !important;
+  stroke: #000000 !important;
 }
 
 html.light-mode .gallery-toolbar button,
@@ -9119,7 +9329,7 @@ html.no-shiny-outline #livetv-category-tabs button:not(#btn-livetv-open-epg-side
 
 /* WinUI 3 Blue Colored Accent Button for Add Custom Channel in Watch tab */
 #btn-livetv-add-custom-channel {
-  background-color: #0067b8 !important; /* WinUI 3 Blue Light Mode */
+  background-color: #0063B8 !important; /* WinUI 3 Blue Light Mode */
   color: #ffffff !important;
   border: 1px solid rgba(0, 0, 0, 0.14) !important;
   border-bottom: 1px solid rgba(0, 0, 0, 0.28) !important;
@@ -9140,19 +9350,19 @@ html.no-shiny-outline #livetv-category-tabs button:not(#btn-livetv-open-epg-side
 }
 
 #btn-livetv-add-custom-channel:hover {
-  background-color: #005aa3 !important;
+  background-color: #0058a6 !important;
   color: #ffffff !important;
 }
 
 #btn-livetv-add-custom-channel:active {
-  background-color: #004c8c !important;
+  background-color: #004c91 !important;
   color: #ffffff !important;
   transform: scale(0.96) !important;
 }
 
-/* Light mode specific: WinUI 3 Blue (#0067b8) */
+/* Light mode specific: WinUI 3 Blue (#0063B8) */
 html.light-mode #btn-livetv-add-custom-channel {
-  background-color: #0067b8 !important;
+  background-color: #0063B8 !important;
   color: #ffffff !important;
   border: 1px solid rgba(0, 0, 0, 0.15) !important;
   border-bottom: 1px solid rgba(0, 0, 0, 0.3) !important;
@@ -9166,12 +9376,12 @@ html.light-mode #btn-livetv-add-custom-channel * {
 }
 
 html.light-mode #btn-livetv-add-custom-channel:hover {
-  background-color: #005aa3 !important;
+  background-color: #0058a6 !important;
   color: #ffffff !important;
 }
 
 html.light-mode #btn-livetv-add-custom-channel:active {
-  background-color: #004c8c !important;
+  background-color: #004c91 !important;
   color: #ffffff !important;
 }
 
@@ -9395,4 +9605,83 @@ html.light-mode [role="menu"] {
 html.light-mode .fluent-context-menu {
   backdrop-filter: blur(40px) saturate(180%) !important;
   -webkit-backdrop-filter: blur(40px) saturate(180%) !important;
+}
+
+/* File Explorer search & address inputs: strictly no bottom underline or focus border */
+#fe-search-box input,
+#fe-search-box input:focus,
+#fe-address-box input,
+#fe-address-box input:focus,
+html.light-mode #fe-search-box input,
+html.light-mode #fe-search-box input:focus,
+html.light-mode #fe-address-box input,
+html.light-mode #fe-address-box input:focus {
+  border: none !important;
+  border-bottom: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  background-color: transparent !important;
+  text-decoration: none !important;
+}
+
+/* File Explorer colored "Import" button next to + new tab */
+/* Dark mode: WinUI 3 #4CC2FF background with black text & icons */
+html:not(.light-mode) #btn-fe-import-device,
+html.dark #btn-fe-import-device {
+  background-color: #4CC2FF !important;
+  background-image: none !important;
+  color: #000000 !important;
+  border: 1px solid rgba(255, 255, 255, 0.20) !important;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.30) !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.35) !important;
+}
+
+html:not(.light-mode) #btn-fe-import-device:hover,
+html.dark #btn-fe-import-device:hover {
+  background-color: #6bd0ff !important;
+  color: #000000 !important;
+}
+
+html:not(.light-mode) #btn-fe-import-device:active,
+html.dark #btn-fe-import-device:active {
+  background-color: #3bb2ef !important;
+  color: #000000 !important;
+}
+
+html:not(.light-mode) #btn-fe-import-device svg,
+html:not(.light-mode) #btn-fe-import-device span,
+html:not(.light-mode) #btn-fe-import-device *,
+html.dark #btn-fe-import-device svg,
+html.dark #btn-fe-import-device span,
+html.dark #btn-fe-import-device * {
+  color: #000000 !important;
+  stroke: #000000 !important;
+}
+
+/* Light mode: WinUI 3 #0063B8 background with white text & icons */
+html.light-mode #btn-fe-import-device {
+  background-color: #0063B8 !important;
+  background-image: none !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(0, 0, 0, 0.14) !important;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.28) !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.16) !important;
+}
+
+html.light-mode #btn-fe-import-device:hover {
+  background-color: #0058a6 !important;
+  color: #ffffff !important;
+}
+
+html.light-mode #btn-fe-import-device:active {
+  background-color: #004c91 !important;
+  color: #ffffff !important;
+}
+
+html.light-mode #btn-fe-import-device svg,
+html.light-mode #btn-fe-import-device span,
+html.light-mode #btn-fe-import-device * {
+  color: #ffffff !important;
+  stroke: #ffffff !important;
 }

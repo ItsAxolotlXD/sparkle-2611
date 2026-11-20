@@ -51,7 +51,8 @@ import {
   Fluent3DHomeIcon,
   Fluent3DCalculatorIcon,
   Fluent3DMapsIcon,
-  Fluent3DMailIcon
+  Fluent3DMailIcon,
+  Fluent3DFileExplorerIcon
 } from './Fluent3DIcons';
 import { motion, AnimatePresence, LayoutGroup } from 'motion/react';
 import { useSettings, SystemSettings } from '../hooks/useSettings';
@@ -532,6 +533,7 @@ export const TopBar: React.FC<TopBarProps> = ({
       { id: 'page-notes', title: 'Notes', subtitle: 'Switch page', keywords: 'ghi chú soạn thảo notes office', type: 'page', onSelect: () => navigate('/notes') },
       { id: 'page-screenbox', title: 'Screenbox', subtitle: 'Switch page', keywords: 'screenbox screenbug vlc media player phát video âm thanh stream disc network equalizer open url', type: 'page', onSelect: () => navigate('/screenbox') },
       { id: 'page-camera', title: 'Camera', subtitle: 'Switch page', keywords: 'camera máy ảnh chụp ảnh camera rolls webcam snapshot photo insider', type: 'page', onSelect: () => navigate('/camera') },
+      { id: 'page-file-explorer', title: 'File Explorer', subtitle: 'Switch page', keywords: 'file explorer files folders drives documents downloads pictures explorer tep tin thu muc', type: 'page', onSelect: () => navigate('/file-explorer') },
       { id: 'page-html-writer', title: 'HTML Writer', subtitle: 'Switch page', keywords: 'html writer code editor css js preview winui 3 lập trình web chạy thử html', type: 'page', onSelect: () => navigate('/html-writer') },
       { id: 'page-pc-settings', title: 'PC Settings', subtitle: 'Switch page', keywords: 'pc settings windows 11 system bluetooth network personalization windows update', type: 'page', onSelect: () => navigate('/pc-settings') },
       { id: 'page-settings', title: 'Settings', subtitle: 'Switch page', keywords: 'cài đặt hệ thống settings preferences', type: 'page', onSelect: () => navigate('/settings') },
@@ -1288,6 +1290,15 @@ export const TopBar: React.FC<TopBarProps> = ({
       );
     }
 
+    // File Explorer
+    if (q.includes('file explorer') || q.includes('explorer') || q.includes('tệp tin') || q.includes('thư mục')) {
+      return (
+        <div className="w-8.5 h-8.5 flex items-center justify-center shrink-0">
+          <Fluent3DFileExplorerIcon className="w-7 h-7 drop-shadow-sm" />
+        </div>
+      );
+    }
+
     // 2. Minecraft / Craftmine / Game
     if (q.includes('minecraft') || q.includes('craftmine') || q.includes('game') || q.includes('play') || q.includes('chơi')) {
       return (
@@ -1912,6 +1923,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                     if (currentRoute.startsWith('/vlc') || currentRoute.startsWith('/screenbox')) return 'Search Screenbox';
                     if (currentRoute.startsWith('/craftmine')) return 'Search Craftmine';
                     if (currentRoute.startsWith('/photopea')) return 'Search Photopea';
+                    if (currentRoute.startsWith('/file-explorer')) return 'Search File Explorer';
                     if (currentRoute.startsWith('/html-writer')) return 'Search HTML Writer';
                     if (currentRoute.startsWith('/pc-settings')) return 'Search PC Settings';
                     if (currentRoute.startsWith('/settings')) return 'Search settings';

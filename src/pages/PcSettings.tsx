@@ -37,6 +37,12 @@ import {
 import { useSettings } from '../hooks/useSettings';
 import { modalDialogVariants, modalBackdropVariants } from '../utils/animations';
 import { showAppToast } from '../utils/toast';
+import {
+  DEFAULT_WALLPAPER_ID,
+  WINDOWS_WALLPAPERS,
+  getWallpaperById,
+  type WallpaperOption,
+} from '../constants/wallpapers';
 
 type PcCategoryId =
   | 'home'
@@ -101,8 +107,8 @@ const DEFAULT_PC_SETTINGS: PcSettingsState = {
   deviceName: 'vm-w11-ssd',
   deviceModel: 'Sparkle Workstation 24H2',
   userName: 'Sparkle User',
-  userEmail: 'sonhuyc2kl@gmail.com',
-  selectedThemeId: 'win11-bloom-light',
+  userEmail: 'Unregistered Account',
+  selectedThemeId: DEFAULT_WALLPAPER_ID,
   brightness: 82,
   displayScale: '100% (Recommended)',
   nightLight: false,
@@ -136,65 +142,7 @@ const DEFAULT_PC_SETTINGS: PcSettingsState = {
   tempFilesGb: 2.4,
 };
 
-interface ThemeThumbnailOption {
-  id: string;
-  label: string;
-  mode: 'light' | 'dark';
-  image: string;
-  accent: string;
-  taskbarBg: string;
-}
-
-const WIN11_THEMES: ThemeThumbnailOption[] = [
-  {
-    id: 'win11-bloom-light',
-    label: 'Windows (light)',
-    mode: 'light',
-    image: '/assets/aistudio/Wallpaper_Alchemy_-_Windows_11_Abstract_Wave_Wallpaper_4K_e12d77d6.png',
-    accent: '#0067b8',
-    taskbarBg: 'bg-white/85',
-  },
-  {
-    id: 'win11-bloom-dark',
-    label: 'Windows (dark)',
-    mode: 'dark',
-    image: '/assets/aistudio/Wallpaper_Alchemy_-_Windows_11_Abstract_Wave_Wallpaper_4K_e12d77d6.png',
-    accent: '#4cc2ff',
-    taskbarBg: 'bg-[#1c2026]/90',
-  },
-  {
-    id: 'win11-nebula',
-    label: 'Captured Motion',
-    mode: 'dark',
-    image: '/background-nebula.svg',
-    accent: '#4cc2ff',
-    taskbarBg: 'bg-[#1f242c]/90',
-  },
-  {
-    id: 'win11-flora',
-    label: 'Sunrise Flora',
-    mode: 'light',
-    image: '/assets/aistudio/pink-nature-landscape-with-vegetation-flora_8a81cb83.jpg',
-    accent: '#0067b8',
-    taskbarBg: 'bg-white/85',
-  },
-  {
-    id: 'win11-glow',
-    label: 'Glow Wave',
-    mode: 'dark',
-    image: '/home-fluent.jpg',
-    accent: '#4cc2ff',
-    taskbarBg: 'bg-[#20232a]/90',
-  },
-  {
-    id: 'win11-classic',
-    label: 'Sparkle Horizon',
-    mode: 'light',
-    image: '/assets/winui3/hero_banner_clean.png',
-    accent: '#0067b8',
-    taskbarBg: 'bg-white/85',
-  },
-];
+const WIN11_THEMES: WallpaperOption[] = WINDOWS_WALLPAPERS;
 
 interface NavCategoryDef {
   id: PcCategoryId;
@@ -221,6 +169,7 @@ const NAV_CATEGORIES: NavCategoryDef[] = [
 
 interface PcSettingsProps {
   navigate?: (route: string) => void;
+  initialCategory?: PcCategoryId;
 }
 
 const WinSwitch: React.FC<{
@@ -250,7 +199,7 @@ const WinSwitch: React.FC<{
   </button>
 );
 
-export const PcSettings: React.FC<PcSettingsProps> = ({ navigate }) => {
+export const PcSettings: React.FC<PcSettingsProps> = ({ navigate, initialCategory }) => {
   const { settings, updateSetting } = useSettings();
   const isLightMode = settings.theme === 'light';
 
@@ -258,13 +207,20 @@ export const PcSettings: React.FC<PcSettingsProps> = ({ navigate }) => {
     try {
       const raw = localStorage.getItem(PC_SETTINGS_STORAGE_KEY);
       if (raw) {
-        return { ...DEFAULT_PC_SETTINGS, ...JSON.parse(raw) };
+        const merged = { ...DEFAULT_PC_SETTINGS, ...JSON.parse(raw) };
+        if (merged.userEmail === 'sonhuyc2kl@gmail.com') {
+          merged.userEmail = 'Unregistered Account';
+        }
+        if (!WINDOWS_WALLPAPERS.some((w) => w.id === merged.selectedThemeId)) {
+          merged.selectedThemeId = DEFAULT_WALLPAPER_ID;
+        }
+        return merged;
       }
     } catch {}
     return DEFAULT_PC_SETTINGS;
   });
 
-  const [activeCategory, setActiveCategory] = useState<PcCategoryId>('home');
+  const [activeCategory, setActiveCategory] = useState<PcCategoryId>(initialCategory || 'home');
   const [searchQuery, setSearchQuery] = useState('');
   const [isRenameOpen, setIsRenameOpen] = useState(false);
   const [renameDraft, setRenameDraft] = useState(pcState.deviceName);
@@ -299,17 +255,26 @@ export const PcSettings: React.FC<PcSettingsProps> = ({ navigate }) => {
     );
   }, [searchQuery]);
 
+  useEffect(() => {
+    if (initialCategory) {
+      setActiveCategory(initialCategory);
+    }
+  }, [initialCategory]);
+
+  const currentWallpaperId = settings.windowsWallpaper || pcState.selectedThemeId || DEFAULT_WALLPAPER_ID;
+
   const activeTheme = useMemo(
-    () => WIN11_THEMES.find((t) => t.id === pcState.selectedThemeId) || WIN11_THEMES[0],
-    [pcState.selectedThemeId]
+    () => getWallpaperById(currentWallpaperId),
+    [currentWallpaperId]
   );
 
-  const handleSelectTheme = (theme: ThemeThumbnailOption) => {
+  const handleSelectTheme = (theme: WallpaperOption) => {
     updatePc('selectedThemeId', theme.id);
+    updateSetting('windowsWallpaper', theme.id);
     if (theme.mode !== settings.theme) {
       updateSetting('theme', theme.mode);
     }
-    showAppToast(`Đã áp dụng giao diện ${theme.label}`, { appName: 'PC Settings' });
+    showAppToast(`Đã áp dụng hình nền ${theme.label}`, { appName: 'PC Settings' });
   };
 
   const handleCheckUpdates = () => {
@@ -587,9 +552,9 @@ export const PcSettings: React.FC<PcSettingsProps> = ({ navigate }) => {
                       Personalize your device
                     </h2>
 
-                    <div className="grid grid-cols-3 gap-2.5">
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
                       {WIN11_THEMES.map((theme) => {
-                        const selected = pcState.selectedThemeId === theme.id;
+                        const selected = currentWallpaperId === theme.id;
                         return (
                           <button
                             key={theme.id}
@@ -1048,9 +1013,9 @@ export const PcSettings: React.FC<PcSettingsProps> = ({ navigate }) => {
             <div className="space-y-4">
               <div className={`${cardClass} p-4 space-y-3`}>
                 <div className="text-[14.5px] font-semibold">Select a theme to apply</div>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                   {WIN11_THEMES.map((theme) => {
-                    const active = pcState.selectedThemeId === theme.id;
+                    const active = currentWallpaperId === theme.id;
                     return (
                       <button
                         key={theme.id}
@@ -1161,9 +1126,10 @@ export const PcSettings: React.FC<PcSettingsProps> = ({ navigate }) => {
                   <div>
                     <label className="block text-[11.5px] text-[#6b7280] dark:text-[#9ca3af] mb-1">Account email</label>
                     <input
-                      type="email"
+                      type="text"
                       value={pcState.userEmail}
                       onChange={(e) => updatePc('userEmail', e.target.value)}
+                      placeholder="Unregistered Account"
                       className="w-full h-[34px] px-3 rounded-[6px] bg-white dark:bg-[#1f2329] border border-black/15 dark:border-white/15 text-[13px] outline-none focus:border-[#0067b8] dark:focus:border-[#4cc2ff]"
                     />
                   </div>

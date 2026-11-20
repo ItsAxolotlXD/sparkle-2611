@@ -38,6 +38,7 @@ import {
   Fluent3DDiscordIcon,
   Fluent3DHtmlWriterIcon,
   Fluent3DPcSettingsIcon,
+  Fluent3DFileExplorerIcon,
 } from './Fluent3DIcons';
 import { FluentPersonFeedbackIcon, FluentSearchIcon } from './FluentIcons';
 import { useSettings, getTaskbarHeightPx, getWindowsUiScaleMultiplier } from '../hooks/useSettings';
@@ -236,6 +237,13 @@ export const WindowsStartMenu: React.FC<WindowsStartMenuProps> = ({
         route: '/photopea',
         keywords: 'photopea photoshop image editor',
         renderIcon: (cls = 'w-8 h-8') => <Fluent3DPhotopeaIcon className={cls} />,
+      },
+      {
+        id: 'app-file-explorer',
+        label: 'File Explorer',
+        route: '/file-explorer',
+        keywords: 'file explorer files folders drives documents downloads pictures explorer tep tin thu muc',
+        renderIcon: (cls = 'w-8 h-8') => <Fluent3DFileExplorerIcon className={cls} />,
       },
       {
         id: 'app-html-writer',

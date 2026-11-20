@@ -50,10 +50,12 @@ import { Feedback } from './pages/Feedback';
 import { WinUI3 } from './pages/WinUI3';
 import { HtmlWriter } from './pages/HtmlWriter';
 import { PcSettings } from './pages/PcSettings';
+import { FileExplorer } from './pages/FileExplorer';
 import { CHANNELS_DATA } from './data/channels';
 import { NEWS_DATA } from './data/news';
 import { Channel, NewsArticle } from './types';
 import { useSettings, getTaskbarHeightPx } from './hooks/useSettings';
+import { getWallpaperById } from './constants/wallpapers';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
 import { type AppTab } from './components/SparkleTabBar';
 import { WindowFrame, type AppWindowState } from './components/WindowFrame';
@@ -85,6 +87,7 @@ export function getRouteTitle(route: string, channel?: Channel): string {
   if (route.startsWith('/winui-3') || route.startsWith('/winui')) return 'WinUI 3';
   if (route.startsWith('/html-writer')) return 'HTML Writer';
   if (route.startsWith('/pc-settings')) return 'PC Settings';
+  if (route.startsWith('/file-explorer')) return 'File Explorer';
   if (route.startsWith('/feedback')) return 'Feedback';
   if (route.startsWith('/channels')) return 'Channels';
   if (route.startsWith('/favorites')) return 'Favorites';
@@ -906,6 +909,7 @@ export default function App() {
         if (b === '/draws' || b.startsWith('/draws/')) return 'draws';
         if (b === '/html-writer' || b.startsWith('/html-writer/')) return 'html-writer';
         if (b === '/pc-settings' || b.startsWith('/pc-settings/')) return 'pc-settings';
+        if (b === '/file-explorer' || b.startsWith('/file-explorer/')) return 'file-explorer';
         if (b === '/settings' || b.startsWith('/settings')) return 'settings';
         return b;
       };
@@ -1471,7 +1475,15 @@ export default function App() {
         return <HtmlWriter />;
 
       case '/pc-settings':
-        return <PcSettings navigate={activeNav} />;
+        return (
+          <PcSettings
+            navigate={activeNav}
+            initialCategory={activeRoute.startsWith('/pc-settings/personalization') ? 'personalization' : undefined}
+          />
+        );
+
+      case '/file-explorer':
+        return <FileExplorer navigate={activeNav} />;
 
       default:
         return <HomePreview channels={channels} onSelectChannel={setCurrentChannel} navigate={activeNav} />;
@@ -1503,7 +1515,7 @@ export default function App() {
         style={
           isWindowsMode
             ? {
-                backgroundImage: "url('/assets/aistudio/image_9bd7238e.png')",
+                backgroundImage: `url('${getWallpaperById(settings.windowsWallpaper).image}')`,
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',
                 backgroundRepeat: 'no-repeat',
@@ -1557,7 +1569,11 @@ export default function App() {
       {/* Main App Container */}
       <div
         style={isWindowsMode ? { paddingBottom: `${taskbarHeight}px` } : undefined}
-        className={`flex-1 flex flex-col min-w-0 min-h-screen transition-[padding] duration-[160ms] ease-[cubic-bezier(0.34,1.45,0.64,1)] ${
+        className={`flex-1 flex flex-col min-w-0 ${
+        !isWindowsMode && (currentRoute === '/file-explorer' || currentRoute.startsWith('/file-explorer/'))
+          ? 'h-screen overflow-hidden'
+          : 'min-h-screen'
+      } transition-[padding] duration-[160ms] ease-[cubic-bezier(0.34,1.45,0.64,1)] ${
         isWindowsMode ? 'relative z-[1] !bg-transparent' : 'bg-[#f3f3f3] dark:bg-[#1b1f24]'
       } ${
         isWindowsMode
@@ -1673,7 +1689,7 @@ export default function App() {
 
             {/* Dynamic Page Content with slide transition between tab pages like touch keyboard (no splash screen) */}
             <main className={`main-tab-page relative flex-1 w-full mx-auto rounded-tl-none md:rounded-tl-[10px] rounded-tr-none rounded-br-none rounded-bl-none overflow-hidden bg-[#f9f9f9] dark:bg-[#282c31] ${
-              currentRoute === '/' || currentRoute === '/home' || currentRoute === '/news' || currentRoute === '/updates' || isOfficeRoute || currentRoute === '/craftmine' || currentRoute === '/photopea' || currentRoute === '/vlc' || currentRoute === '/screenbox' || currentRoute === '/screenbug' || currentRoute === '/gallery' || currentRoute === '/draws' || currentRoute.startsWith('/draws/') || currentRoute === '/camera' || currentRoute === '/html-writer' || currentRoute.startsWith('/html-writer/') || currentRoute === '/pc-settings' || currentRoute.startsWith('/pc-settings/')
+              currentRoute === '/' || currentRoute === '/home' || currentRoute === '/news' || currentRoute === '/updates' || isOfficeRoute || currentRoute === '/craftmine' || currentRoute === '/photopea' || currentRoute === '/vlc' || currentRoute === '/screenbox' || currentRoute === '/screenbug' || currentRoute === '/gallery' || currentRoute === '/draws' || currentRoute.startsWith('/draws/') || currentRoute === '/camera' || currentRoute === '/html-writer' || currentRoute.startsWith('/html-writer/') || currentRoute === '/pc-settings' || currentRoute.startsWith('/pc-settings/') || currentRoute === '/file-explorer' || currentRoute.startsWith('/file-explorer/')
                 ? 'p-0 max-w-none pt-0' 
                 : 'px-4 sm:px-6 md:px-8 py-5 max-w-7xl'
             } ${
@@ -1783,7 +1799,7 @@ export default function App() {
                     id: 'desk-personalize',
                     label: 'Personalize',
                     icon: <Palette className="w-4 h-4" />,
-                    onSelect: () => openOrFocusAppWindow('/settings'),
+                    onSelect: () => openOrFocusAppWindow('/pc-settings/personalization'),
                   },
                   {
                     id: 'desk-exit-win',

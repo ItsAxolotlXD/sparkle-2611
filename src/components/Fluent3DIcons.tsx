@@ -767,6 +767,16 @@ export const Fluent3DPcSettingsIcon: React.FC<Fluent3DIconProps> = ({ className 
   </svg>
 );
 
+export const FILE_EXPLORER_ICON_URL = '/assets/aistudio/image_9f10cca3.png';
 
-
-
+// 20. File Explorer - Exact Windows 11 File Explorer Icon
+export const Fluent3DFileExplorerIcon: React.FC<Fluent3DIconProps> = ({ className = 'w-5 h-5', style }) => (
+  <div className={`fluent-3d-icon ${className} shrink-0 flex items-center justify-center`} style={style}>
+    <img
+      src={FILE_EXPLORER_ICON_URL}
+      alt="File Explorer"
+      draggable={false}
+      className="fluent-3d-icon w-full h-full object-contain select-none pointer-events-none"
+    />
+  </div>
+);

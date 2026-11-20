@@ -47,6 +47,7 @@ import {
   Fluent3DMailIcon,
   Fluent3DUpdatesIcon,
   Fluent3DDiscordIcon,
+  Fluent3DFileExplorerIcon,
 } from './Fluent3DIcons';
 import { FluentSearchIcon } from './FluentIcons';
 import { FluentEmojiText } from './FluentEmoji';
@@ -54,6 +55,12 @@ import { NEWS_DATA } from '../data/news';
 import { Channel } from '../types';
 import { galleryDB, GalleryMediaItem } from '../services/galleryStorage';
 import { showAppToast } from '../utils/toast';
+import {
+  WindowsWidgetsBoard,
+  CITY_WEATHER_DATA,
+  loadWidgetsPrefs,
+  FluentWeatherIcon,
+} from './WindowsWidgetsBoard';
 
 function stripHtml(html: string): string {
   return (html || '').replace(/<[^>]*>?/gm, ' ').replace(/\s+/g, ' ').trim();
@@ -157,6 +164,68 @@ export const WindowsTaskbar: React.FC<WindowsTaskbarProps> = ({
   const flyoutBottomOffset = taskbarHeight + 8;
   const isLeftAligned = settings.taskbarAlignment === 'left';
   const isSearchButtonMode = settings.taskbarSearchStyle === 'button';
+
+  // Widgets Dashboard state & synced city weather
+  const [isWidgetsOpen, setIsWidgetsOpen] = useState(false);
+  const [widgetsPrefs, setWidgetsPrefs] = useState(() => loadWidgetsPrefs());
+  const weatherHoverTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    const onPrefsChanged = (e: Event) => {
+      const detail = (e as CustomEvent).detail;
+      if (detail) setWidgetsPrefs(detail);
+      else setWidgetsPrefs(loadWidgetsPrefs());
+    };
+    window.addEventListener('sparkle:widgets-prefs-changed', onPrefsChanged);
+    return () => window.removeEventListener('sparkle:widgets-prefs-changed', onPrefsChanged);
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (weatherHoverTimerRef.current) clearTimeout(weatherHoverTimerRef.current);
+    };
+  }, []);
+
+  const activeCityWeather = useMemo(
+    () => CITY_WEATHER_DATA.find((c) => c.id === widgetsPrefs.selectedCityId) || CITY_WEATHER_DATA[0],
+    [widgetsPrefs.selectedCityId]
+  );
+
+  const handleToggleWidgets = () => {
+    onCloseStartMenu();
+    onCloseDirectCommand();
+    setIsSearchOpen(false);
+    setIsQuickSettingsOpen(false);
+    setIsTrayOverflowOpen(false);
+    setIsTaskViewOpen(false);
+    setHoverTooltip(null);
+    setIsWidgetsOpen((prev) => !prev);
+  };
+
+  const handleWeatherMouseEnter = (e: React.MouseEvent<HTMLElement>) => {
+    showTooltip('Widgets', e);
+    if (widgetsPrefs.openOnHover && !isWidgetsOpen) {
+      if (weatherHoverTimerRef.current) clearTimeout(weatherHoverTimerRef.current);
+      weatherHoverTimerRef.current = setTimeout(() => {
+        onCloseStartMenu();
+        onCloseDirectCommand();
+        setIsSearchOpen(false);
+        setIsQuickSettingsOpen(false);
+        setIsTrayOverflowOpen(false);
+        setIsTaskViewOpen(false);
+        setHoverTooltip(null);
+        setIsWidgetsOpen(true);
+      }, 300);
+    }
+  };
+
+  const handleWeatherMouseLeave = () => {
+    setHoverTooltip(null);
+    if (weatherHoverTimerRef.current) {
+      clearTimeout(weatherHoverTimerRef.current);
+      weatherHoverTimerRef.current = null;
+    }
+  };
 
   const btnSizeClass =
     taskbarScale === 'small'
@@ -421,9 +490,15 @@ export const WindowsTaskbar: React.FC<WindowsTaskbarProps> = ({
     return () => clearTimeout(t);
   }, [isSearchOpen]);
 
-  // Pinned taskbar apps: only Settings (Start, Search, Task View are built-in taskbar controls)
+  // Pinned taskbar apps: File Explorer and Settings
   const pinnedApps: PinnedAppDef[] = useMemo(
     () => [
+      {
+        id: 'pin-file-explorer',
+        title: 'File Explorer',
+        route: '/file-explorer',
+        matchPrefixes: ['/file-explorer'],
+      },
       {
         id: 'pin-settings',
         title: 'Settings',
@@ -539,6 +614,7 @@ export const WindowsTaskbar: React.FC<WindowsTaskbarProps> = ({
       { id: 'page-notes', title: 'Notes', subtitle: 'Switch page', keywords: 'ghi chú soạn thảo notes office', type: 'page', onSelect: () => onLaunchRoute('/notes') },
       { id: 'page-screenbox', title: 'Screenbox', subtitle: 'Switch page', keywords: 'screenbox screenbug vlc media player phát video âm thanh stream disc network equalizer open url', type: 'page', onSelect: () => onLaunchRoute('/screenbox') },
       { id: 'page-camera', title: 'Camera', subtitle: 'Switch page', keywords: 'camera máy ảnh chụp ảnh camera rolls webcam snapshot photo insider', type: 'page', onSelect: () => onLaunchRoute('/camera') },
+      { id: 'page-file-explorer', title: 'File Explorer', subtitle: 'Switch page', keywords: 'file explorer files folders drives documents downloads pictures explorer tep tin thu muc', type: 'page', onSelect: () => onLaunchRoute('/file-explorer') },
       { id: 'page-html-writer', title: 'HTML Writer', subtitle: 'Switch page', keywords: 'html writer code editor css js preview winui 3 viet chay html', type: 'page', onSelect: () => onLaunchRoute('/html-writer') },
       { id: 'page-pc-settings', title: 'PC Settings', subtitle: 'Switch page', keywords: 'pc settings windows 11 system bluetooth network personalization windows update', type: 'page', onSelect: () => onLaunchRoute('/pc-settings') },
       { id: 'page-settings', title: 'Settings', subtitle: 'Switch page', keywords: 'cài đặt hệ thống settings preferences', type: 'page', onSelect: () => onLaunchRoute('/settings') },
@@ -987,6 +1063,13 @@ export const WindowsTaskbar: React.FC<WindowsTaskbarProps> = ({
       );
     }
 
+    if (q.includes('file explorer') || q.includes('explorer') || q.includes('thu muc') || q.includes('tệp tin')) {
+      return (
+        <div className="w-8.5 h-8.5 flex items-center justify-center shrink-0">
+          <Fluent3DFileExplorerIcon className="w-7 h-7 drop-shadow-sm" />
+        </div>
+      );
+    }
     if (q.includes('minecraft') || q.includes('craftmine') || q.includes('game') || q.includes('play') || q.includes('chơi')) {
       return (
         <div className="w-8.5 h-8.5 flex items-center justify-center shrink-0">
@@ -1266,33 +1349,22 @@ export const WindowsTaskbar: React.FC<WindowsTaskbarProps> = ({
           <button
             id="btn-taskbar-weather"
             type="button"
-            onClick={() => {
-              onCloseDirectCommand();
-              onLaunchRoute('/news');
-            }}
-            onMouseEnter={(e) => showTooltip('Weather & Feed', e)}
-            onMouseLeave={() => setHoverTooltip(null)}
-            className="hidden md:flex items-center gap-2.5 h-[38px] px-2.5 rounded-[6px] hover:bg-black/[0.06] dark:hover:bg-white/[0.08] active:scale-[0.98] transition-all cursor-pointer border-0 outline-none focus:outline-none shrink-0 text-left"
+            onClick={handleToggleWidgets}
+            onMouseEnter={handleWeatherMouseEnter}
+            onMouseLeave={handleWeatherMouseLeave}
+            aria-expanded={isWidgetsOpen}
+            className={`hidden md:flex items-center gap-2.5 h-[38px] px-2.5 rounded-[6px] active:scale-[0.98] transition-all cursor-pointer border-0 outline-none focus:outline-none shrink-0 text-left ${
+              isWidgetsOpen
+                ? 'bg-black/[0.08] dark:bg-white/[0.12]'
+                : 'hover:bg-black/[0.06] dark:hover:bg-white/[0.08]'
+            }`}
           >
-            <svg
-              id="windows-taskbar-weather-sun"
-              className="w-6 h-6 shrink-0 fluent-3d-icon"
-              viewBox="0 0 28 28"
-              fill="none"
-              stroke="none"
-            >
-              <defs>
-                <radialGradient id="win11_sunny_grad" cx="40%" cy="35%" r="65%">
-                  <stop offset="0%" stopColor="#FDE047" />
-                  <stop offset="55%" stopColor="#F59E0B" />
-                  <stop offset="100%" stopColor="#EA580C" />
-                </radialGradient>
-              </defs>
-              <circle cx="14" cy="14" r="9" fill="url(#win11_sunny_grad)" stroke="none" strokeWidth={0} />
-            </svg>
+            <div id="windows-taskbar-weather-sun" className="w-6 h-6 shrink-0 flex items-center justify-center">
+              <FluentWeatherIcon type={activeCityWeather.condition} className="w-6 h-6" />
+            </div>
             <div className="leading-tight">
-              <div className="text-[12px] font-medium">32°C</div>
-              <div className="text-[11px] text-black/65 dark:text-white/70">Sunny</div>
+              <div className="text-[12px] font-medium tabular-nums">{activeCityWeather.temp}°C</div>
+              <div className="text-[11px] text-black/65 dark:text-white/70">{activeCityWeather.conditionLabel}</div>
             </div>
           </button>
         )}
@@ -1310,6 +1382,7 @@ export const WindowsTaskbar: React.FC<WindowsTaskbarProps> = ({
             id="btn-taskbar-start"
             type="button"
             onClick={() => {
+              setIsWidgetsOpen(false);
               setIsQuickSettingsOpen(false);
               setIsTrayOverflowOpen(false);
               setIsTaskViewOpen(false);
@@ -2074,31 +2147,20 @@ export const WindowsTaskbar: React.FC<WindowsTaskbarProps> = ({
             <button
               id="btn-taskbar-weather"
               type="button"
-              onClick={() => {
-                onCloseDirectCommand();
-                onLaunchRoute('/news');
-              }}
-              onMouseEnter={(e) => showTooltip('Weather & Feed', e)}
-              onMouseLeave={() => setHoverTooltip(null)}
-              className="hidden lg:flex items-center gap-2 h-[34px] px-2 rounded-[5px] hover:bg-black/[0.06] dark:hover:bg-white/[0.08] active:scale-[0.98] transition-all cursor-pointer border-0 outline-none focus:outline-none shrink-0 text-left mr-0.5"
+              onClick={handleToggleWidgets}
+              onMouseEnter={handleWeatherMouseEnter}
+              onMouseLeave={handleWeatherMouseLeave}
+              aria-expanded={isWidgetsOpen}
+              className={`hidden lg:flex items-center gap-2 h-[34px] px-2 rounded-[5px] active:scale-[0.98] transition-all cursor-pointer border-0 outline-none focus:outline-none shrink-0 text-left mr-0.5 ${
+                isWidgetsOpen
+                  ? 'bg-black/[0.08] dark:bg-white/[0.12]'
+                  : 'hover:bg-black/[0.06] dark:hover:bg-white/[0.08]'
+              }`}
             >
-              <svg
-                id="windows-taskbar-weather-sun"
-                className="w-5 h-5 shrink-0 fluent-3d-icon"
-                viewBox="0 0 28 28"
-                fill="none"
-                stroke="none"
-              >
-                <defs>
-                  <radialGradient id="win11_sunny_grad_tray" cx="40%" cy="35%" r="65%">
-                    <stop offset="0%" stopColor="#FDE047" />
-                    <stop offset="55%" stopColor="#F59E0B" />
-                    <stop offset="100%" stopColor="#EA580C" />
-                  </radialGradient>
-                </defs>
-                <circle cx="14" cy="14" r="9" fill="url(#win11_sunny_grad_tray)" stroke="none" strokeWidth={0} />
-              </svg>
-              <span className="text-[11.5px] font-medium">32°C</span>
+              <div id="windows-taskbar-weather-sun" className="w-5 h-5 shrink-0 flex items-center justify-center">
+                <FluentWeatherIcon type={activeCityWeather.condition} className="w-5 h-5" />
+              </div>
+              <span className="text-[11.5px] font-medium tabular-nums">{activeCityWeather.temp}°C</span>
             </button>
           )}
 
@@ -2517,6 +2579,14 @@ export const WindowsTaskbar: React.FC<WindowsTaskbarProps> = ({
           />
         )}
       </AnimatePresence>
+
+      <WindowsWidgetsBoard
+        isOpen={isWidgetsOpen}
+        onClose={() => setIsWidgetsOpen(false)}
+        onLaunchRoute={onLaunchRoute}
+        channels={channels}
+        onSelectChannel={onSelectChannel}
+      />
     </>
   );
 };
